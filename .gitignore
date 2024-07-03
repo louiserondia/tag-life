@@ -1,0 +1,11 @@
+media/trash
+media/trash/*
+myenv
+myenv/*
+db.sqlite3
+taglife/__pycache__
+taglife/__pycache__/*
+apps/images/__pycache__
+apps/images/__pycache__/*
+apps/images/migrations
+apps/images/migrations/*

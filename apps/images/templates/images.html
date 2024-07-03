@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Images</title>
+</head>
+<body style="background-color: black; color: white;">
+
+    <form method="get" action="{% url 'import_images' %}">
+        <label for="tag">Filter by tag:</label>
+        <input type="text" id="tag" name="tag" value="{{ tag_filter|default:'' }}">
+        <button type="submit">Filter</button>
+    </form>
+    <h1>DICO</h1>
+    {% for k, v in dico.items %}
+    <h3>
+        {{k}} : {% for tag in v %} {{tag}} {% endfor %}
+    </h3>
+    {% endfor %}
+
+    <h1>Images</h1>
+    {% for image in images %}
+        <h2>{{ image.title }}</h2>
+        <img style="height: 15rem;" src="{{ image.image_field.url }}" alt="{{ image.title }}">
+        <button data-image-id="{{image.title}}" class="add-random-tag-button">Add random tag</button>
+        <div class="tags-container">
+            {% for tag in image.tags.all %}
+                <h3>{{tag.title}}</h3>
+            {% endfor %}
+        </div>    
+    {% endfor %}
+
+    <script type="module" src="{% static 'add_random_tag.js' %}"></script>
+</body>
+</html>

@@ -31,6 +31,7 @@
         </div>    
     {% endfor %}
 
+    <script id="dico-data" type="application/json">{{ dico|safe }}</script>
     <script type="module" src="{% static 'add_random_tag.js' %}"></script>
 </body>
 </html>

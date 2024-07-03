@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-import random
-from .jsonManager import dico, write_dico_to_json
+import random, json
+from .jsonManager import write_dico_to_json, printDico
 from .models import TagModel, ImageModel
 
 
@@ -20,8 +20,9 @@ def add_tags(image, tags):
     
 
 @require_POST
-def add_random_tag(_, imageId):
+def add_random_tag(request, imageId):
     try:
+        dico = json.loads(request.body.decode('utf-8'))['dico']
         image = ImageModel.objects.get(title=imageId)
         random_tag = f"Tag {random.randint(1, 10)}"
         if not image.tags.filter(title=random_tag).exists():

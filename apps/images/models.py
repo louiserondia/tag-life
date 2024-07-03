@@ -7,6 +7,7 @@ class TagModel(models.Model):
         return self.title
 
 class ImageModel(models.Model):
+    path = models.CharField(max_length=500)
     title = models.CharField(max_length=200)
     image_field = models.ImageField(upload_to='trash/')
     tags = models.ManyToManyField(TagModel, related_name='images')

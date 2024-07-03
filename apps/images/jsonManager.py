@@ -1,7 +1,6 @@
 from django.shortcuts import render
 import json
 
-dico = {}
 
 #------------------
 #   PARSE JSON
@@ -15,14 +14,16 @@ def write_dico_to_json(dico):
 def parse_json():
     with open('media/test.json', 'r') as json_file:
         data = json.load(json_file)
-
+    dico = {}
     for img, tags in data.items():
         dico[img] = tags
 
     write_dico_to_json(dico)
-    printDico()
     return dico
-    # return render(request, 'test.html', {'dico': res})
 
-def printDico():
+def printDico(dico):
+    print("")
+    print("------ dicoooo ------")
     print(json.dumps(dico, indent=4))
+    print("---------------------")
+    print("")

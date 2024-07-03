@@ -1,15 +1,11 @@
+import os
 from django.shortcuts import render
 from django.core.files import File
 from django.conf import settings
-from .models import ImageModel, TagModel
+from .models import ImageModel
 from .utils import clear_all
-import json, os
 from .jsonManager import write_dico_to_json, parse_json, printDico
 from .tagManager import add_tags
-
-#------------------------
-#       ADD IMAGES
-#------------------------
 
 def add_image_to_db(dico):
     for image, tags in dico.items():

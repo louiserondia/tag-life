@@ -1,10 +1,4 @@
-from django.shortcuts import render
 import json
-
-
-#------------------
-#   PARSE JSON
-#------------------
 
 def write_dico_to_json(dico):
     json_file = "media/images.json"

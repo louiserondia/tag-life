@@ -1,9 +1,8 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-import random, json
+import random
 from .jsonManager import parse_json, write_dico_to_json, printDico
 from .models import TagModel, ImageModel
-
 
 def add_tag(image, tag_name):
         tag, created = TagModel.objects.get_or_create(title=tag_name)
@@ -17,7 +16,6 @@ def add_tags(image, tags):
     for tag in tags:
         tag_list.append(add_tag(image, tag))
     return tag_list
-    
 
 @require_POST
 def add_random_tag(_, imageId):
@@ -33,4 +31,3 @@ def add_random_tag(_, imageId):
         return JsonResponse({'tags': tags})
     except ImageModel.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Image not found'}, status=404)
-

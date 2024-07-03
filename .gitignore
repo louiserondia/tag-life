@@ -1,5 +1,5 @@
-media/trash
-media/trash/*
+media\uploads
+media/uploads/*
 myenv
 myenv/*
 db.sqlite3

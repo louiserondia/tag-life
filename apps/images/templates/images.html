@@ -12,12 +12,6 @@
         <input type="text" id="tag" name="tag" value="{{ tag_filter|default:'' }}">
         <button type="submit">Filter</button>
     </form>
-    <h1>DICO</h1>
-    {% for k, v in dico.items %}
-    <h3>
-        {{k}} : {% for tag in v %} {{tag}} {% endfor %}
-    </h3>
-    {% endfor %}
 
     <h1>Images</h1>
     {% for image in images %}
@@ -31,7 +25,6 @@
         </div>    
     {% endfor %}
 
-    <script id="dico-data" type="application/json">{{ dico|safe }}</script>
     <script type="module" src="{% static 'add_random_tag.js' %}"></script>
 </body>
 </html>

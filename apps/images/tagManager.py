@@ -22,7 +22,7 @@ def add_random_tag(_, imageId):
     try:
         dico = parse_json()
         image = ImageModel.objects.get(title=imageId)
-        random_tag = f"Tag {random.randint(1, 10)}"
+        random_tag = f"tag{random.randint(1, 10)}"
         if not image.tags.filter(title=random_tag).exists():
             tag = add_tag(image, random_tag)
             dico[image.title].append(tag.title)

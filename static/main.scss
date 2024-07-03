@@ -1,0 +1,42 @@
+:root {
+    --darkmode-bgcolor: #080126;
+    --lightmode-bgcolor: #a09db3;
+
+    --darkmode-color: #e6e4f2;
+    --lightmode-color: #140a49;
+}
+
+body {
+    .yo {
+        color: black;
+    }
+    background-color: var(--darkmode-bgcolor);
+    color: var(--darkmode-color);
+    height: 200vh;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+}
+
+#title {
+    margin: auto;
+    font-size: 5rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 300;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.dessins {
+    height: 20rem;
+    width: 100%;
+}
+
+#thug-life {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}

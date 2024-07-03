@@ -10,3 +10,4 @@ apps/images/__pycache__/*
 apps/images/migrations
 apps/images/migrations/*
 taglife/settings.py
+taglife\settings.py

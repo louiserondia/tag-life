@@ -12,8 +12,6 @@ function updateTags(tags, newTags) {
 
 async function tryAddRandomTagRequest(buttonClicked) {
   const imageId = buttonClicked.dataset.imageId;
-  const dicoElem = document.getElementById('dico-data');
-  const dico = JSON.parse(dicoElem.textContent);
   try {
     const response = await fetch(`/add_random_tag/${imageId}/`, {
       method: "POST",
@@ -21,7 +19,7 @@ async function tryAddRandomTagRequest(buttonClicked) {
         "Content-Type": "application/json",
         "X-CSRFToken": getCookie("csrftoken"),
       },
-      body: JSON.stringify({ dico: dico }),
+      body: JSON.stringify({ imageId }),
     });
 
     if (!response.ok) throw new Error("Failed to add tag");

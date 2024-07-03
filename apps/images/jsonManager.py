@@ -7,18 +7,14 @@ import json
 #------------------
 
 def write_dico_to_json(dico):
-    json_file = "media/res.json"
+    json_file = "media/images.json"
     with (open(json_file, 'w') as file):
         json.dump(dico, file, indent=4)
 
 def parse_json():
-    with open('media/test.json', 'r') as json_file:
-        data = json.load(json_file)
     dico = {}
-    for img, tags in data.items():
-        dico[img] = tags
-
-    write_dico_to_json(dico)
+    with open('media/images.json', 'r') as json_file:
+        dico = json.load(json_file)
     return dico
 
 def printDico(dico):

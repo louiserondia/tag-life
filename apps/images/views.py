@@ -5,9 +5,7 @@ from .models import ImageModel, TagModel
 from .utils import clear_all
 import json, os
 from .jsonManager import write_dico_to_json, parse_json, printDico
-
-
-dico = {}
+from .tagManager import add_tags
 
 #------------------------
 #       ADD IMAGES
@@ -15,18 +13,20 @@ dico = {}
 
 def add_image_to_db(dico):
     for image, tags in dico.items():
-        if ImageModel.objects.filter(title=image).exists():
+        image_path = os.path.join(settings.MEDIA_ROOT, 'images', image)
+
+        if ImageModel.objects.filter(title=image).exists() and os.path.exists(image_path):
             print(f"{image} already exists. Skipping...")
             continue
-
-        image_path = os.path.join(settings.MEDIA_ROOT, 'images', image)
+        
         image_model = ImageModel(path=image_path, title=image)
 
         with open(image_path, 'rb') as file:
             django_file = File(file)
-            image_model.image_field.save(image, django_file, save=True)
+            image_model.image_field.save(image, django_file, save=False)
 
         image_model.save()
+        add_tags(image_model, tags)
 
 def import_images(request):
     # clear_all()
@@ -39,10 +39,9 @@ def import_images(request):
     else:
         images = ImageModel.objects.all()
 
-    write_dico_to_json(dico)
+    # write_dico_to_json(dico)
 
     context = {
-        'dico': json.dumps(dico),
         'images': images,
     }
     return render(request, 'images.html', context)

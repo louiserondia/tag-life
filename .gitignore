@@ -17,3 +17,5 @@ static\main.css
 static/main.css
 static\main.css.map
 static/main.css.map
+apps/main/__pycache__
+apps/main/__pycache__/*

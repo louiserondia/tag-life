@@ -8,9 +8,31 @@
     <link rel="stylesheet" href="{% static 'main.css' %}">
 </head>
 <body>
-    <div class="dessins">
+    
+    <button id="switch-mode">☾</button>
+    <div id="part1">
         <img id="thug-life" src="{% static 'img/0004.jpg' %}">
     </div>
-    <h1 id="title">Louise Brondia</h1>
+    <div id="part2">
+        <h1 id="title">Louise Brondia</h1>
+    </div>
+    <div id="part3">
+        <div class="img-grid">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+            <img src="{% static 'img/0004.jpg' %}">
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script src="https://unpkg.com/htmx.org@1.7.0"></script>
+
 </body>
 </html>

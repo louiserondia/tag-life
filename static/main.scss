@@ -1,42 +1,104 @@
-:root {
-    --darkmode-bgcolor: #080126;
-    --lightmode-bgcolor: #a09db3;
+// ------------------
+//     VARIABLES
+// ------------------
 
-    --darkmode-color: #e6e4f2;
-    --lightmode-color: #140a49;
+
+$dark-color: #080126;
+$light-color: #e5e3ee;
+
+
+// ------------------
+//  DARK MODE BUTTON
+// ------------------
+
+
+#switch-mode {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    height: 3rem;
+    width: 3rem;
+
+    font-size: x-large;
+    padding-bottom: 0.2rem;
+    background-color: $light-color;
+    color: $dark-color;
+    border-color: $dark-color;
+    border-radius: 20%;
+
+    &.dark-mode {
+        background-color: $dark-color;
+        color: $light-color;
+        border-color: $light-color;
+    }
 }
 
+
+// ------------------
+//        BODY
+// ------------------
+
+
 body {
-    .yo {
-        color: black;
+    background-color: $light-color;
+    color: $dark-color;
+
+    &.dark-mode {
+        background-color: $dark-color;
+        color: $light-color;
     }
-    background-color: var(--darkmode-bgcolor);
-    color: var(--darkmode-color);
+
     height: 200vh;
     overflow-x: hidden;
     scroll-snap-type: y mandatory;
 }
 
-#title {
-    margin: auto;
-    font-size: 5rem;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: 300;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    white-space: nowrap;
+
+// ------------------
+//       PART 1
+// ------------------
+
+
+#part1 {
+    height: 30rem;
+    width: auto;
+    
+
+
+    #thug-life {
+        position: absolute;
+        height: 20rem;
+        top: 5rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
 }
 
-.dessins {
-    height: 20rem;
+
+// ------------------
+//       PART 2
+// ------------------
+
+#part2 {
+    height: 75vh;
     width: 100%;
+
+    #title {
+        margin: auto;
+        font-size: 4rem;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 300;
+        position: absolute;
+        top: 110vh;
+        left: 50%;
+        transform: translate(-50%, 0);
+        text-align: center;
+        white-space: nowrap;
+    }
 }
 
-#thug-life {
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}
+
+// ------------------
+//       PART 3
+// ------------------

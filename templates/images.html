@@ -26,21 +26,12 @@
     </form>
 
     <h1>Images</h1>
-    <div class="images">
+    <div class="images" id="images"></div>
 
-        {% for image in images %}
-        <div class="box">
-            <h2 id="title-{{ forloop.counter }}" hidden="true">{{ image.title }}</h2>
-            <img src="{{ image.image_field.url }}" id="img-{{ forloop.counter }}" alt="{{ image.title }}" onclick="displayImageInfos('{{ forloop.counter }}')">
-            <div class="tags-container" hidden="true" id="tags-{{ forloop.counter }}">
-                {% for tag in image.tags.all %}
-                    <h3>{{tag.title}}</h3>
-                {% endfor %}
-            </div> 
-        </div>
-        {% endfor %}
-    </div>
-
+    <script>
+        const imagesData = {{ images_json|safe }};
+    </script>
+    <script src="{% static 'js/columns.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
     <script type="module" src="{% static 'add_random_tag.js' %}"></script>
 </body>

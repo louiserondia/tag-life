@@ -1,11 +1,10 @@
-import os
+import os, json
 from django.shortcuts import render
 from django.core.files import File
 from django.conf import settings
-from django.db.models import Q
 from .models import ImageModel, TagModel
 from .utils import clear_all
-from .jsonManager import write_to_json, parse_json, printDico
+from .jsonManager import write_to_json, parse_json, printDico, format_images_to_json
 from .tagManager import add_tags
 
 def delete_missing_images_tags(dico):
@@ -63,6 +62,10 @@ def import_images(request):
     if checked_tags:
         for tag in checked_tags:
             images = images.filter(tags__title__icontains=tag).distinct()
-    print(images)
-    context = { 'images': images, 'tags': tags, 'checked_tags': checked_tags }
+
+    images_json = format_images_to_json(images)
+    context = { 'images': images, 
+               'images_json': images_json,
+               'tags': tags, 
+               'checked_tags': checked_tags }
     return render(request, 'images.html', context)

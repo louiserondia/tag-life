@@ -1,15 +1,14 @@
 import json
 
-def write_dico_to_json(dico):
-    json_file = "media/images.json"
-    with (open(json_file, 'w') as file):
-        json.dump(dico, file, indent=4)
+def write_to_json(content, file):
+    with (open(file, 'w') as file):
+        json.dump(content, file, indent=4)
 
-def parse_json():
-    dico = {}
-    with open('media/images.json', 'r') as json_file:
-        dico = json.load(json_file)
-    return dico
+def parse_json(file):
+    m = {}
+    with open(file, 'r') as json_file:
+        m = json.load(json_file)
+    return m
 
 def printDico(dico):
     print("")

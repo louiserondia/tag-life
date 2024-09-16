@@ -4,27 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Images</title>
+    <link rel="stylesheet" href="{% static 'images.css' %}">
 </head>
-<body style="background-color: black; color: white;">
+<body>
+
 
     <form method="get" action="{% url 'import_images' %}">
-        <label for="tag">Filter by tag:</label>
-        <input type="text" id="tag" name="tag" value="{{ tag_filter|default:'' }}">
-        <button type="submit">Filter</button>
+        {% for tag in tags %}
+        <label for="tag-{{ forloop.counter }}" class="tag-tic">
+            <input type="checkbox" name="checked_tags" value="{{tag}}" id="tag-{{ forloop.counter }}"
+            {% if tag in checked_tags %} checked {% endif %} onchange="this.form.submit()"
+            >
+                {{ tag }}
+        </label>
+        {% endfor %}
+    </form>
+    <form method="get" action="{% url 'import_images' %}">
+        <label for="tag">New tag : </label>
+        <input type="text" id="tag" name="new_tag" value="{{ tag_filter|default:'' }}">
+        <button type="submit">Add</button>
     </form>
 
     <h1>Images</h1>
-    {% for image in images %}
-        <h2>{{ image.title }}</h2>
-        <img style="height: 15rem;" src="{{ image.image_field.url }}" alt="{{ image.title }}">
-        <button data-image-id="{{image.title}}" class="add-random-tag-button">Add random tag</button>
-        <div class="tags-container">
-            {% for tag in image.tags.all %}
-                <h3>{{tag.title}}</h3>
-            {% endfor %}
-        </div>    
-    {% endfor %}
+    <div class="images">
 
+        {% for image in images %}
+        <div class="box">
+            <h2 id="title-{{ forloop.counter }}" hidden="true">{{ image.title }}</h2>
+            <img src="{{ image.image_field.url }}" id="img-{{ forloop.counter }}" alt="{{ image.title }}" onclick="displayImageInfos('{{ forloop.counter }}')">
+            <div class="tags-container" hidden="true" id="tags-{{ forloop.counter }}">
+                {% for tag in image.tags.all %}
+                    <h3>{{tag.title}}</h3>
+                {% endfor %}
+            </div> 
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="{% static 'js/utils.js' %}"></script>
     <script type="module" src="{% static 'add_random_tag.js' %}"></script>
 </body>
 </html>

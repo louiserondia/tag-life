@@ -2,9 +2,10 @@ import os
 from django.shortcuts import render
 from django.core.files import File
 from django.conf import settings
+from django.db.models import Q
 from .models import ImageModel, TagModel
 from .utils import clear_all
-from .jsonManager import write_dico_to_json, parse_json, printDico
+from .jsonManager import write_to_json, parse_json, printDico
 from .tagManager import add_tags
 
 def delete_missing_images_tags(dico):
@@ -18,6 +19,8 @@ def delete_missing_images_tags(dico):
     for tag in TagModel.objects.all():
         if tag.images.count() == 0:
             tag.delete()
+        # ça pose pas un problème si je supprime un tag 
+        # qui permet de faire le tri mais qui n'est dans aucune image ?
 
 
 def add_image_to_db(dico):
@@ -39,16 +42,27 @@ def add_image_to_db(dico):
         add_tags(image_model, tags)
 
 def import_images(request):
+    print(request)
     # clear_all()
-    dico = parse_json()
+    dico = parse_json('media/images.json')
+    tags = parse_json('media/tags.json')['tags']
     add_image_to_db(dico)
     delete_missing_images_tags(dico)
     
-    tag_filter = request.GET.get('tag', None)
-    if tag_filter:
-        images = ImageModel.objects.filter(tags__title__istartswith=tag_filter).distinct()
-    else:
-        images = ImageModel.objects.all()
+    checked_tags = request.GET.getlist('checked_tags')
+    custom_tag = request.GET.get('new_tag', None)
+    if custom_tag:
+        if not tags.count(custom_tag):
+            tag, created = TagModel.objects.get_or_create(title=custom_tag)
+            if created:
+                tags.append(custom_tag)
+                write_to_json({'tags': tags}, 'media/tags.json')
+        checked_tags.append(custom_tag)
+    images = ImageModel.objects.all()
 
-    context = { 'images': images }
+    if checked_tags:
+        for tag in checked_tags:
+            images = images.filter(tags__title__icontains=tag).distinct()
+    print(images)
+    context = { 'images': images, 'tags': tags, 'checked_tags': checked_tags }
     return render(request, 'images.html', context)

@@ -6,18 +6,57 @@
         "tag4",
         "tag2",
         "tag6",
-        "tag10"
+        "tag10",
+        "tag3"
     ],
     "0002.jpg": [
         "tag3",
         "tag9",
-        "tag10"
+        "tag10",
+        "tag2",
+        "tag8"
     ],
     "0003.jpg": [
         "yooooo",
         "tag 33",
         "tag4",
         "yolo",
-        "tag7"
+        "tag7",
+        "tag9"
+    ],
+    "0004.jpg": [
+        "tag9"
+    ],
+    "0005.jpg": [
+        "tag9"
+    ],
+    "0006.jpg": [
+        "tag9"
+    ],
+    "0007.jpg": [
+        "tag9"
+    ],
+    "0008.jpg": [
+        "marseille",
+        "mer",
+        "valentin"
+    ],
+    "0009.jpg": [
+        "pierre",
+        "golden hour",
+        "montagne"
+    ],
+    "0010.jpg": [
+    ],
+    "0011.jpg": [
+        "valentin",
+        "pierre",
+        "soleil"
+    ],
+    "0012.jpg": [
+    ],
+    "0013.jpg": [
+    ],
+    "0014.jpg": [
     ]
 }

@@ -1,0 +1,60 @@
+// ------------------
+//     VARIABLES
+// ------------------
+
+
+$dark-color: #080126;
+$light-color: #e5e3ee;
+
+
+
+body {
+    background-color: $dark-color;
+    color: $light-color;
+
+    &.dark-mode {
+        background-color: $dark-color;
+        color: $light-color;
+    }
+
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+}
+
+.images {
+    columns: 5;
+    column-gap: 1rem;
+    margin: 1rem auto;
+    box-sizing: border-box;
+    height: max-content;
+
+    .box {
+        width: 100%;
+        margin-bottom: 10px;
+
+        img {
+            width: 100%;
+            border-radius: 5px;
+            display: block;
+        }
+
+    }
+}
+
+@media (max-width: 1200px) {
+    .images {
+        columns: 4;
+    }
+}
+
+@media (max-width: 900px) {
+    .images {
+        columns: 3;
+    }
+}
+
+@media (max-width: 600px) {
+    .images {
+        columns: 2;
+    }
+}

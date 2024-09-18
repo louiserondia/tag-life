@@ -2,6 +2,7 @@ const imageList = imagesData;
 let currentBatch = 1;
 const batchSize = 10;
 const loadedImages = new Set();
+let imagesToLoad;
 
 // ---------------------------
 //   CREATING ALL THE STUFF
@@ -18,9 +19,15 @@ function createTitle(name, box) {
 function createImg(name, box) {
   const img = document.createElement("img");
   img.src = "../../media/images/" + name;
+  img.loading = "lazy";
   img.id = `img-${name}`;
   img.onclick = () => displayImageInfos(name);
   box.appendChild(img);
+  img.addEventListener("load", () => {
+    requestIdleCallback(() => {
+      imageLoaded();
+    });
+  });
 }
 
 function createTagsContainer(name, box, tags) {
@@ -50,13 +57,14 @@ function initializeColumns(images, nColumns) {
     container.appendChild(column);
   }
 
-  if (loadedImages.length) createColumns(loadedImages, 0);
+  if (loadedImages.size) createColumns(loadedImages, 0);
   else createColumns(imageList.slice(0, batchSize), 0);
 }
 
 function createColumns(images, startIndex) {
   const container = document.getElementById("images");
   const nColumns = container.children.length;
+  imagesToLoad = batchSize;
 
   images.forEach((image, index) => {
     const columnIndex = (startIndex + index) % nColumns;
@@ -95,6 +103,16 @@ function updateColumns() {
   initializeColumns(imageList, nColumns);
 }
 
+function imageLoaded() {
+  imagesToLoad--;
+  if (!imagesToLoad) {
+    setTimeout(() => {
+      const logo = document.getElementById("loadingLogo");
+      logo.style.display = "none";
+    }, 500);
+  }
+}
+
 // -----------------------
 //    LOAD NEXT BATCH
 // -----------------------
@@ -109,6 +127,7 @@ function loadNextBatch() {
   createColumns(imagesToLoad, start);
 
   currentBatch++;
+
 }
 
 // ---------------
@@ -118,7 +137,9 @@ function loadNextBatch() {
 function setupInfiniteScroll() {
   const observer = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
+      if (entry.isIntersecting && imageList.length != loadedImages.size) {
+        const logo = document.getElementById("loadingLogo");
+        logo.style.display = "block";
         loadNextBatch();
       }
     });

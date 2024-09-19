@@ -3,6 +3,7 @@ let currentBatch = 1;
 const batchSize = 10;
 const loadedImages = new Set();
 let imagesToLoad;
+let lastColumn = 0;
 
 // ---------------------------
 //   CREATING ALL THE STUFF
@@ -58,7 +59,7 @@ function initializeColumns(images, nColumns) {
   }
 
   if (loadedImages.size) createColumns(loadedImages, 0);
-  else createColumns(imageList.slice(0, batchSize), 0);
+  else createColumns(images.slice(0, batchSize), lastColumn);
 }
 
 function createColumns(images, startIndex) {
@@ -67,8 +68,7 @@ function createColumns(images, startIndex) {
   imagesToLoad = batchSize;
 
   images.forEach((image, index) => {
-    const columnIndex = (startIndex + index) % nColumns;
-    const column = container.children[columnIndex];
+    const column = container.children[lastColumn];
     const box = document.createElement("div");
 
     box.classList.add("box");
@@ -79,7 +79,9 @@ function createColumns(images, startIndex) {
 
     column.appendChild(box);
     loadedImages.add(image);
+    lastColumn = (lastColumn + 1) % nColumns;
   });
+  
 }
 
 // -------------------------
@@ -124,7 +126,7 @@ function loadNextBatch() {
 
   if (!imagesToLoad.length) return;
 
-  createColumns(imagesToLoad, start);
+  createColumns(imagesToLoad, lastColumn);
 
   currentBatch++;
 

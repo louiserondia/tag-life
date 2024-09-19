@@ -1,47 +1,3 @@
-// ------------------
-//     VARIABLES
-// ------------------
-
-
-$dark-color: #080126;
-$light-color: #e5e3ee;
-
-
-
-html {
-    background-color: $dark-color;
-    color: $light-color;
-
-    &.dark-mode {
-        background-color: $dark-color;
-        color: $light-color;
-    }
-
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    min-height: 100vh;
-
-    &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100px;
-        margin: 0 !important;
-        // background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 5, 5, 0.907));
-        pointer-events: none;
-    }
-}
-
-body {
-    margin: 0;
-    padding: 0;
-}
-
 .images {
     margin: 0 1rem ;
     overflow-y: hidden;
@@ -73,9 +29,15 @@ body {
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 15rem;
+    height: 10rem;
+    margin-bottom: 2rem;
     #loadingLogo {
         display: none;
         margin: auto auto;
     }
+}
+
+#scrollAnchor {
+    height: 1rem;
+    width: 100%;
 }

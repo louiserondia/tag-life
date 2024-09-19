@@ -11,6 +11,10 @@ apps/images/__pycache__
 apps/images/__pycache__/*
 apps/images/migrations
 apps/images/migrations/*
+apps/main/__pycache__
+apps/main/__pycache__/*
+apps/main/migrations
+apps/main/migrations/*
 taglife/settings.py
 taglife\settings.py
 static\main.css

@@ -26,7 +26,7 @@ def format_images_to_json(images):
         tags = [tag.title for tag in image.tags.all()]
         image_data = {
             'title': image.title,
-            'path': image.path,
+            'path': image.upload_path,
             'tags': tags
         }
         data.append(image_data)

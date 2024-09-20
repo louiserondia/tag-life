@@ -24,12 +24,11 @@ function createTitle(name, box) {
   box.appendChild(title);
 }
 
-function createImg(name, box) {
+function createImg(image, box) {
   const img = document.createElement("img");
-  img.src = "../../media/images/" + name;
-  img.loading = "lazy";
-  img.id = `img-${name}`;
-  img.onclick = () => displayImageInfos(name);
+  img.src = image.path;
+  img.id = `img-${image.title}`;
+  img.onclick = () => displayImageInfos(image.title);
   box.appendChild(img);
   img.addEventListener("load", () => {
     requestIdleCallback(() => {
@@ -81,7 +80,7 @@ function createColumns(images, startIndex) {
     box.classList.add("box");
 
     createTitle(image.title, box);
-    createImg(image.title, box);
+    createImg(image, box);
     createTagsContainer(image.title, box, image.tags);
 
     column.appendChild(box);
@@ -118,7 +117,7 @@ function imageLoaded() {
 }
 
 // -----------------------
-//    LOAD NEXT BATCH
+//    INFINITE SCROLL
 // -----------------------
 
 function loadNextBatch() {
@@ -133,10 +132,6 @@ function loadNextBatch() {
   currentBatch++;
 }
 
-// ---------------
-//    LAZY LOAD
-// ---------------
-
 function setupInfiniteScroll() {
   const observer = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
@@ -150,6 +145,48 @@ function setupInfiniteScroll() {
 
   const sentinel = document.getElementById("scrollAnchor");
   observer.observe(sentinel);
+}
+
+// ------------------
+//      FILTERS
+// ------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+  const tagBoxes = document.querySelectorAll(".tag-box");
+
+  tagBoxes.forEach(function (box) {
+    box.addEventListener("click", function () {
+      box.classList.toggle("active");
+      const content = box.id;
+      if (tagsChecked.has(content)) {
+        tagsChecked.delete(content);
+      } else {
+        tagsChecked.add(content);
+      }
+      updateImagesAndUrl();
+    });
+  });
+});
+
+function updateImagesAndUrl() {
+  const clientUrl = new URL("/", window.location.origin);
+  const url = new URL("/api/images/", window.location.origin);
+  for (const tag of tagsChecked) {
+    if (tag.length === 0) continue;
+    url.searchParams.append("tag", tag);
+    clientUrl.searchParams.append("tag", tag);
+  }
+  window.history.pushState({}, "", clientUrl);
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      resetEverything();
+      imageList = data.images;
+      updateColumns();
+    })
+    .catch((error) => {
+      console.error("error quand je fetch les images : " + error);
+    });
 }
 
 // ------------------

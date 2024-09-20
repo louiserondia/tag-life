@@ -37,8 +37,9 @@ def run_django_command(command):
 
 # Paths to remove
 directories_to_remove = [
-    'apps/images/migrations',
-    'apps/images/__pycache__'
+    'apps/main/migrations',
+    'apps/main/migrations main',
+    'apps/main/__pycache__'
 ]
 
 file_to_remove = 'db.sqlite3'
@@ -56,7 +57,7 @@ clear_directory(uploads_directory)
 
 # Run Django commands
 django_commands = [
-    'python manage.py makemigrations main',
+    'python manage.py makemigrations',
     'python manage.py migrate'
 ]
 

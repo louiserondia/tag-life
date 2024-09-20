@@ -25,16 +25,17 @@ def delete_missing_images_tags(dico):
 
 def add_image_to_db(dico):
     for image, tags in dico.items():
-        image_path = os.path.join(settings.MEDIA_ROOT, 'images', image)
-        image_path_dest = os.path.join(settings.MEDIA_ROOT, 'uploads', image)
-        if ImageModel.objects.filter(title=image).exists() and os.path.exists(image_path_dest):
+        src_path = os.path.join(settings.MEDIA_ROOT, 'images', image)
+        upload_path = os.path.join(settings.MEDIA_ROOT, 'uploads', image)
+        if ImageModel.objects.filter(title=image).exists() and os.path.exists(upload_path):
             image_model = ImageModel.objects.get(title=image)
             add_tags(image_model, tags)
             continue
         
-        image_model = ImageModel(path=image_path, title=image)
+        upload_path = settings.MEDIA_URL + 'uploads/' + image;
+        image_model = ImageModel(src_path=src_path, upload_path=upload_path, title=image)
 
-        with open(image_path, 'rb') as file:
+        with open(src_path, 'rb') as file:
             django_file = File(file)
             image_model.image_field.save(image, django_file, save=False)
 
@@ -43,8 +44,6 @@ def add_image_to_db(dico):
 
 def fetch_images(request):
     checked_tags = request.GET.getlist('tag')
-    print(checked_tags)
-    print("helloooOooOoo")
     images = ImageModel.objects.all()
 
     if checked_tags:

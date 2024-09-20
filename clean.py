@@ -58,6 +58,7 @@ clear_directory(uploads_directory)
 # Run Django commands
 django_commands = [
     'python manage.py makemigrations',
+    'python manage.py makemigrations main',
     'python manage.py migrate'
 ]
 

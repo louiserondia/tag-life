@@ -1,6 +1,9 @@
 var isLightMode = true;
 
-document.addEventListener("DOMContentLoaded", function () {
+// comment faire pour pas avoir de petit temps où c'est light
+//  quand je refresh et que c'était dark avant ????
+
+// document.addEventListener("DOMContentLoaded", function () {
   if (localStorage.getItem("dark-mode") === "true") {
     const everything = document.querySelectorAll("*");
     everything.forEach((thing) => {
@@ -28,4 +31,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     isLightMode = !isLightMode;
   });
-});
+// });

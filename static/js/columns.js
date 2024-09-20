@@ -1,4 +1,5 @@
-const imageList = imagesData;
+let imageList = imagesData;
+let tagsChecked = new Set(checkedTags);
 let currentBatch = 1;
 const batchSize = 10;
 const loadedImages = new Set();
@@ -8,6 +9,12 @@ let lastColumn = 0;
 // ---------------------------
 //   CREATING ALL THE STUFF
 // ---------------------------
+
+function resetEverything() {
+  loadedImages.clear();
+  currentBatch = 1;
+  lastColumn = 0;
+}
 
 function createTitle(name, box) {
   const title = document.createElement("h2");
@@ -81,7 +88,6 @@ function createColumns(images, startIndex) {
     loadedImages.add(image);
     lastColumn = (lastColumn + 1) % nColumns;
   });
-  
 }
 
 // -------------------------
@@ -89,18 +95,14 @@ function createColumns(images, startIndex) {
 // -------------------------
 
 function getNumberOfColumns() {
-  if (window.matchMedia("(max-width: 600px)").matches) {
-    return 2;
-  } else if (window.matchMedia("(max-width: 900px)").matches) {
-    return 3;
-  } else if (window.matchMedia("(max-width: 1200px)").matches) {
-    return 4;
-  } else {
-    return 5;
-  }
+  if (window.matchMedia("(max-width: 600px)").matches) return 2;
+  if (window.matchMedia("(max-width: 900px)").matches) return 3;
+  if (window.matchMedia("(max-width: 1200px)").matches) return 4;
+  return 5;
 }
 
 function updateColumns() {
+  lastColumn = 0;
   const nColumns = getNumberOfColumns();
   initializeColumns(imageList, nColumns);
 }
@@ -129,7 +131,6 @@ function loadNextBatch() {
   createColumns(imagesToLoad, lastColumn);
 
   currentBatch++;
-
 }
 
 // ---------------

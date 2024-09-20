@@ -20,18 +20,13 @@
 
     <div id="part3">
         <div id="tags">
-            <form method="get" action="{% url 'import_images' %}">
-                <div id="tags-grid">
-                    {% for tag in tags %}
-                        <input type="checkbox" name="checked_tags" value="{{tag}}" id="tag-{{ forloop.counter }}"
-                            {% if tag in checked_tags %} checked {% endif %} class="tag-checkbox"
-                        >
-                        <label for="tag-{{ forloop.counter }}" class="tag-box {% if tag in checked_tags %} active {% endif %}">
-                            {{ tag }}
-                        </label>
-                    {% endfor %}
+            <div id="tags-grid">
+                {% for tag in tags %}
+                <div class="tag-box {% if tag in checked_tags %} active {% endif %}" id="{{ tag }}">
+                    {{ tag }}
                 </div>
-            </form>
+                {% endfor %}
+            </div>
             <form method="get" action="{% url 'import_images' %}">
                 <div id="new-tag">
                     <label for="tag"></label>
@@ -49,7 +44,8 @@
     </div>
 
     <script>
-        const imagesData = {{ images_json|safe }};
+        const imagesData = JSON.parse("{{ images_json|safe|escapejs }}");
+        const checkedTags = JSON.parse("{{ checked_tags|escapejs }}");
     </script>
     <script src="{% static 'js/columns.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>

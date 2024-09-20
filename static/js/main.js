@@ -21,22 +21,41 @@ document.addEventListener("DOMContentLoaded", function () {
   // updateTitlePosition();
 });
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   const tagBoxes = document.querySelectorAll(".tag-box");
 
-  tagBoxes.forEach(function(box) {
-    box.addEventListener("click", function() {
-      const checkbox = document.getElementById(box.getAttribute("for"));
-      
-      checkbox.checked = !checkbox.checked;
-      if (checkbox.checked) {
-        box.classList.add("active");
+  tagBoxes.forEach(function (box) {
+    box.addEventListener("click", function () {
+      box.classList.toggle("active");
+      const content = box.id;
+      console.log(content);
+      if (tagsChecked.has(content)) {
+        tagsChecked.delete(content);
       } else {
-        box.classList.remove("active");
+        tagsChecked.add(content);
       }
-      
-      // Soumettre le formulaire automatiquement si besoin
-      box.closest("form").submit();
+      refresh();
     });
   });
 });
+
+function refresh() {
+  const clientUrl = new URL("/", window.location.origin)
+  const url = new URL("/api/images/", window.location.origin)
+  for (const tag of tagsChecked) {
+    if (tag.length === 0) continue
+    url.searchParams.append("tag", tag)
+    clientUrl.searchParams.append("tag", tag)
+  }
+  window.history.pushState({}, "", clientUrl)
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      resetEverything();
+      imageList = data.images;
+      updateColumns();
+    })
+    .catch((error) => {
+      console.error("error quand je fetch les images : " + error);
+    });
+}

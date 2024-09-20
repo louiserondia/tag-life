@@ -2,6 +2,7 @@ import os, json
 from django.shortcuts import render
 from django.core.files import File
 from django.conf import settings
+from django.http import JsonResponse
 from .models import ImageModel, TagModel
 from .utils import clear_all
 from .jsonManager import write_to_json, parse_json, printDico, format_images_to_json
@@ -40,6 +41,18 @@ def add_image_to_db(dico):
         image_model.save()
         add_tags(image_model, tags)
 
+def fetch_images(request):
+    checked_tags = request.GET.getlist('tag')
+    print(checked_tags)
+    print("helloooOooOoo")
+    images = ImageModel.objects.all()
+
+    if checked_tags:
+        for tag in checked_tags:
+            images = images.filter(tags__title__icontains=tag).distinct()
+    images = format_images_to_json(images)
+    return JsonResponse({'images': images})
+
 def import_images(request):
     # clear_all()
     dico = parse_json('media/images.json')
@@ -47,7 +60,7 @@ def import_images(request):
     add_image_to_db(dico)
     delete_missing_images_tags(dico)
     
-    checked_tags = request.GET.getlist('checked_tags')
+    checked_tags = request.GET.getlist('tag') or []
     custom_tag = request.GET.get('new_tag', None)
     if custom_tag:
         if not tags.count(custom_tag):
@@ -64,7 +77,7 @@ def import_images(request):
 
     images_json = format_images_to_json(images)
     context = { 'images': images, 
-               'images_json': images_json,
+               'images_json': json.dumps(images_json),
                'tags': tags, 
-               'checked_tags': checked_tags }
+               'checked_tags': json.dumps(checked_tags) }
     return render(request, 'home.html', context)

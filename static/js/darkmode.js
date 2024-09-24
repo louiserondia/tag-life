@@ -4,31 +4,44 @@ var isLightMode = true;
 //  quand je refresh et que c'était dark avant ????
 
 // document.addEventListener("DOMContentLoaded", function () {
-  if (localStorage.getItem("dark-mode") === "true") {
-    const everything = document.querySelectorAll("*");
-    everything.forEach((thing) => {
-      thing.classList.add("dark-mode");
-    })
-
-    document.body.classList.add("dark-mode");
-    document.getElementById("switch-mode").textContent = "☼";
-    isLightMode = false;
-  }
-
-  document.getElementById("switch-mode").addEventListener("click", function () {
-    const everything = document.querySelectorAll("*");
-    everything.forEach((thing) => {
-      thing.classList.toggle("dark-mode");
-    })
-    const button = document.getElementById("switch-mode");
-
-    if (isLightMode) {
-      button.textContent = "☼";
-      localStorage.setItem("dark-mode", "true");
-    } else {
-      button.textContent = "☾";
-      localStorage.setItem("dark-mode", "false");
-    }
-    isLightMode = !isLightMode;
+if (localStorage.getItem("dark-mode") === "true") {
+  const everything = document.querySelectorAll("*");
+  everything.forEach((thing) => {
+    thing.classList.add("dark-mode");
   });
+
+  document.body.classList.add("dark-mode");
+  document.getElementById("switch-mode").textContent = "☼";
+  isLightMode = false;
+}
+
+document.getElementById("switch-mode").addEventListener("click", function () {
+  const everything = document.querySelectorAll("*");
+  const bg = document.getElementById("bgImg");
+  let bgSrc = bg.getAttribute("src");
+  const title = document.getElementById("titleImg");
+  let titleSrc = title.getAttribute('src');
+  console.log(bg.getAttribute("src"));
+  everything.forEach((thing) => {
+    thing.classList.toggle("dark-mode");
+  });
+  const button = document.getElementById("switch-mode");
+
+  if (isLightMode) {
+    button.textContent = "☼";
+    localStorage.setItem("dark-mode", "true");
+    bgSrc = bgSrc.replace("day", "night");
+    bg.src = bgSrc;
+    titleSrc = titleSrc.replace("black", "white");
+    title.src = titleSrc;
+  } else {
+    button.textContent = "☾";
+    localStorage.setItem("dark-mode", "false");
+    bgSrc = bgSrc.replace("night.png", "day.png");
+    bg.src = bgSrc;
+    titleSrc = titleSrc.replace("white", "black");
+    title.src = titleSrc;
+  }
+  isLightMode = !isLightMode;
+});
 // });

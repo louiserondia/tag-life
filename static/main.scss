@@ -11,25 +11,30 @@ $light-color: #e5e3ee;
 //  DARK MODE BUTTON
 // ------------------
 
-
-#switch-mode {
+#topRightButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     position: fixed;
     top: 2rem;
     right: 2rem;
-    height: 3rem;
-    width: 3rem;
 
-    font-size: x-large;
-    padding-bottom: 0.2rem;
-    background-color: $light-color;
-    color: $dark-color;
-    border-color: $dark-color;
-    border-radius: 20%;
+    .top-right-buttons {
+        height: 3rem;
+        width: 3rem;
 
-    &.dark-mode {
-        background-color: $dark-color;
-        color: $light-color;
-        border-color: $light-color;
+        padding-bottom: 0.2rem;
+        background-color: $light-color;
+        color: $dark-color;
+        border-color: $dark-color;
+        border-radius: 20%;
+        font-size: x-large;
+
+        &.dark-mode {
+            background-color: $dark-color;
+            color: $light-color;
+            border-color: $light-color;
+        }
     }
 }
 
@@ -94,7 +99,7 @@ button {
     width: auto;
 
     img {
-        margin-top: 20vh;
+        margin-top: 20vhz;
         width: 85vw;
         max-width: 1000px;
     }
@@ -199,20 +204,21 @@ button {
         &.dark-mode {
             background-color: $dark-color;
             color: $light-color;
-            
+
         }
     }
-    
+
     button {
         cursor: pointer;
         transition: background-color 0.1s, border-color 0.1s;
-        
+
     }
-    
+
     button:hover {
         color: white;
         background-color: #6200ea; // Couleur quand sélectionné (par exemple violet)
         border-color: #6200ea; // Change la couleur de la bordure au survol
+
         &.dark-mode {
             background-color: #e0b301;
             border-color: #e0b301;

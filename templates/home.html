@@ -10,7 +10,10 @@
 </head>
 <body>
     
-    <button id="switch-mode">☾</button>
+    <div id="topRightButtons">
+        <button id="switchMode" class="top-right-buttons">☾</button>
+        <button id="edit" class="top-right-buttons">🖉</button>
+    </div>
     <div id="part1">
         <img id="bgImg" src="{% static 'img/day.png' %}">
     </div>
@@ -50,9 +53,10 @@
     </script>
     <script src="{% static 'js/images.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
-    <script type="module" src="{% static 'add_random_tag.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/darkmode.js' %}"></script>
+    <script type="module" src="{% static 'add_random_tag.js' %}"></script>
+    <script type="module" src="{% static 'js/edit-tags.js' %}"></script>
 
 </body>
 </html>

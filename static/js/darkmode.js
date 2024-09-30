@@ -11,21 +11,20 @@ if (localStorage.getItem("dark-mode") === "true") {
   });
 
   document.body.classList.add("dark-mode");
-  document.getElementById("switch-mode").textContent = "☼";
+  document.getElementById("switchMode").textContent = "☼";
   isLightMode = false;
 }
 
-document.getElementById("switch-mode").addEventListener("click", function () {
+document.getElementById("switchMode").addEventListener("click", function () {
   const everything = document.querySelectorAll("*");
   const bg = document.getElementById("bgImg");
   let bgSrc = bg.getAttribute("src");
   const title = document.getElementById("titleImg");
   let titleSrc = title.getAttribute('src');
-  console.log(bg.getAttribute("src"));
   everything.forEach((thing) => {
     thing.classList.toggle("dark-mode");
   });
-  const button = document.getElementById("switch-mode");
+  const button = document.getElementById("switchMode");
 
   if (isLightMode) {
     button.textContent = "☼";

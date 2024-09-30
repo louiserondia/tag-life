@@ -5,8 +5,8 @@ from django.conf import settings
 from django.http import JsonResponse
 from .models import ImageModel, TagModel
 from .utils import clear_all
-from .jsonManager import write_to_json, parse_json, printDico, format_images_to_json
-from .tagManager import add_tags
+from .json_manager import write_to_json, parse_json, printDico, format_images_to_json
+from .tag_manager import add_tags
 
 def delete_missing_images_tags(dico):
     for image in ImageModel.objects.all():

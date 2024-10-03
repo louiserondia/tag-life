@@ -1,10 +1,10 @@
 let imageList = imagesData;
-let tagsChecked = new Set(checkedTags);
 let currentBatch = 1;
 const batchSize = 10;
 const loadedImages = new Set();
 let imagesToLoad;
 let lastColumn = 0;
+let edit = false;
 
 // ---------------------------
 //   CREATING ALL THE STUFF
@@ -158,12 +158,13 @@ document.addEventListener("DOMContentLoaded", function () {
     box.addEventListener("click", function () {
       box.classList.toggle("active");
       const content = box.id;
-      if (tagsChecked.has(content)) {
-        tagsChecked.delete(content);
+      if (checkedTags.has(content)) {
+        checkedTags.delete(content);
       } else {
-        tagsChecked.add(content);
+        checkedTags.add(content);
       }
-      updateImagesAndUrl();
+      if (!edit)
+        updateImagesAndUrl();
     });
   });
 });
@@ -171,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function updateImagesAndUrl() {
   const clientUrl = new URL("/", window.location.origin);
   const url = new URL("/api/images/", window.location.origin);
-  for (const tag of tagsChecked) {
+  for (const tag of checkedTags) {
     if (tag.length === 0) continue;
     url.searchParams.append("tag", tag);
     clientUrl.searchParams.append("tag", tag);
@@ -188,6 +189,21 @@ function updateImagesAndUrl() {
       console.error("error quand je fetch les images : " + error);
     });
 }
+
+// ------------------
+//    EDIT BUTTON
+// ------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+  const editButton = document.getElementById("edit");
+  editButton.addEventListener("click", function () {
+    if (edit) { // si on valide l'edit, on décoche tous les tags
+      checkedTags.clear();
+      updateImagesAndUrl();
+    }
+    edit = !edit;
+  });
+});
 
 // ------------------
 //   INITIALISATION

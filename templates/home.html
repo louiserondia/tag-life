@@ -12,7 +12,7 @@
     
     <div id="topRightButtons">
         <button id="switchMode" class="top-right-buttons">☾</button>
-        <button id="edit" class="top-right-buttons">🖉</button>
+        <button id="edit" class="top-right-buttons off">🖉</button>
     </div>
     <div id="part1">
         <img id="bgImg" src="{% static 'img/day.png' %}">
@@ -49,14 +49,14 @@
 
     <script>
         const imagesData = JSON.parse("{{ images_json|safe|escapejs }}");
-        const checkedTags = JSON.parse("{{ checked_tags|escapejs }}");
+        const checkedTags = new Set(JSON.parse("{{ checked_tags|escapejs }}"));
     </script>
     <script src="{% static 'js/images.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/darkmode.js' %}"></script>
     <script type="module" src="{% static 'add_random_tag.js' %}"></script>
-    <script type="module" src="{% static 'js/edit-tags.js' %}"></script>
+    <script type="module" src="{% static 'edit-tags.js' %}"></script>
 
 </body>
 </html>

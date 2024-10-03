@@ -63,7 +63,7 @@ def initiate_database():
 def import_images(request):
     data = initiate_database()
     
-    checked_tags = request.GET.getlist('tag') or []
+    checked_tags = set(request.GET.getlist('tag')) or set()
     new_tag = request.GET.get('new_tag', None)
     if new_tag:
         if not data['tags'].count(new_tag):  # if new_tag doesn't exist in database yet
@@ -71,17 +71,16 @@ def import_images(request):
             if created:
                 data['tags'].append(new_tag)
                 write_to_json({'tags': data['tags']}, 'media/tags.json')
-        if not checked_tags.count(new_tag):  # vérifier que ça marche bien (quand j'ajoute un tag qui est déjà coché), p-e if pas nécesssaire
-            checked_tags.append(new_tag)
+            checked_tags.add(new_tag)
     images = ImageModel.objects.all()
 
-    if checked_tags:
+    if len(checked_tags):
         for tag in checked_tags:
-            images = images.filter(tags__title__icontains=tag).distinct()
+            images = images.filter(tags__title__icontains=tag)
 
     images_json = format_images_to_json(images)
     context = { 'images': images, 
                'images_json': json.dumps(images_json),
                'tags': data['tags'], 
-               'checked_tags': json.dumps(checked_tags) }
+               'checked_tags': json.dumps(list(checked_tags)) }
     return render(request, 'home.html', context)

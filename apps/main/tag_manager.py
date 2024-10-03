@@ -49,6 +49,7 @@ def add_new_tag(_, image_id, new_tag):
 @require_POST
 def add_tag_list_to_image_list(_, tags, images):
     dico = parse_json('media/images.json')
+    print(images)
     for i in images:
         image = ImageModel.objects.get(title=i)
         for t in tags:

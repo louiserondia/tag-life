@@ -1,5 +1,5 @@
 .images {
-    margin: 0 1rem ;
+    margin: 0 1rem;
     overflow-y: hidden;
     display: flex;
     gap: 1rem;
@@ -22,7 +22,8 @@
             }
 
             .selected {
-                border: solid 0.5rem red;
+                outline: 0.3rem solid rgb(235, 156, 51);
+                outline-offset: -4px;
             }
         }
 
@@ -35,6 +36,7 @@
     width: 100%;
     height: 10rem;
     margin-bottom: 2rem;
+
     #loadingLogo {
         display: none;
         margin: auto auto;

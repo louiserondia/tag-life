@@ -52,7 +52,6 @@ def add_tag_list_to_image_list(request: HttpRequest):
     body = json.loads(request.body)
     images = body['images']
     tags = body['tags']
-    print(tags)
     dico = parse_json('media/images.json')
     for i in images:
         image = ImageModel.objects.get(title=i)
@@ -61,6 +60,6 @@ def add_tag_list_to_image_list(request: HttpRequest):
                 tag = add_tag(image, t)
                 dico[image.title].append(tag.title)
     write_to_json(dico, 'media/images.json')
-    return JsonResponse({'tags': tags})
+    return JsonResponse({'images': images})
 
 

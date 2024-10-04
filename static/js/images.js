@@ -24,6 +24,15 @@ function createTitle(name, box) {
   box.appendChild(title);
 }
 
+function displayImageInfos(id) {
+  if (edit)
+    return
+  const title = document.getElementById("title-" + id);
+  title.toggleAttribute("hidden");
+  const tags = document.getElementById("tags-" + id);
+  tags.toggleAttribute("hidden");
+}
+
 function createImg(image, box) {
   const img = document.createElement("img");
   img.src = image.path;
@@ -109,10 +118,10 @@ function updateColumns() {
 function imageLoaded() {
   imagesToLoad--;
   if (!imagesToLoad) {
-    setTimeout(() => {
+    // setTimeout(() => {
       const logo = document.getElementById("loadingLogo");
       logo.style.display = "none";
-    }, 500);
+    // }, 500);
   }
 }
 
@@ -163,8 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         checkedTags.add(content);
       }
-      if (!edit)
-        updateImagesAndUrl();
+      if (!edit) updateImagesAndUrl();
     });
   });
 });
@@ -197,8 +205,12 @@ function updateImagesAndUrl() {
 document.addEventListener("DOMContentLoaded", () => {
   const editButton = document.getElementById("edit");
   editButton.addEventListener("click", function () {
-    if (edit) { // si on valide l'edit, on décoche tous les tags
+    if (edit) {
       checkedTags.clear();
+      const tagsEl = document.querySelectorAll(".tag-box.active");
+      tagsEl.forEach((t) => {
+        t.classList.remove("active");
+      });
       updateImagesAndUrl();
     }
     edit = !edit;

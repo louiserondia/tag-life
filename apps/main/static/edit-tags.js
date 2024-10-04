@@ -2,7 +2,7 @@ import { getCookie } from "./get_cookie.js";
 
 let edit = false;
 let checkedImages = new Set();
-let tags = checkedTags; // récupérer les checked tags
+let tags = new Set();
 
 function toggleSet(s, o) {
   if (s.has(o)) s.delete(o);
@@ -21,17 +21,16 @@ function updateTags(tags, newTags) {
 
 async function tryAddTagListToImageListRequest(buttonClicked) {
   try {
-    const response = await fetch(
-      `/add_tag_list_to_image_list/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-        body: JSON.stringify({ tags: [...tags], images: [...checkedImages] }),
-      }
-    );
+    const response = await fetch(`/add_tag_list_to_image_list/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify({ tags: [...tags], images: [...checkedImages] }),
+    });
+
+    const updatedImages = await response.json().images;
 
     if (!response.ok) throw new Error("Failed to add tags : ");
   } catch (error) {
@@ -40,9 +39,11 @@ async function tryAddTagListToImageListRequest(buttonClicked) {
 }
 
 function checkImages(event) {
-  const i = event.target;
-  i.classList.toggle("selected");
-  toggleSet(checkedImages, i.id);
+  if (edit) {
+    const i = event.target;
+    i.classList.toggle("selected");
+    toggleSet(checkedImages, i.id);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -50,14 +51,16 @@ document.addEventListener("DOMContentLoaded", () => {
   editButton.addEventListener("click", function () {
     editButton.classList.toggle("off");
     editButton.classList.toggle("on");
-    if (edit) {
+    edit = !edit;
+    if (!edit) {
+      const activeTags = document.querySelectorAll(".tag-box.active");
+      activeTags.forEach((t) => tags.add(t.id));
       tryAddTagListToImageListRequest(this);
-      editButton.style.backgroundColor = "inherit";
+      editButton.style.backgroundColor = "revert-layer";
     } else {
       const images = document.getElementById("images");
       images.addEventListener("click", checkImages);
       editButton.style.backgroundColor = "red";
     }
-    edit = !edit;
   });
 });

@@ -1,8 +1,13 @@
 import { getCookie } from "./get_cookie.js";
 
 let edit = false;
-let images = new Set();
+let checkedImages = new Set();
 let tags = checkedTags; // récupérer les checked tags
+
+function toggleSet(s, o) {
+  if (s.has(o)) s.delete(o);
+  else s.add(o);
+}
 
 function updateTags(tags, newTags) {
   tags.innerHTML = "";
@@ -17,43 +22,41 @@ function updateTags(tags, newTags) {
 async function tryAddTagListToImageListRequest(buttonClicked) {
   try {
     const response = await fetch(
-      `/add_tag_list_to_image_list/${tags}/${images}/`,
+      `/add_tag_list_to_image_list/`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": getCookie("csrftoken"),
         },
-        body: JSON.stringify({ tags, images }),
+        body: JSON.stringify({ tags: [...tags], images: [...checkedImages] }),
       }
     );
 
-    if (!response.ok) throw new Error("Failed to add tag.s : ");
-
-    const data = await response.json();
-    // const tags = buttonClicked.nextElementSibling;
-    // updateTags(tags, data.tags);
+    if (!response.ok) throw new Error("Failed to add tags : ");
   } catch (error) {
     console.error(error);
   }
 }
 
+function checkImages(event) {
+  const i = event.target;
+  i.classList.toggle("selected");
+  toggleSet(checkedImages, i.id);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const editButton = document.getElementById("edit");
   editButton.addEventListener("click", function () {
-    if (edit) { // si on valide l'edit, on add les tags
-      // console.log(images);
+    editButton.classList.toggle("off");
+    editButton.classList.toggle("on");
+    if (edit) {
       tryAddTagListToImageListRequest(this);
-      editButton.classList.toggle('off');
-      editButton.classList.toggle('on');
-      editButton.style.backgroundColor = 'inherit';
-    }
-    else {
-      // maintenant il faut cocher les images, faire que ça affiche pas les infos quand edit on
-      // dans images.js et ici ajouter à un set pour envoyer au backend
-      editButton.classList.toggle('off');
-      editButton.classList.toggle('on');
-      editButton.style.backgroundColor = 'red';
+      editButton.style.backgroundColor = "inherit";
+    } else {
+      const images = document.getElementById("images");
+      images.addEventListener("click", checkImages);
+      editButton.style.backgroundColor = "red";
     }
     edit = !edit;
   });

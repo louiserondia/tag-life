@@ -20,6 +20,10 @@
                 display: block;
                 margin-bottom: 1rem;
             }
+
+            .selected {
+                border: solid 0.5rem red;
+            }
         }
 
     }

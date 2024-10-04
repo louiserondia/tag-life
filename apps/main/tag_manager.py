@@ -1,8 +1,9 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_POST
 import random
 from .json_manager import parse_json, write_to_json, printDico
 from .models import TagModel, ImageModel
+import json
 
 def add_tag(image, tag_name):
         tag, created = TagModel.objects.get_or_create(title=tag_name)
@@ -47,9 +48,12 @@ def add_new_tag(_, image_id, new_tag):
         return JsonResponse({'status': 'error', 'message': 'Image not found'}, status=404)
 
 @require_POST
-def add_tag_list_to_image_list(_, tags, images):
+def add_tag_list_to_image_list(request: HttpRequest):
+    body = json.loads(request.body)
+    images = body['images']
+    tags = body['tags']
+    print(tags)
     dico = parse_json('media/images.json')
-    print(images)
     for i in images:
         image = ImageModel.objects.get(title=i)
         for t in tags:

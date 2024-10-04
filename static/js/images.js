@@ -27,7 +27,7 @@ function createTitle(name, box) {
 function createImg(image, box) {
   const img = document.createElement("img");
   img.src = image.path;
-  img.id = `img-${image.title}`;
+  img.id = `${image.title}`;
   img.onclick = () => displayImageInfos(image.title);
   box.appendChild(img);
   img.addEventListener("load", () => {

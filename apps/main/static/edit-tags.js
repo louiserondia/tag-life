@@ -1,4 +1,5 @@
-import { getCookie } from "./get_cookie.js";
+import { getCookie } from "./get-cookie.js";
+import { updateTagsContainers } from "./utils.js";
 
 let edit = false;
 let checkedImages = new Set();
@@ -9,17 +10,7 @@ function toggleSet(s, o) {
   else s.add(o);
 }
 
-function updateTags(tags, newTags) {
-  tags.innerHTML = "";
-
-  newTags.forEach((newTag) => {
-    const tagElem = document.createElement("h3");
-    tagElem.textContent = newTag;
-    tags.appendChild(tagElem);
-  });
-}
-
-async function tryAddTagListToImageListRequest(buttonClicked) {
+async function tryAddTagListToImageListRequest() {
   try {
     const response = await fetch(`/add_tag_list_to_image_list/`, {
       method: "POST",
@@ -30,7 +21,10 @@ async function tryAddTagListToImageListRequest(buttonClicked) {
       body: JSON.stringify({ tags: [...tags], images: [...checkedImages] }),
     });
 
-    const updatedImages = await response.json().images;
+    const data = await response.json();
+    updateTagsContainers(data.images, data.tags); // doit utiliser autre chose que add new tag 
+    // parce que là j'ajoute à la liste de tags de tags-container pas à la liste 
+    // des tags a cocher
 
     if (!response.ok) throw new Error("Failed to add tags : ");
   } catch (error) {
@@ -55,8 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!edit) {
       const activeTags = document.querySelectorAll(".tag-box.active");
       activeTags.forEach((t) => tags.add(t.id));
-      tryAddTagListToImageListRequest(this);
+      tryAddTagListToImageListRequest();
       editButton.style.backgroundColor = "revert-layer";
+      activeTags.forEach((t) => {
+        t.classList.remove("active");
+      });
     } else {
       const images = document.getElementById("images");
       images.addEventListener("click", checkImages);

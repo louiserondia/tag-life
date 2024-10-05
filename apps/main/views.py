@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from .models import ImageModel, TagModel
 from .utils import clear_all
-from .json_manager import write_to_json, parse_json, printDico, format_images_to_json
+from .json_manager import write_to_json_file, parse_json_from_file, printDico, format_images_to_json
 from .tag_manager import add_tags
 
 def delete_missing_images_tags(dico):
@@ -19,9 +19,6 @@ def delete_missing_images_tags(dico):
     for tag in TagModel.objects.all():
         if tag.images.count() == 0:
             tag.delete()
-        # ça pose pas un problème si je supprime un tag 
-        # qui permet de faire le tri mais qui n'est dans aucune image ?
-
 
 def add_image_to_db(dico):
     for image, tags in dico.items():
@@ -42,48 +39,40 @@ def add_image_to_db(dico):
         image_model.save()
         add_tags(image_model, tags)
 
+def initiate_database():
+    # clear_all()
+    dico = parse_json_from_file('media/images.json')
+    tags = set()
+    for tag in dico.values():
+        tags.update(tag)
+    write_to_json_file({'tags': list(tags)}, 'media/tags.json')
+    add_image_to_db(dico)
+    delete_missing_images_tags(dico)
+    return tags, dico
+
 def fetch_images(request):
     checked_tags = request.GET.getlist('tag')
     images = ImageModel.objects.all()
 
     if checked_tags:
         for tag in checked_tags:
-            images = images.filter(tags__title__icontains=tag).distinct()
+            images = images.filter(tags__title=tag).distinct()
     images = format_images_to_json(images)
     return JsonResponse({'images': images})
 
-def initiate_database():
-    # clear_all()
-    dico = parse_json('media/images.json')
-    tags = set()
-    for tag in dico.values():
-        tags.update(tag)
-    write_to_json({'tags': list(tags)}, 'media/tags.json')
-    add_image_to_db(dico)
-    delete_missing_images_tags(dico)
-    return tags, dico
-
 def import_images(request):
     tags, dico = initiate_database()
+    # tags = TagModel.objects.values_list('title', flat=True)
     
     checked_tags = set(request.GET.getlist('tag')) or set()
-    new_tag = request.GET.get('new_tag', None)
-    if new_tag:
-        if not new_tag in tags:  # if new_tag doesn't exist in database yet
-            tag, created = TagModel.objects.get_or_create(title=new_tag)
-            if created:
-                tags.add(new_tag)
-                write_to_json({'tags': list(tags)   }, 'media/tags.json')
-            checked_tags.add(new_tag)
     images = ImageModel.objects.all()
 
     if len(checked_tags):
         for tag in checked_tags:
-            images = images.filter(tags__title__icontains=tag)
+            images = images.filter(tags__title=tag)
 
     images_json = format_images_to_json(images)
-    context = { 'images': images, 
-               'images_json': json.dumps(images_json),
+    context = { 'images_json': json.dumps(images_json),
                'tags': tags,
                'checked_tags': json.dumps(list(checked_tags)) }
     return render(request, 'home.html', context)

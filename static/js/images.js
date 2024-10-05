@@ -5,6 +5,7 @@ const loadedImages = new Set();
 let imagesToLoad;
 let lastColumn = 0;
 let edit = false;
+let tagBoxes;
 
 // ---------------------------
 //   CREATING ALL THE STUFF
@@ -25,8 +26,7 @@ function createTitle(name, box) {
 }
 
 function displayImageInfos(id) {
-  if (edit)
-    return
+  if (edit) return;
   const title = document.getElementById("title-" + id);
   title.toggleAttribute("hidden");
   const tags = document.getElementById("tags-" + id);
@@ -119,8 +119,8 @@ function imageLoaded() {
   imagesToLoad--;
   if (!imagesToLoad) {
     // setTimeout(() => {
-      const logo = document.getElementById("loadingLogo");
-      logo.style.display = "none";
+    const logo = document.getElementById("loadingLogo");
+    logo.style.display = "none";
     // }, 500);
   }
 }
@@ -160,20 +160,24 @@ function setupInfiniteScroll() {
 //      FILTERS
 // ------------------
 
+function addEventToCheckedTags(tag) {
+  tag.addEventListener("click", function () {
+    tag.classList.toggle("active");
+    const content = tag.id;
+    if (checkedTags.has(content)) {
+      checkedTags.delete(content);
+    } else {
+      checkedTags.add(content);
+    }
+    if (!edit) updateImagesAndUrl();
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-  const tagBoxes = document.querySelectorAll(".tag-box");
+  tagBoxes = document.querySelectorAll(".tag-box");
 
   tagBoxes.forEach(function (box) {
-    box.addEventListener("click", function () {
-      box.classList.toggle("active");
-      const content = box.id;
-      if (checkedTags.has(content)) {
-        checkedTags.delete(content);
-      } else {
-        checkedTags.add(content);
-      }
-      if (!edit) updateImagesAndUrl();
-    });
+    addEventToCheckedTags(box);
   });
 });
 
@@ -198,6 +202,26 @@ function updateImagesAndUrl() {
     });
 }
 
+function updateTagList(newTag) {
+  tagBoxes = document.querySelectorAll(".tag-box");
+  const tagsGrid = document.getElementById("tags-grid");
+
+  const tag = document.createElement("div");
+  tag.textContent = newTag;
+  tag.classList.add("tag-box");
+  if (tagsGrid.classList.contains("dark-mode")) {
+    tag.classList.add("dark-mode");
+  }
+  tag.id = newTag;
+  tagsGrid.appendChild(tag);
+  addEventToCheckedTags(tag);
+}
+
+document.addEventListener("tagAdded", (event) => {
+  const tag = event.detail.tag;
+  const tagBox = document.getElementById(tag);
+});
+
 // ------------------
 //    EDIT BUTTON
 // ------------------
@@ -207,10 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
   editButton.addEventListener("click", function () {
     if (edit) {
       checkedTags.clear();
-      const tagsEl = document.querySelectorAll(".tag-box.active");
-      tagsEl.forEach((t) => {
-        t.classList.remove("active");
-      });
       updateImagesAndUrl();
     }
     edit = !edit;

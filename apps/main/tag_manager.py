@@ -1,13 +1,14 @@
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_POST
 import random
-from .json_manager import parse_json, write_to_json, printDico
+from .json_manager import parse_json_from_file, write_to_json_file, printDico
 from .models import TagModel, ImageModel
 import json
 
 def add_tag(image, tag_name):
         tag, created = TagModel.objects.get_or_create(title=tag_name)
-        image.tags.add(tag)
+        if image: #dangereux si j'envoie null exprès ?
+            image.tags.add(tag)
         if created:
             tag.save()
         return tag
@@ -19,47 +20,32 @@ def add_tags(image, tags):
     return tag_list
 
 @require_POST
-def add_random_tag(_, image_id):
-    try:
-        dico = parse_json('media/images.json')
-        image = ImageModel.objects.get(title=image_id)
-        random_tag = f"tag{random.randint(1, 10)}"
-        if not image.tags.filter(title=random_tag).exists():
-            tag = add_tag(image, random_tag)
-            dico[image.title].append(tag.title)
-            write_to_json(dico, 'media/images.json')
-        tags = list(image.tags.values_list('title', flat=True))
-        return JsonResponse({'tags': tags})
-    except ImageModel.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Image not found'}, status=404)
+def add_new_tag(request: HttpRequest):
+    tags = TagModel.objects.values_list('title', flat=True)
+    tag = json.loads(request.body)['tag']
+    if (tag and not tag in tags):  # if new_tag doesn't exist in database yet
+        add_tag(None, tag)
+        tags = parse_json_from_file('media/tags.json')['tags']
+        tags.append(tag)
+        write_to_json_file({'tags': tags}, 'media/tags.json')
 
-@require_POST
-def add_new_tag(_, image_id, new_tag):
-    try:
-        dico = parse_json('media/images.json')
-        image = ImageModel.objects.get(title=image_id)
-        if not image.tags.filter(title=new_tag).exists():
-            tag = add_tag(image, new_tag)
-            dico[image.title].append(tag.title)
-            write_to_json(dico, 'media/images.json')
-        tags = list(image.tags.values_list('title', flat=True))
-        return JsonResponse({'tags': tag.title, 'image': image.title})
-    except ImageModel.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Image not found'}, status=404)
+
+
+    return JsonResponse({'tag': tag})
 
 @require_POST
 def add_tag_list_to_image_list(request: HttpRequest):
     body = json.loads(request.body)
     images = body['images']
     tags = body['tags']
-    dico = parse_json('media/images.json')
+    dico = parse_json_from_file('media/images.json')
     for i in images:
         image = ImageModel.objects.get(title=i)
         for t in tags:
             if not image.tags.filter(title=t).exists():
                 tag = add_tag(image, t)
                 dico[image.title].append(tag.title)
-    write_to_json(dico, 'media/images.json')
-    return JsonResponse({'images': images})
+    write_to_json_file(dico, 'media/images.json')
+    return JsonResponse({'images': images, 'tags': tags})
 
 

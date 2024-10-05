@@ -30,13 +30,12 @@
                 </div>
                 {% endfor %}
             </div>
-            <form method="get" action="{% url 'import_images' %}">
-                <div id="new-tag">
-                    <label for="tag"></label>
-                    <input type="text" id="tag" name="new_tag" value="{{ tag_filter|default:'' }}">
-                    <button type="submit">Add</button>
-                </div>
-            </form>
+            <!-- <form method="get" action="{% url 'import_images' %}"> -->
+            <div id="new-tag">
+                <textarea id="add-new-tag-input"></textarea>
+                <button id="add-new-tag-button">Add</button>
+            </div>
+            <!-- </form> -->
         </div>
         
         <div class="images" id="images"></div>
@@ -54,7 +53,7 @@
     <script src="{% static 'js/utils.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/darkmode.js' %}"></script>
-    <script type="module" src="{% static 'add_random_tag.js' %}"></script>
+    <script type="module" src="{% static 'add-new-tag.js' %}"></script>
     <script type="module" src="{% static 'edit-tags.js' %}"></script>
 
 </body>

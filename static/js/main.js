@@ -21,18 +21,3 @@ document.addEventListener("DOMContentLoaded", function () {
   // updateTitlePosition();
 });
 
-
-// ------------------
-//    EDIT BUTTON
-// ------------------
-
-document.addEventListener("DOMContentLoaded", () => {
-  const editButton = document.getElementById("edit");
-  editButton.addEventListener("click", function () {
-    if (edit) {
-      checkedTags.clear();
-      updateImagesAndUrl();
-    }
-    edit = !edit;
-  });
-});

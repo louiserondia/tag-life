@@ -50,6 +50,12 @@ def initiate_database():
     delete_missing_images_tags(dico)
     return tags, dico
 
+def fetch_images_data(_):
+    images = ImageModel.objects.all()
+    return JsonResponse({
+        'images_data': format_images_to_json(images),
+    })
+
 def fetch_images(request):
     checked_tags = request.GET.getlist('tag')
     images = ImageModel.objects.all()

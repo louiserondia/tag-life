@@ -1,5 +1,5 @@
 import { getCookie } from "./get-cookie.js";
-// import { updateTagList } from "../../../static/js/images";
+import { updateTagList } from "../../../static/js/tags.js";
 
 
 async function tryAddNewTagRequest() {
@@ -18,7 +18,7 @@ async function tryAddNewTagRequest() {
     if (!response.ok) throw new Error("Failed to add tag");
 
     const data = await response.json();
-    // updateTagList(data.tag);
+    updateTagList(data.tag);
     input.value = "";
 
     const event = new CustomEvent("tagAdded", { detail: { tag: data.tag } });

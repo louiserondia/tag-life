@@ -45,15 +45,11 @@
         </div>
     </div>
 
-    <script>
-        const imagesData = JSON.parse("{{ images_json|safe|escapejs }}");
-        const checkedTags = new Set(JSON.parse("{{ checked_tags|escapejs }}"));
-    </script>
-    <script src="{% static 'js/images.js' %}"></script>
-    <script src="{% static 'js/tags.js' %}"></script>
-    <script src="{% static 'js/utils.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script type="module" src="{% static 'js/images.js' %}"></script>
+    <script type="module" src="{% static 'js/tags.js' %}"></script>
+    <script type="module" src="{% static 'js/utils.js' %}"></script>
+    <script type="module" src="{% static 'js/darkmode.js' %}"></script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
     <script type="module" src="{% static 'add-new-tag.js' %}"></script>
     <script type="module" src="{% static 'edit-tags.js' %}"></script>
 

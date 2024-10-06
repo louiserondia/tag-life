@@ -1,4 +1,4 @@
-let imageList = imagesData;
+let imageList;
 let currentBatch = 1;
 let prevBatch;
 const batchSize = 10;
@@ -7,8 +7,32 @@ let loadedImagesCopy = new Set();
 let imagesToLoad;
 let lastColumn = 0;
 let prevLastColumn;
-let edit = false;
-let tagBoxes;
+export let edit = false;
+import { checkedTags } from "./tags.js";
+
+async function fetchImagesData() {
+  try {
+    const response = await fetch("/api/images_data/");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    return data.images_data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des images:", error);
+  }
+}
+
+async function init() {
+  imageList = await fetchImagesData();
+
+  if (imageList && imageList.length) {
+    updateColumns();
+    setupInfiniteScroll();
+  } else {
+    console.error("Erreur: Aucun image disponible");
+  }
+}
 
 // ---------------------------
 //   CREATING ALL THE STUFF
@@ -53,7 +77,7 @@ function createTitle(name, box) {
   box.appendChild(title);
 }
 
-function createTagsContainer(name, box, tags) {
+export function createTagsContainer(name, box, tags) {
   const tagsContainer = document.createElement("div");
   tagsContainer.classList.add("tags-container");
   tagsContainer.id = `tags-${name}`;
@@ -176,7 +200,7 @@ function setupInfiniteScroll() {
 //   UPDATE IMAGES URL
 // ---------------------
 
-function updateImagesAndUrl() {
+export function updateImagesAndUrl() {
   const clientUrl = new URL("/", window.location.origin);
   const url = new URL("/api/images/", window.location.origin);
   for (const tag of checkedTags) {
@@ -198,11 +222,23 @@ function updateImagesAndUrl() {
 }
 
 // ------------------
+//    EDIT BUTTON
+// ------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+  const editButton = document.getElementById("edit");
+  editButton.addEventListener("click", function () {
+    if (edit) {
+      checkedTags.clear();
+      updateImagesAndUrl();
+    }
+    edit = !edit;
+  });
+});
+
+// ------------------
 //   INITIALISATION
 // ------------------
 
 window.addEventListener("resize", updateColumns);
-updateColumns();
-window.addEventListener("load", () => {
-  setupInfiniteScroll();
-});
+window.addEventListener("load", init);

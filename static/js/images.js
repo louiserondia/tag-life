@@ -1,9 +1,12 @@
 let imageList = imagesData;
 let currentBatch = 1;
+let prevBatch;
 const batchSize = 10;
-const loadedImages = new Set();
+let loadedImages = new Set();
+let loadedImagesCopy = new Set();
 let imagesToLoad;
 let lastColumn = 0;
+let prevLastColumn;
 let edit = false;
 let tagBoxes;
 
@@ -11,10 +14,35 @@ let tagBoxes;
 //   CREATING ALL THE STUFF
 // ---------------------------
 
-function resetEverything() {
-  loadedImages.clear();
-  currentBatch = 1;
-  lastColumn = 0;
+function resetColumns() {
+  if (checkedTags.size) {
+    loadedImagesCopy = new Set(loadedImages);
+    loadedImages.clear();
+    prevBatch = currentBatch;
+    currentBatch = 1;
+    prevLastColumn = lastColumn;
+    lastColumn = 0;
+  } else {
+    loadedImages = new Set(loadedImagesCopy);
+    loadedImagesCopy.clear();
+    currentBatch = prevBatch;
+    lastColumn = prevLastColumn;
+  }
+}
+
+// Create images' boxes and their title and tags, which appear when clicked on
+
+function createImg(image, box) {
+  const img = document.createElement("img");
+  img.src = image.path;
+  img.id = `${image.title}`;
+  img.onclick = () => toggleImageInfos(image.title);
+  box.appendChild(img);
+  img.addEventListener("load", () => {
+    requestIdleCallback(() => {
+      imageLoaded();
+    });
+  });
 }
 
 function createTitle(name, box) {
@@ -23,27 +51,6 @@ function createTitle(name, box) {
   title.hidden = true;
   title.textContent = name;
   box.appendChild(title);
-}
-
-function displayImageInfos(id) {
-  if (edit) return;
-  const title = document.getElementById("title-" + id);
-  title.toggleAttribute("hidden");
-  const tags = document.getElementById("tags-" + id);
-  tags.toggleAttribute("hidden");
-}
-
-function createImg(image, box) {
-  const img = document.createElement("img");
-  img.src = image.path;
-  img.id = `${image.title}`;
-  img.onclick = () => displayImageInfos(image.title);
-  box.appendChild(img);
-  img.addEventListener("load", () => {
-    requestIdleCallback(() => {
-      imageLoaded();
-    });
-  });
 }
 
 function createTagsContainer(name, box, tags) {
@@ -57,6 +64,14 @@ function createTagsContainer(name, box, tags) {
     tagsContainer.appendChild(t);
   });
   box.appendChild(tagsContainer);
+}
+
+function toggleImageInfos(id) {
+  if (edit) return;
+  const title = document.getElementById("title-" + id);
+  title.toggleAttribute("hidden");
+  const tags = document.getElementById("tags-" + id);
+  tags.toggleAttribute("hidden");
 }
 
 // -------------------------
@@ -73,16 +88,19 @@ function initializeColumns(images, nColumns) {
     container.appendChild(column);
   }
 
-  if (loadedImages.size) createColumns(loadedImages, 0);
-  else createColumns(images.slice(0, batchSize), lastColumn);
+  if (loadedImages.size) {
+    createColumns(loadedImages);
+  } else {
+    createColumns(images.slice(0, batchSize));
+  }
 }
 
-function createColumns(images, startIndex) {
+function createColumns(images) {
   const container = document.getElementById("images");
   const nColumns = container.children.length;
   imagesToLoad = batchSize;
 
-  images.forEach((image, index) => {
+  images.forEach((image) => {
     const column = container.children[lastColumn];
     const box = document.createElement("div");
 
@@ -118,10 +136,8 @@ function updateColumns() {
 function imageLoaded() {
   imagesToLoad--;
   if (!imagesToLoad) {
-    // setTimeout(() => {
     const logo = document.getElementById("loadingLogo");
     logo.style.display = "none";
-    // }, 500);
   }
 }
 
@@ -136,7 +152,7 @@ function loadNextBatch() {
 
   if (!imagesToLoad.length) return;
 
-  createColumns(imagesToLoad, lastColumn);
+  createColumns(imagesToLoad);
 
   currentBatch++;
 }
@@ -156,30 +172,9 @@ function setupInfiniteScroll() {
   observer.observe(sentinel);
 }
 
-// ------------------
-//      FILTERS
-// ------------------
-
-function addEventToCheckedTags(tag) {
-  tag.addEventListener("click", function () {
-    tag.classList.toggle("active");
-    const content = tag.id;
-    if (checkedTags.has(content)) {
-      checkedTags.delete(content);
-    } else {
-      checkedTags.add(content);
-    }
-    if (!edit) updateImagesAndUrl();
-  });
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  tagBoxes = document.querySelectorAll(".tag-box");
-
-  tagBoxes.forEach(function (box) {
-    addEventToCheckedTags(box);
-  });
-});
+// ---------------------
+//   UPDATE IMAGES URL
+// ---------------------
 
 function updateImagesAndUrl() {
   const clientUrl = new URL("/", window.location.origin);
@@ -193,7 +188,7 @@ function updateImagesAndUrl() {
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      resetEverything();
+      resetColumns();
       imageList = data.images;
       updateColumns();
     })
@@ -201,41 +196,6 @@ function updateImagesAndUrl() {
       console.error("error quand je fetch les images : " + error);
     });
 }
-
-function updateTagList(newTag) {
-  tagBoxes = document.querySelectorAll(".tag-box");
-  const tagsGrid = document.getElementById("tags-grid");
-
-  const tag = document.createElement("div");
-  tag.textContent = newTag;
-  tag.classList.add("tag-box");
-  if (tagsGrid.classList.contains("dark-mode")) {
-    tag.classList.add("dark-mode");
-  }
-  tag.id = newTag;
-  tagsGrid.appendChild(tag);
-  addEventToCheckedTags(tag);
-}
-
-document.addEventListener("tagAdded", (event) => {
-  const tag = event.detail.tag;
-  const tagBox = document.getElementById(tag);
-});
-
-// ------------------
-//    EDIT BUTTON
-// ------------------
-
-document.addEventListener("DOMContentLoaded", () => {
-  const editButton = document.getElementById("edit");
-  editButton.addEventListener("click", function () {
-    if (edit) {
-      checkedTags.clear();
-      updateImagesAndUrl();
-    }
-    edit = !edit;
-  });
-});
 
 // ------------------
 //   INITIALISATION

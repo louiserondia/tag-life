@@ -77,16 +77,22 @@ function createTitle(name, box) {
   box.appendChild(title);
 }
 
-export function createTagsContainer(name, box, tags) {
-  const tagsContainer = document.createElement("div");
-  tagsContainer.classList.add("tags-container");
-  tagsContainer.id = `tags-${name}`;
-  tagsContainer.hidden = true;
+export function addTagsToTagContainer(tags, tagsContainer) {
+  const prev = [...tagsContainer.children]
   tags.forEach((tag) => {
+    if (prev.some((p) => p.innerHTML === tag)) return;
     const t = document.createElement("h3");
     t.textContent = tag;
     tagsContainer.appendChild(t);
   });
+}
+
+function createTagsContainer(name, box, tags) {
+  const tagsContainer = document.createElement("div");
+  tagsContainer.classList.add("tags-container");
+  tagsContainer.id = `tags-${name}`;
+  tagsContainer.hidden = true;
+  addTagsToTagContainer(tags, tagsContainer)
   box.appendChild(tagsContainer);
 }
 
@@ -120,6 +126,7 @@ function initializeColumns(images, nColumns) {
 }
 
 function createColumns(images) {
+
   const container = document.getElementById("images");
   const nColumns = container.children.length;
   imagesToLoad = batchSize;
@@ -230,7 +237,10 @@ document.addEventListener("DOMContentLoaded", () => {
   editButton.addEventListener("click", function () {
     if (edit) {
       checkedTags.clear();
-      updateImagesAndUrl();
+      const selectedImgs = document.querySelectorAll('img.selected');
+      selectedImgs.forEach((i) => {
+        i.classList.remove("selected");
+      }) 
     }
     edit = !edit;
   });

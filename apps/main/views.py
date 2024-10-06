@@ -39,6 +39,7 @@ def add_image_to_db(dico):
         image_model.save()
         add_tags(image_model, tags)
 
+# Clears, update images in db from json and update tags.json
 def initiate_database():
     # clear_all()
     dico = parse_json_from_file('media/images.json')
@@ -50,12 +51,15 @@ def initiate_database():
     delete_missing_images_tags(dico)
     return tags, dico
 
+
+# Send all images to frontend formated to json
 def fetch_images_data(_):
     images = ImageModel.objects.all()
     return JsonResponse({
         'images_data': format_images_to_json(images),
     })
 
+# Sends images filtered by tag(s)
 def fetch_images(request):
     checked_tags = request.GET.getlist('tag')
     images = ImageModel.objects.all()
@@ -66,9 +70,10 @@ def fetch_images(request):
     images = format_images_to_json(images)
     return JsonResponse({'images': images})
 
-def import_images(request):
-    tags, dico = initiate_database()
-    # tags = TagModel.objects.values_list('title', flat=True)
+# uncomment line 1 and comment line 2 to initiate database, 
+def home(request):
+    # tags, dico = initiate_database()
+    tags = TagModel.objects.values_list('title', flat=True)
     
     checked_tags = set(request.GET.getlist('tag')) or set()
     images = ImageModel.objects.all()
@@ -77,8 +82,6 @@ def import_images(request):
         for tag in checked_tags:
             images = images.filter(tags__title=tag)
 
-    images_json = format_images_to_json(images)
-    context = { 'images_json': json.dumps(images_json),
-               'tags': tags,
+    context = { 'tags': tags,
                'checked_tags': json.dumps(list(checked_tags)) }
     return render(request, 'home.html', context)

@@ -9,6 +9,7 @@ document.addEventListener("load", () => {
   });
 });
 
+// Adds an event listener to tag we checked and toggles it
 function addEventToCheckedTags(tag) {
   tag.addEventListener("click", function () {
     tag.classList.toggle("active");

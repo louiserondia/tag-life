@@ -21,8 +21,6 @@ async function tryAddNewTagRequest() {
     updateTagList(data.tag);
     input.value = "";
 
-    const event = new CustomEvent("tagAdded", { detail: { tag: data.tag } });
-    document.dispatchEvent(event);
   } catch (error) {
     console.error("Error adding new tag:", error);
   }

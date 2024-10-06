@@ -1,120 +1,80 @@
 {
     "0001.jpg": [
-        "bojour",
-        "croute",
         "mer",
+        "bd",
+        "bbb",
         "moi",
-        "hellooooooo",
-        "prou",
-        "pierre",
-        "3d",
-        "abc"
+        "marseille"
     ],
     "0002.jpg": [
-        "tag3",
+        "bbb",
+        "aaaaa",
+        "marseille",
         "soleil",
-        "croute",
-        "pierre",
-        "yooooo",
-        "3d",
-        "montagne",
-        "prou",
         "moi",
-        "abc",
+        "3d",
         "mer"
     ],
     "0003.jpg": [
-        "yooooo",
-        "tag9",
-        "prou",
-        "3d",
-        "croute",
-        "montagne",
-        "tag3",
+        "mer",
+        "f",
+        "bbb",
+        "aaaaa",
         "moi",
-        "pierre",
-        "marseille",
-        "valentin",
-        "abc",
-        "mer"
+        "3d"
     ],
     "0004.jpg": [
-        "tag9",
-        "croute",
-        "yooooo",
-        "3d",
-        "montagne",
-        "tag3",
-        "prou",
-        "moi",
-        "pierre"
-    ],
-    "0005.jpg": [
-        "tag9",
-        "tag3",
-        "yooooo",
+        "bbb",
+        "f",
+        "mer",
+        "soleil",
+        "bd",
         "marseille",
-        "valentin",
-        "3d"
+        "aaaaa"
     ],
+    "0005.jpg": [],
     "0006.jpg": [
-        "tag9",
-        "moi",
         "valentin",
-        "prou",
-        "3d"
+        "f"
     ],
     "0007.jpg": [
-        "tag9",
-        "yooooo",
+        "moi",
         "mer",
-        "tag3",
-        "soleil",
-        "valentin",
-        "abc"
+        "bd",
+        "3d"
     ],
     "0008.jpg": [
-        "marseille",
         "mer",
-        "valentin",
-        "golden hour",
-        "tag3",
-        "prou",
-        "moi",
-        "pierre",
-        "abc"
-    ],
-    "0009.jpg": [
-        "pierre",
-        "golden hour",
-        "montagne",
-        "prou",
-        "moi",
-        "yooooo",
-        "marseille",
         "valentin"
     ],
+    "0009.jpg": [],
     "0010.jpg": [
-        "prou",
-        "moi",
-        "pierre",
-        "yooooo",
-        "abc"
+        "marseille"
     ],
     "0011.jpg": [
-        "valentin",
-        "pierre",
         "soleil"
     ],
     "0012.jpg": [],
     "0013.jpg": [],
-    "0014.jpg": [],
-    "0015.jpg": [],
+    "0014.jpg": [
+        "f",
+        "soleil"
+    ],
+    "0015.jpg": [
+        "bbb",
+        "aaaaa"
+    ],
     "0016.jpg": [],
     "0017.jpg": [],
-    "0018.jpg": [],
+    "0018.jpg": [
+        "bbb",
+        "f",
+        "aaaaa"
+    ],
     "0019.jpg": [],
-    "0020.jpg": [],
+    "0020.jpg": [
+        "3d"
+    ],
     "0021.jpg": [],
     "0022.jpg": [],
     "0023.jpg": [],

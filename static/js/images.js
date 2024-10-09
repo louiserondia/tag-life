@@ -1,3 +1,4 @@
+let imagesData;
 let imageList;
 let currentBatch = 1;
 let prevBatch;
@@ -23,9 +24,27 @@ async function fetchImagesData() {
   }
 }
 
-async function init() {
-  imageList = await fetchImagesData();
+function shuffle(src) {
+  let images = [...src];
 
+  for (let i = images.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [images[i], images[j]] = [images[j], images[i]];
+  }
+  return images;
+}
+
+async function init() {
+  imagesData = await fetchImagesData();
+  const listFromLocalStorage = localStorage.getItem('imageList');
+  if (!listFromLocalStorage) {
+    imageList = shuffle(imagesData);
+    localStorage.setItem('imageList', JSON.stringify(imageList));
+  }
+  else {
+    imageList = JSON.parse(listFromLocalStorage);
+  }
+  console.log(imageList);
   if (imageList && imageList.length) {
     updateColumns();
     setupInfiniteScroll();
@@ -78,7 +97,7 @@ function createTitle(name, box) {
 }
 
 export function addTagsToTagContainer(tags, tagsContainer) {
-  const prev = [...tagsContainer.children]
+  const prev = [...tagsContainer.children];
   tags.forEach((tag) => {
     if (prev.some((p) => p.innerHTML === tag)) return;
     const t = document.createElement("h3");
@@ -92,7 +111,7 @@ function createTagsContainer(name, box, tags) {
   tagsContainer.classList.add("tags-container");
   tagsContainer.id = `tags-${name}`;
   tagsContainer.hidden = true;
-  addTagsToTagContainer(tags, tagsContainer)
+  addTagsToTagContainer(tags, tagsContainer);
   box.appendChild(tagsContainer);
 }
 
@@ -126,7 +145,6 @@ function initializeColumns(images, nColumns) {
 }
 
 function createColumns(images) {
-
   const container = document.getElementById("images");
   const nColumns = container.children.length;
   imagesToLoad = batchSize;
@@ -234,19 +252,32 @@ export function updateImagesAndUrl() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const editButton = document.getElementById("edit");
-  editButton.addEventListener("click", function () {
+  editButton.addEventListener("click", () => {
     if (edit) {
       checkedTags.clear();
-      const selectedImgs = document.querySelectorAll('img.selected');
+      const selectedImgs = document.querySelectorAll("img.selected");
       selectedImgs.forEach((i) => {
         i.classList.remove("selected");
-      }) 
+      });
     }
     edit = !edit;
   });
 });
 
 // ------------------
+//    EDIT BUTTON
+// ------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+ const shuffleButton = document.getElementById('shuffle');
+ shuffleButton.addEventListener("click", () => {
+  imageList = shuffle(imagesData);
+  localStorage.setItem('imageList', JSON.stringify(imageList));
+  updateColumns();
+ });
+});
+  
+  // ------------------
 //   INITIALISATION
 // ------------------
 

@@ -8,6 +8,7 @@ let loadedImagesCopy = new Set();
 let imagesToLoad;
 let lastColumn = 0;
 let prevLastColumn;
+let hasShuffled = false;
 export let edit = false;
 import { checkedTags } from "./tags.js";
 
@@ -36,15 +37,13 @@ function shuffle(src) {
 
 async function init() {
   imagesData = await fetchImagesData();
-  const listFromLocalStorage = localStorage.getItem('imageList');
+  const listFromLocalStorage = localStorage.getItem("imageList");
   if (!listFromLocalStorage) {
     imageList = shuffle(imagesData);
-    localStorage.setItem('imageList', JSON.stringify(imageList));
-  }
-  else {
+    localStorage.setItem("imageList", JSON.stringify(imageList));
+  } else {
     imageList = JSON.parse(listFromLocalStorage);
   }
-  console.log(imageList);
   if (imageList && imageList.length) {
     updateColumns();
     setupInfiniteScroll();
@@ -58,7 +57,7 @@ async function init() {
 // ---------------------------
 
 function resetColumns() {
-  if (checkedTags.size) {
+  if (checkedTags.size || hasShuffled) {
     loadedImagesCopy = new Set(loadedImages);
     loadedImages.clear();
     prevBatch = currentBatch;
@@ -180,6 +179,7 @@ function updateColumns() {
   lastColumn = 0;
   const nColumns = getNumberOfColumns();
   initializeColumns(imageList, nColumns);
+  hasShuffled = false;
 }
 
 function imageLoaded() {
@@ -269,15 +269,17 @@ document.addEventListener("DOMContentLoaded", () => {
 // ------------------
 
 document.addEventListener("DOMContentLoaded", () => {
- const shuffleButton = document.getElementById('shuffle');
- shuffleButton.addEventListener("click", () => {
-  imageList = shuffle(imagesData);
-  localStorage.setItem('imageList', JSON.stringify(imageList));
-  updateColumns();
- });
+  const shuffleButton = document.getElementById("shuffle");
+  shuffleButton.addEventListener("click", () => {
+    hasShuffled = true;
+    imageList = shuffle(imagesData);
+    localStorage.setItem("imageList", JSON.stringify(imageList));
+    resetColumns();
+    updateColumns();
+  });
 });
-  
-  // ------------------
+
+// ------------------
 //   INITIALISATION
 // ------------------
 

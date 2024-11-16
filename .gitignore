@@ -15,6 +15,10 @@ apps/main/__pycache__
 apps/main/__pycache__/*
 apps/main/migrations
 apps/main/migrations/*
+apps/main/__init__.py
+apps/__pycache__
+apps/__pycache__/*
+apps/__init__.py
 taglife/settings.py
 taglife\settings.py
 static\main.css
@@ -25,5 +29,3 @@ static/images.css.map
 static/images.css
 static\images.css.map
 static\images.css
-apps/main/__pycache__
-apps/main/__pycache__/*

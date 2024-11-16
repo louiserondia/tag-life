@@ -2,7 +2,7 @@ let imagesData;
 let imageList;
 let currentBatch = 1;
 let prevBatch;
-const batchSize = 10;
+const batchSize = 50;
 let loadedImages = new Set();
 let loadedImagesCopy = new Set();
 let imagesToLoad;
@@ -10,7 +10,7 @@ let lastColumn = 0;
 let prevLastColumn;
 let hasShuffled = false;
 export let edit = false;
-import { checkedTags } from "./tags.js";
+import { checkedTags, editCheckedTags } from "./tags.js";
 
 async function fetchImagesData() {
   try {
@@ -146,7 +146,7 @@ function initializeColumns(images, nColumns) {
 function createColumns(images) {
   const container = document.getElementById("images");
   const nColumns = container.children.length;
-  imagesToLoad = batchSize;
+  imagesToLoad = Math.min(batchSize, images.length);
 
   images.forEach((image) => {
     const column = container.children[lastColumn];
@@ -197,17 +197,17 @@ function imageLoaded() {
 function loadNextBatch() {
   const start = currentBatch * batchSize;
   const end = start + batchSize;
-  const imagesToLoad = imageList.slice(start, end);
+  const images = imageList.slice(start, end);
 
-  if (!imagesToLoad.length) return;
+  if (!images.length) return;
 
-  createColumns(imagesToLoad);
+  createColumns(images);
 
   currentBatch++;
 }
 
 function setupInfiniteScroll() {
-  const observer = new IntersectionObserver((entries, observer) => {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting && imageList.length != loadedImages.size) {
         const logo = document.getElementById("loadingLogo");
@@ -242,7 +242,7 @@ export function updateImagesAndUrl() {
       updateColumns();
     })
     .catch((error) => {
-      console.error("error quand je fetch les images : " + error);
+      console.error("error dans updateImagesAndUrl : " + error);
     });
 }
 
@@ -250,14 +250,31 @@ export function updateImagesAndUrl() {
 //    EDIT BUTTON
 // ------------------
 
+// créer une liste des tags a cocher quand on edit, pour ajouter sur image
+// donc quand on click sur edit ça décoche visuellement ceux qui étaient cochés pour le tri
+// puis quand on valide on vide la edit liste et on recoche les éléments de checkedTags qui sont pour le tri
+
 document.addEventListener("DOMContentLoaded", () => {
   const editButton = document.getElementById("edit");
   editButton.addEventListener("click", () => {
+    let tags = document.querySelectorAll(".tag-box");
     if (edit) {
-      checkedTags.clear();
       const selectedImgs = document.querySelectorAll("img.selected");
       selectedImgs.forEach((i) => {
         i.classList.remove("selected");
+      });
+      editCheckedTags.clear();
+      tags.forEach ((tag) => {
+        if (checkedTags.has(tag.id)) {
+          setTimeout(() => {
+            tag.classList.add("active");
+          }, 10);
+        }
+      });
+    }
+    else {
+      tags.forEach((tag) => {
+        tag.classList.remove("active");
       });
     }
     edit = !edit;
@@ -265,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ------------------
-//    EDIT BUTTON
+//    SHUFFLE BUTTON
 // ------------------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -284,4 +301,4 @@ document.addEventListener("DOMContentLoaded", () => {
 // ------------------
 
 window.addEventListener("resize", updateColumns);
-window.addEventListener("load", init);
+window.addEventListener("DOMContentLoaded", init);

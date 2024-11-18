@@ -29,3 +29,10 @@ static/images.css.map
 static/images.css
 static\images.css.map
 static\images.css
+node_modules
+node_modules/*
+node_modules\*
+node_modules/*/*
+node_modules\*\*
+node_modules/*/*/*
+node_modules\*\*\*

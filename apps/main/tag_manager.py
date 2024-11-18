@@ -39,13 +39,15 @@ def add_tag_list_to_image_list(request: HttpRequest):
     tags = body['tags']
     dico = parse_json_from_file('media/images.json')
     for i in images:
+        print(i)
         image = ImageModel.objects.get(title=i)
         if (not image):
             print(i)
-        for t in tags:
-            if not image.tags.filter(title=t).exists():
-                tag = add_tag(image, t)
-                dico[image.title].append(tag.title)
+        else:
+            for t in tags:
+                if not image.tags.filter(title=t).exists():
+                    tag = add_tag(image, t)
+                    dico[image.title].append(tag.title)
     write_to_json_file(dico, 'media/images.json')
     return JsonResponse({'images': images, 'tags': tags})
 

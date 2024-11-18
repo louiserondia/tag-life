@@ -9,9 +9,10 @@ let tags = new Set();
 function updateTagsContainers(images, newTags) {
   images.forEach((image) => {
     const imageEl = document.getElementById(image);
-    const ctn = imageEl.nextElementSibling;
-
-    addTagsToTagContainer(newTags, ctn);
+    if (imageEl) {
+      const ctn = imageEl.nextElementSibling;
+      addTagsToTagContainer(newTags, ctn);
+    }
   });
 }
 

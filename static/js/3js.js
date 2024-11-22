@@ -4,58 +4,117 @@ import { OrbitControls } from '/static/js/libs/OrbitControls.js';
 
 const scene = new THREE.Scene();
 
-// Créer une caméra
-const camera = new THREE.PerspectiveCamera(75, (window.innerWidth) / (window.innerHeight/2), 0.1, 1000);
-camera.position.z = 5;
+const aspect = window.innerWidth / (window.innerHeight * .7);
+const d = 5;
+let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 1, 1000);
+camera.position.set(-20, 20, -20);
+camera.lookAt(scene.position);
 
-camera.position.set(-3.5, 3.5, -3.5); // Positionner la caméra pour avoir une vue claire
-camera.lookAt(0, 1, 0);
 
-// Créer un renderer et l'ajouter à la page
 const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight / 2);
+renderer.setSize(window.innerWidth, window.innerHeight * .7);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1, 0);
+controls.enableDamping = true; // Ajoute inertie
+controls.dampingFactor = 0.05;
+controls.rotateSpeed = 0.5;
+controls.enablePan = false; // Désactiver le déplacement latéral
+controls.enableZoom = true;
+controls.minzoom = 2;
+controls.maxZoom = 20; // ????? marche pas
+controls.minPolarAngle = Math.PI / 3; // Verrouiller la caméra à 60°
+controls.maxPolarAngle = Math.PI / 3;
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+dirLight.position.set(8, 12, 15);
+dirLight.target.position.set(0, 0, 0);
+dirLight.castShadow = true;
+dirLight.shadow.camera.left = -10;
+dirLight.shadow.camera.right = 10;
+dirLight.shadow.camera.top = 10;
+dirLight.shadow.camera.near = 5;
+dirLight.shadow.camera.far = 30;
+dirLight.shadow.mapSize.width = 2048/2;
+dirLight.shadow.mapSize.height = 2048/2;
+dirLight.shadow.bias = -0.005;
+scene.add(dirLight);
+
+const helper = new THREE.CameraHelper(dirLight.shadow.camera);
+// scene.add(helper);
+
+const ambientLight = new THREE.AmbientLight(0xbab7ad);
+scene.add(ambientLight);
+scene.background = null;
+
+function updateWallVisibility(visibleWalls) {
+    walls.forEach((wall, index) => {
+        wall.visible = visibleWalls[index];
+    });
+}
+
+function onCameraRotate() {
+    let a = new THREE.Vector3();
+    camera.getWorldDirection(a);
+    if (a.x <= 0 && a.z <= 0)
+        updateWallVisibility([false, false, true, true]) // nord
+    else if (a.x > 0 && a.z <= 0)
+        updateWallVisibility([true, false, false, true]) // est
+    else if (a.x > 0 && a.z > 0)
+        updateWallVisibility([true, true, false, false]) //sud
+    else
+        updateWallVisibility([false, true, true, false]) // ouest
+}
 
 const loader = new GLTFLoader();
 
 loader.load('../media/models/desk2.glb', (gltf) => {
-    const model = gltf.scene;
-    scene.add(model);
-    model.position.set(0, 0, 1);
-    model.scale.set(1, 1, 1);
+    const desk = gltf.scene;
+    gltf.scene.traverse(function (node) {
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+    scene.add(desk);
+    desk.position.set(0, 0, 1);
+    desk.scale.set(1, 1, 1);
 }, undefined, (error) => {
-    console.error(error, "Error on loading of gltf model");
-
+    console.error(error, "Error on loading of gltf desk");
 });
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 1, 0); // Point vers lequel la caméra regarde
-controls.enableDamping = true; // Ajoute une inertie
-controls.dampingFactor = 0.05; // Facteur d'inertie
-controls.rotateSpeed = 0.5; // Vitesse de rotation
-controls.enablePan = false; // Désactiver le déplacement latéral
-controls.enableZoom = true; // Autoriser le zoom
-controls.minDistance = 4; // Distance minimale de la caméra par rapport à l'objet
-controls.maxDistance = 10; // Distance maximale de la caméra par rapport à l'objet
-// Désactiver le zoom
-// controls.enableZoom = false;
+let walls = [];
+loader.load('../media/models/wall.glb', (gltf) => {
+    walls[0] = gltf.scene;
+    gltf.scene.traverse(function (node) {
+        if (node.isMesh) {
+            node.castShadow = true;
+        }
+    });
+    for (let i = 0; i < 4; i++) {
 
-// // Désactiver le pan (déplacement latéral de la caméra)
-// controls.enablePan = false;
+        walls[i] = walls[0].clone();
+        const angle = (Math.PI / 2) * i;
+        walls[i].rotation.y = angle;
+        walls[i].position.set(Math.cos(angle) * 4, 0, Math.sin(angle) * 4);
+        scene.add(walls[i]);
+    }
+    walls[2].visible = false;
+    walls[3].visible = false;
+    controls.addEventListener('change', onCameraRotate);
 
-const lightRight = new THREE.DirectionalLight(0xffffff, 1.5);
-lightRight.position.set(8, 8, 8);
-const lightLeft = new THREE.DirectionalLight(0xffffff, 1.5);
-lightLeft.position.set(-8, 8, -8);
-scene.add(lightLeft, lightRight);
+}, undefined, (error) => {
+    console.error(error, "Error on loading of gltf walls");
+});
 
-const ambientLight = new THREE.AmbientLight(0xf0e4c2); // lumière d'ambiance
-scene.add(ambientLight);
+let geometry = new THREE.BoxGeometry(8, .1, 8);
+const material = new THREE.MeshStandardMaterial({ color: 0xA2AEE7 });
+const ground = new THREE.Mesh(geometry, material);
+ground.receiveShadow = true;
+scene.add(ground);
 
-scene.background = null;
-// Animation
 function animate() {
     requestAnimationFrame(animate);
     controls.update();

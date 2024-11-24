@@ -4,15 +4,15 @@ import { OrbitControls } from '/static/js/libs/OrbitControls.js';
 
 const scene = new THREE.Scene();
 
-const aspect = window.innerWidth / (window.innerHeight * .7);
-const d = 5;
+const aspect = window.innerWidth / window.innerHeight;
+const d = 8;
 let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 1, 1000);
-camera.position.set(-20, 20, -20);
+camera.position.set(-50, 50, -50);
 camera.lookAt(scene.position);
-
+camera.zoom = 20;
 
 const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight * .7);
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -22,7 +22,7 @@ controls.enableDamping = true; // Ajoute inertie
 controls.dampingFactor = 0.05;
 controls.rotateSpeed = 0.5;
 controls.enablePan = false; // Désactiver le déplacement latéral
-controls.enableZoom = true;
+controls.enableZoom = false;
 controls.minzoom = 2;
 controls.maxZoom = 20; // ????? marche pas
 controls.minPolarAngle = Math.PI / 3; // Verrouiller la caméra à 60°
@@ -37,15 +37,15 @@ dirLight.shadow.camera.right = 10;
 dirLight.shadow.camera.top = 10;
 dirLight.shadow.camera.near = 5;
 dirLight.shadow.camera.far = 30;
-dirLight.shadow.mapSize.width = 2048/2;
-dirLight.shadow.mapSize.height = 2048/2;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
 dirLight.shadow.bias = -0.005;
 scene.add(dirLight);
 
 const helper = new THREE.CameraHelper(dirLight.shadow.camera);
 // scene.add(helper);
 
-const ambientLight = new THREE.AmbientLight(0xbab7ad);
+const ambientLight = new THREE.AmbientLight(0xd9d4c5);
 scene.add(ambientLight);
 scene.background = null;
 
@@ -53,6 +53,10 @@ function updateWallVisibility(visibleWalls) {
     walls.forEach((wall, index) => {
         wall.visible = visibleWalls[index];
     });
+    if (walls[3].visible)
+        curtain.visible = true;
+    else
+        curtain.visible = false;
 }
 
 function onCameraRotate() {
@@ -109,11 +113,29 @@ loader.load('../media/models/wall.glb', (gltf) => {
     console.error(error, "Error on loading of gltf walls");
 });
 
-let geometry = new THREE.BoxGeometry(8, .1, 8);
+let curtain;
+loader.load('../media/models/curtain3.glb', (gltf) => {
+    curtain = gltf.scene;
+    gltf.scene.traverse(function (node) {
+        if (node.isMesh) {
+            node.castShadow = true;
+        }
+    });
+    scene.add(curtain);
+    curtain.position.set(1.5, 0, -3.82);
+    curtain.scale.set(.9, .9, .9);
+    curtain.rotation.y = Math.PI / 2;
+    curtain.visible = false;
+}, undefined, (error) => {
+    console.error(error, "Error on loading of gltf curtain");
+});
+
+const geometry = new THREE.BoxGeometry(8, .1, 8);
 const material = new THREE.MeshStandardMaterial({ color: 0xA2AEE7 });
 const ground = new THREE.Mesh(geometry, material);
 ground.receiveShadow = true;
 scene.add(ground);
+
 
 function animate() {
     requestAnimationFrame(animate);

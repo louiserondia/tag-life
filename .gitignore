@@ -15,6 +15,7 @@ apps/main/__pycache__
 apps/main/__pycache__/*
 apps/main/migrations
 apps/main/migrations/*
+apps/main/migrations/*/*
 apps/main/__init__.py
 apps/__pycache__
 apps/__pycache__/*
@@ -36,3 +37,4 @@ node_modules/*/*
 node_modules\*\*
 node_modules/*/*/*
 node_modules\*\*\*
+old3js.js

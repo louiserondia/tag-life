@@ -39,7 +39,6 @@ def add_tag_list_to_image_list(request: HttpRequest):
     tags = body['tags']
     dico = parse_json_from_file('media/images.json')
     for i in images:
-        print(i)
         image = ImageModel.objects.get(title=i)
         if (not image):
             print(i)

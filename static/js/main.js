@@ -19,5 +19,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // window.addEventListener("scroll", updateTitlePosition);
   // updateTitlePosition();
+
+  let bullePhotos = document.getElementById('bullePhotos');
+  let bulleRadio = document.getElementById('bulleRadio');
+
+  if (bullePhotos) {
+    bullePhotos.addEventListener('click', () => {
+      window.location.href = imagesUrl;
+    }); 
+  }
+  
 });
 

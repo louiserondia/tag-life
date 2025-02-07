@@ -1,3 +1,120 @@
+$dark-color: #080126;
+$light-color: #e5e3ee;
+
+#tagsAndImages {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#tags {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+#tags-grid {
+
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.5rem 0.75rem;
+
+    max-width: 750px;
+    margin: 0 1rem;
+
+    .tag-checkbox {
+        display: none;
+    }
+
+    .tag-box {
+        display: inline-block;
+        padding: 0.25rem 1rem;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        transition: background-color 0.1s, border-color 0.1s;
+        font-family: monospace;
+        font-weight: 200;
+        font-size: 1rem;
+
+        &.dark-mode {
+            background-color: $dark-color;
+        }
+    }
+
+
+    .tag-box.active {
+        background-color: #6200ea;
+        color: white;
+        border-color: #6200ea;
+
+        &.dark-mode {
+            background-color: #e0b301;
+            border-color: #e0b301;
+        }
+    }
+
+    .tag-box:hover {
+        &.dark-mode {
+            border-color: #e0b301;
+        }
+
+        border-color: #6200ea;
+    }
+
+}
+
+#new-tag {
+    display: flex;
+    gap: 0.75rem;
+
+    input,
+    button,
+    textarea {
+        font-family: monospace;
+        font-weight: 200;
+        font-size: 1rem;
+        padding: 0.25rem 1rem;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+
+        &.dark-mode {
+            background-color: $dark-color;
+            color: $light-color;
+
+        }
+    }
+
+    button {
+        cursor: pointer;
+        transition: background-color 0.1s, border-color 0.1s;
+
+    }
+
+    button:hover {
+        color: white;
+        background-color: #6200ea; // Couleur quand sélectionné (par exemple violet)
+        border-color: #6200ea; // Change la couleur de la bordure au survol
+
+        &.dark-mode {
+            background-color: #e0b301;
+            border-color: #e0b301;
+        }
+    }
+
+    textarea {
+        margin-left: 1rem;
+        resize: none;
+        height: 1.2rem;
+        outline: 0;
+    }
+
+}
+
+
 .images {
     margin: 0 1rem;
     overflow-y: hidden;

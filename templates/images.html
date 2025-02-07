@@ -1,0 +1,49 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'images.css' %}">
+</head>
+<body>
+    
+    <div id="topRightButtons">
+        <button id="switchMode" class="top-right-buttons">☾</button>
+        <button id="edit" class="top-right-buttons off">🖉</button>
+        <button id="shuffle" class="top-right-buttons">⚂</button>
+    </div>
+    <div id="tagsAndImages">
+        <div id="tags">
+            <div id="tags-grid">
+                {% for tag in tags %}
+                <div class="tag-box {% if tag in checked_tags %} active {% endif %}" id="{{ tag }}">
+                    {{ tag }}
+                </div>
+                {% endfor %}
+            </div>
+            <div id="new-tag">
+                <textarea id="add-new-tag-input"></textarea>
+                <button id="add-new-tag-button">Add</button>
+            </div>
+        </div>
+        
+        <div class="images" id="images"></div>
+        <div id="scrollAnchor"></div>
+        <div id="loading">
+            <img src="../static/img/0004.jpg" id="loadingLogo">
+        </div>
+    </div>
+
+    <script type="module" src="{% static 'js/images.js' %}"></script>
+    <script type="module" src="{% static 'js/tags.js' %}"></script>
+    <script type="module" src="{% static 'js/darkmode.js' %}"></script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
+    <script type="module" src="{% static 'add-new-tag.js' %}"></script>
+    <script type="module" src="{% static 'edit-tags.js' %}"></script>
+
+</body>
+</html>

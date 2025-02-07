@@ -79,7 +79,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    // gap: 30vh;
     margin: 0;
     padding: 0;
 }
@@ -89,11 +88,11 @@ button {
 }
 
 // ------------------
-//       PART 1
+//   bgImgContainer
 // ------------------
 
 
-#part1 {
+#bgImgContainer {
     display: flex;
     justify-content: center;
     width: auto;
@@ -102,6 +101,9 @@ button {
         margin-top: 3rem;
         width: 75vw;
         max-width: 1000px;
+        &.dark-mode {
+            margin-top: 2rem;
+        }
     }
 
 }
@@ -110,152 +112,47 @@ button {
 //       3JS
 // ------------------
 
-#threejs-container {
+#threejsContainer {
     display: flex;
     justify-content: center;
-    margin-top: -10vh;
-
-    &.dark-mode {
-        margin-top: -25vh;
-    }
+    position: absolute;
+    top: 10rem;
 }
 
 // ------------------
-//       PART 2
+//   titleContainer
 // ------------------
 
-#part2 {
+#titleContainer {
     display: flex;
     justify-content: center;
     width: 100%;
     padding-bottom: 2rem;
-    margin-top: -37vh;
-    margin-bottom: 8rem;
-
-    // &.dark-mode {
-    //     margin-top: -6rem;
-    // }
-
+    position: absolute;
+    bottom: 2rem;
     img {
-        width: 65vw;
+        width: 55vw;
         height: fit-content;
     }
 }
 
-
-// ------------------
-//       PART 3
-// ------------------
-
-#part3 {
+#bulles {
     display: flex;
-    flex-direction: column;
-    // margin: 0 auto;
-}
-
-#tags {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 2rem;
-    gap: 1rem;
-}
-
-#tags-grid {
-
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 0.5rem 0.75rem;
-
-    max-width: 750px;
-    margin: 0 1rem;
-
-    .tag-checkbox {
-        display: none;
+    justify-content: space-evenly;
+    z-index: 2;
+    gap: 6rem;
+    margin-top: -8rem;
+    #bullePhotos, #bulleRadio {
+        height: 6rem;
     }
+        // #bullePhotos {
+        //     top: 5rem;
+        //     left: 5rem;
 
-    .tag-box {
-        display: inline-block;
-        padding: 0.25rem 1rem;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: #f0f0f0;
-        transition: background-color 0.1s, border-color 0.1s;
-        font-family: monospace;
-        font-weight: 200;
-        font-size: 1rem;
+        // }
+        // #bulleRadio {
+        //     top: 5rem;
+        //     right: 5rem;
 
-        &.dark-mode {
-            background-color: $dark-color;
-        }
-    }
-
-
-    .tag-box.active {
-        background-color: #6200ea;
-        color: white;
-        border-color: #6200ea;
-
-        &.dark-mode {
-            background-color: #e0b301;
-            border-color: #e0b301;
-        }
-    }
-
-    .tag-box:hover {
-        &.dark-mode {
-            border-color: #e0b301;
-        }
-
-        border-color: #6200ea;
-    }
-
-}
-
-#new-tag {
-    display: flex;
-    gap: 0.75rem;
-
-    input,
-    button,
-    textarea {
-        font-family: monospace;
-        font-weight: 200;
-        font-size: 1rem;
-        padding: 0.25rem 1rem;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-
-        &.dark-mode {
-            background-color: $dark-color;
-            color: $light-color;
-
-        }
-    }
-
-    button {
-        cursor: pointer;
-        transition: background-color 0.1s, border-color 0.1s;
-
-    }
-
-    button:hover {
-        color: white;
-        background-color: #6200ea; // Couleur quand sélectionné (par exemple violet)
-        border-color: #6200ea; // Change la couleur de la bordure au survol
-
-        &.dark-mode {
-            background-color: #e0b301;
-            border-color: #e0b301;
-        }
-    }
-
-    textarea {
-        margin-left: 1rem;
-        resize: none;
-        height: 1.2rem;
-        outline: 0;
-    }
-
+        // }
 }

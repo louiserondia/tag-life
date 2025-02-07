@@ -41,14 +41,14 @@ def add_image_to_db(dico):
 
 # Clears, update images in db from json and update tags.json
 def initiate_database():
-    # clear_all()
+    clear_all()
     dico = parse_json_from_file('media/images.json')
     tags = set()
     for tag in dico.values():
         tags.update(tag)
     write_to_json_file({'tags': list(tags)}, 'media/tags.json')
     add_image_to_db(dico)
-    delete_missing_images_tags(dico)
+    # delete_missing_images_tags(dico)
     return tags, dico
 
 
@@ -71,8 +71,8 @@ def fetch_images(request):
     return JsonResponse({'images': images})
 
 # uncomment line 1 and comment line 2 to initiate database, 
-def home(request):
-    # tags, dico = initiate_database()
+def images(request):
+    tags, dico = initiate_database()
     tags = TagModel.objects.values_list('title', flat=True)
     
     checked_tags = set(request.GET.getlist('tag')) or set()
@@ -84,4 +84,8 @@ def home(request):
 
     context = { 'tags': tags,
                'checked_tags': json.dumps(list(checked_tags)) }
-    return render(request, 'home.html', context)
+    return render(request, 'images.html', context)
+
+
+def home(request):
+    return render(request, 'home.html')

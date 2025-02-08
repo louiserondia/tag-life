@@ -29,5 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }); 
   }
   
+  let homeButton = document.getElementById('home');
+  if (homeButton) {
+    homeButton.addEventListener('click', () => {
+      window.location.href = homeUrl;
+    });
+  }
+
+
 });
 

@@ -15,7 +15,11 @@
         <button id="switchMode" class="top-right-buttons">☾</button>
         <button id="edit" class="top-right-buttons off">🖉</button>
         <button id="shuffle" class="top-right-buttons">⚂</button>
+        <button id="home" class="top-right-buttons">
+            <img id="homeImg" src="{% static 'img/home_black.png' %}">
+        </button>
     </div>
+
     <div id="tagsAndImages">
         <div id="tags">
             <div id="tags-grid">
@@ -30,7 +34,14 @@
                 <button id="add-new-tag-button">Add</button>
             </div>
         </div>
-        
+
+        <div id="lightbox">
+            <span class="lightbox-buttons" id="closeLightbox">&times;</span>
+            <!-- <span class="lightbox-buttons" id="nextImg">&lt;</span>
+            <span class="lightbox-buttons" id="prevImg"> &gt;</span> -->
+            <img id="lightbox-img">
+        </div>
+
         <div class="images" id="images"></div>
         <div id="scrollAnchor"></div>
         <div id="loading">
@@ -38,6 +49,9 @@
         </div>
     </div>
 
+    <script>
+        var homeUrl = "{% url 'home' %}";
+    </script>
     <script type="module" src="{% static 'js/images.js' %}"></script>
     <script type="module" src="{% static 'js/tags.js' %}"></script>
     <script type="module" src="{% static 'js/darkmode.js' %}"></script>

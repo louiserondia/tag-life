@@ -1,60 +1,43 @@
-var isLightMode = true;
+var isDarkMode = false;
+const everything = document.querySelectorAll("*");
 
-if (localStorage.getItem("dark-mode") === "true") {
-  const everything = document.querySelectorAll("*");
+const switchMode = document.getElementById("switchMode");
+switchMode.addEventListener("click", () => {
+  isDarkMode = !isDarkMode;
+  const mode = isDarkMode ? ["black", "white"] : ["white", "black"];
+  handleSwitchMode(mode);
+});
+
+if (localStorage.getItem("dark-mode") === true) {
+  isDarkMode = true;
   everything.forEach((thing) => {
     thing.classList.add("dark-mode");
   });
-
-  const bg = document.getElementById("bgImg");
-  if (bg) {
-    let bgSrc = bg.getAttribute("src");
-    bgSrc = bgSrc.replace("day", "night");
-    bg.src = bgSrc;
-    const title = document.getElementById("titleImg");
-    let titleSrc = title.getAttribute("src");
-    titleSrc = titleSrc.replace("black", "white");
-    title.src = titleSrc;
-  }
-
   document.body.classList.add("dark-mode");
-  document.getElementById("switchMode").textContent = "☼";
-  isLightMode = false;
+  handleSwitchMode(["black", "white"]);
 }
 
-function handleHome(bg) {
-  let bgSrc = bg.getAttribute("src");
-  const title = document.getElementById("titleImg");
-  let titleSrc = title.getAttribute("src");
-  if (isLightMode) {
-    bgSrc = bgSrc.replace("day", "night");
-    titleSrc = titleSrc.replace("black", "white");
-  }
-  else {
-    bgSrc = bgSrc.replace("night", "day");
-    titleSrc = titleSrc.replace("white", "black");
-  }
-  bg.src = bgSrc;
-  title.src = titleSrc;
-}
-
-document.getElementById("switchMode").addEventListener("click", function () {
-  const everything = document.querySelectorAll("*");
-  const bg = document.getElementById("bgImg");
-  if (bg)
-    handleHome(bg)
-
+function handleSwitchMode(mode) {
   everything.forEach((thing) => {
     thing.classList.toggle("dark-mode");
   });
-  const button = document.getElementById("switchMode");
 
-  if (isLightMode) {
-    button.textContent = "☼";
-    localStorage.setItem("dark-mode", "true");
-  } else {
-    button.textContent = "☾";
-    localStorage.setItem("dark-mode", "false");
+  const homeBg = document.getElementById("bgImg");
+  if (homeBg) { // Home page
+    const title = document.getElementById("titleImg");
+    const photos = document.getElementById('bullePhotos');
+    const radio = document.getElementById('bulleRadio');
+    homeBg.src = homeBg.src.replace(mode[0], mode[1]);
+    title.src = title.src.replace(mode[0], mode[1]);
+    photos.src = photos.src.replace(mode[0], mode[1]);
+    radio.src = radio.src.replace(mode[0], mode[1]);
   }
-  isLightMode = !isLightMode;
-});
+
+  const homeButton = document.getElementById('homeImg');
+  if (homeButton) { // Images page
+    homeButton.src = homeButton.src.replace(mode[0], mode[1]);
+  }
+
+  switchMode.textContent = isDarkMode ? '☼' : '☾';
+  localStorage.setItem("dark-mode", isDarkMode);
+}

@@ -18,6 +18,7 @@ $light-color: #e5e3ee;
     position: fixed;
     top: 2rem;
     right: 2rem;
+    z-index: 2;
 
     .top-right-buttons {
         height: 3rem;
@@ -138,12 +139,15 @@ button {
 
 #bulles {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     z-index: 2;
-    gap: 6rem;
-    margin-top: -8rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110vw;
     #bullePhotos, #bulleRadio {
-        height: 6rem;
+        max-width: 10rem;
     }
         // #bullePhotos {
         //     top: 5rem;

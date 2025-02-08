@@ -78,7 +78,8 @@ function createImg(image, box) {
   const img = document.createElement("img");
   img.src = image.path;
   img.id = `${image.title}`;
-  img.onclick = () => toggleImageInfos(image.title);
+  img.onclick = () => lightBoxOn(img);
+  // img.onclick = () => toggleImageInfos(image.title);
   box.appendChild(img);
   img.addEventListener("load", () => {
     requestIdleCallback(() => {
@@ -264,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
         i.classList.remove("selected");
       });
       editCheckedTags.clear();
-      tags.forEach ((tag) => {
+      tags.forEach((tag) => {
         if (checkedTags.has(tag.id)) {
           setTimeout(() => {
             tag.classList.add("active");
@@ -282,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ------------------
-//    SHUFFLE BUTTON
+//     BUTTON
 // ------------------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -295,6 +296,41 @@ document.addEventListener("DOMContentLoaded", () => {
     updateColumns();
   });
 });
+
+// ------------------
+//      LIGHTBOX
+// ------------------
+
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightbox-img");
+
+const closeLightbox = document.getElementById("closeLightbox");
+// const nextImg = document.getElementById("nextImg");
+// const prevImg = document.getElementById("prevImg");
+
+function lightBoxOn(image) {
+  lightbox.classList.add("active");
+  lightboxImg.src = image.src;
+}
+
+closeLightbox.addEventListener("click", () => {
+  lightbox.classList.remove("active");
+});
+
+lightbox.addEventListener("click", (e) => {
+  // if (e.target !== lightboxImg && e.target !== nextImg && e.target !== prevImg) {
+  if (e.target !== lightboxImg) {
+    lightbox.classList.remove("active");
+  }
+});
+
+// nextImg.addEventListener('click', () => {
+//   const imgTitle = lightboxImg.src.split("/").pop();
+//   let index = imageList.findIndex(img => img.title == imgTitle)
+//   if (index == imageList.length - 1)
+//     index = -1;
+//   lightboxImg.src = imageList[index + 1];
+// });
 
 // ------------------
 //   INITIALISATION

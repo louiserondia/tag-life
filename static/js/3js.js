@@ -9,7 +9,6 @@ const d = 6;
 let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 1, 1000);
 camera.position.set(-1, 50, -1);
 camera.lookAt(scene.position);
-camera.zoom = 15;
 
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight * 0.75);
@@ -120,5 +119,25 @@ function animate() {
 
 const container = document.getElementById('threejsContainer');
 container.appendChild(renderer.domElement);
+
+window.addEventListener('resize', () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    
+    let scaleFactor = 1;
+    if (w < 700)
+        scaleFactor = w / 700;
+    
+    const a = w / (h * 0.75 * scaleFactor);
+    camera.left = -d * a;
+    camera.right = d * a;
+    camera.top = d;
+    camera.bottom = -d;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(w, h * 0.75 * scaleFactor);
+    renderer.setPixelRatio(window.devicePixelRatio);
+});
+
 
 animate();

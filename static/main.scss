@@ -102,12 +102,21 @@ button {
         margin-top: 3rem;
         width: 75vw;
         max-width: 1000px;
+
         &.dark-mode {
             margin-top: 2rem;
         }
     }
 
 }
+
+#bgImg,
+#titleImg {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
 
 // ------------------
 //       3JS
@@ -131,6 +140,7 @@ button {
     padding-bottom: 2rem;
     position: absolute;
     bottom: 2rem;
+
     img {
         width: 55vw;
         height: fit-content;
@@ -146,17 +156,21 @@ button {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 110vw;
-    #bullePhotos, #bulleRadio {
+
+    #bullePhotos,
+    #bulleRadio {
         max-width: 10rem;
+        cursor: pointer;
     }
-        // #bullePhotos {
-        //     top: 5rem;
-        //     left: 5rem;
 
-        // }
-        // #bulleRadio {
-        //     top: 5rem;
-        //     right: 5rem;
+    // #bullePhotos {
+    //     top: 5rem;
+    //     left: 5rem;
 
-        // }
+    // }
+    // #bulleRadio {
+    //     top: 5rem;
+    //     right: 5rem;
+
+    // }
 }

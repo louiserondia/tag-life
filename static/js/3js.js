@@ -36,7 +36,7 @@ dirLight.shadow.mapSize.height = 2048;
 dirLight.shadow.bias = -0.005;
 scene.add(dirLight);
 
-const counterLight = new THREE.DirectionalLight(0xffc95e, 0.6);
+const counterLight = new THREE.DirectionalLight(0xffc95e, 1.25);
 counterLight.position.set(-5, 8, -10);
 counterLight.target.position.set(0, 0, 0);
 counterLight.castShadow = true;
@@ -50,23 +50,46 @@ counterLight.shadow.mapSize.height = 2048;
 counterLight.shadow.bias = -0.005;
 scene.add(counterLight);
 
-const deskLight = new THREE.SpotLight( 0xf2bb4e );
+const shadowLight = new THREE.DirectionalLight(0xffc95e, 0.5);
+shadowLight.position.set(5, 20, -10);
+shadowLight.target.position.set(0, 0, 0);
+shadowLight.castShadow = true;
+shadowLight.shadow.camera.left = -10;
+shadowLight.shadow.camera.right = 10;
+shadowLight.shadow.camera.top = 10;
+shadowLight.shadow.camera.near = 5;
+shadowLight.shadow.camera.far = 30;
+shadowLight.shadow.mapSize.width = 2048;
+shadowLight.shadow.mapSize.height = 2048;
+shadowLight.shadow.bias = -0.005;
+shadowLight.visible = false;
+scene.add(shadowLight);
+rotating.add(shadowLight);
+
+const deskLight = new THREE.SpotLight(0xf2bb4e, 2);
 deskLight.position.set( 2.2, 2.45, -2.4 );
-deskLight.castShadow = true;
 scene.add(deskLight);
 rotating.add(deskLight);
+deskLight.visible = false;
 
-const wallLight = new THREE.PointLight( 0xf2bb4e, 1, 100 );
-wallLight.position.set( 1.7, 4.65, 2.35 );
+const wallLight = new THREE.SpotLight(0xf2bb4e, 4);
+wallLight.position.set(1.7, 4.65, 2.35);
+wallLight.target.position.set(1.7, 0, 2.35);
+wallLight.penumbra = 0.05 ;
+wallLight.decay = 1;
 scene.add(wallLight);
+scene.add( wallLight.target ); 
 rotating.add(wallLight);
+rotating.add(wallLight.target);
+wallLight.visible = false;
+
 
 const dhelper = new THREE.PointLightHelper( deskLight, 0.2 );
 const whelper = new THREE.PointLightHelper( wallLight, 0.2 );
 const helper = new THREE.CameraHelper(dirLight.shadow.camera);
-// scene.add(dhelper);
+// scene.add(whelper);
 
-const ambientLight = new THREE.AmbientLight(0xfcedbb, 1.4);
+const ambientLight = new THREE.AmbientLight(0xfcedbb, 0.8);
 scene.add(ambientLight);
 scene.background = null;
 
@@ -91,6 +114,26 @@ loader.load('../media/models/mini_room.glb', (gltf) => {
     console.error(error, "Error on loading of gltf miniRoom");
 });
 
+// switch lights when switching to dark/lightmode
+let isDarkMode = localStorage.getItem("dark-mode") === "true";
+if (isDarkMode) {
+    dirLight.visible = false;
+    counterLight.visible = false;
+    shadowLight.visible = true;
+    wallLight.visible = true;
+    deskLight.visible = true;
+}
+
+const switchMode = document.getElementById("switchMode");
+switchMode.addEventListener("click", () => {
+  isDarkMode = !isDarkMode;
+  dirLight.visible = !dirLight.visible;
+  counterLight.visible = !counterLight.visible;
+  shadowLight.visible = !shadowLight.visible;
+  wallLight.visible = !wallLight.visible;
+  deskLight.visible = !deskLight.visible;
+});
+
 let isDragging = false;
 let prevMousePosX = 0;
 let velocity = 0;
@@ -100,15 +143,13 @@ window.addEventListener('mousedown', (e) => {
     prevMousePosX = e.clientX;
 });
 
-window.addEventListener('mouseup', () => {
-    isDragging = false;
-});
+window.addEventListener('mouseup', () => isDragging = false);
 
 window.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
 
     const deltaX = e.clientX - prevMousePosX;
-    velocity = deltaX * 0.005;
+    velocity = deltaX * 0.0025;
     
     prevMousePosX = e.clientX;
 });
@@ -128,7 +169,6 @@ window.addEventListener('resize', () => {
     renderer.setSize(w, h * 0.75 * scaleFactor);
     renderer.setPixelRatio(window.devicePixelRatio);
 });
-
 
 function animate() {
     requestAnimationFrame(animate);

@@ -1,4 +1,3 @@
-var isDarkMode = false;
 const everything = document.querySelectorAll("*");
 
 const switchMode = document.getElementById("switchMode");
@@ -8,13 +7,11 @@ switchMode.addEventListener("click", () => {
   handleSwitchMode(mode);
 });
 
-if (localStorage.getItem("dark-mode") === true) {
-  isDarkMode = true;
-  everything.forEach((thing) => {
-    thing.classList.add("dark-mode");
-  });
-  document.body.classList.add("dark-mode");
-  handleSwitchMode(["black", "white"]);
+let isDarkMode = localStorage.getItem("dark-mode") === "true";
+if (isDarkMode) {
+  if (!document.body.classList.contains('dark-mode')) {
+    handleSwitchMode(["black", "white"]);
+  }
 }
 
 function handleSwitchMode(mode) {
@@ -38,6 +35,7 @@ function handleSwitchMode(mode) {
     homeButton.src = homeButton.src.replace(mode[0], mode[1]);
   }
 
-  switchMode.textContent = isDarkMode ? '☼' : '☾';
-  localStorage.setItem("dark-mode", isDarkMode);
+  switchMode.textContent = isDarkMode === true ? '☼' : '☾';
+  const content = isDarkMode ? "true" : "false";
+  localStorage.setItem("dark-mode", content);
 }

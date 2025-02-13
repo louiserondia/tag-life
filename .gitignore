@@ -38,3 +38,4 @@ node_modules\*\*
 node_modules/*/*/*
 node_modules\*\*\*
 old3js.js
+apps/main/static/js/libs/*

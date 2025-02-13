@@ -35,7 +35,7 @@ function handleSwitchMode(mode) {
     homeButton.src = homeButton.src.replace(mode[0], mode[1]);
   }
 
-  switchMode.textContent = isDarkMode === true ? '☼' : '☾';
-  const content = isDarkMode ? "true" : "false";
+  switchMode.textContent = isDarkMode ? '☼' : '☾';
+  const content = isDarkMode.toString();
   localStorage.setItem("dark-mode", content);
 }

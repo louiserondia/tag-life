@@ -19,22 +19,19 @@ function handleSwitchMode(mode) {
     thing.classList.toggle("dark-mode");
   });
 
-  const homeBg = document.getElementById("bgImg");
-  if (homeBg) { // Home page
-    const title = document.getElementById("titleImg");
-    const photos = document.getElementById('bullePhotos');
-    const radio = document.getElementById('bulleRadio');
-    homeBg.src = homeBg.src.replace(mode[0], mode[1]);
-    title.src = title.src.replace(mode[0], mode[1]);
-    photos.src = photos.src.replace(mode[0], mode[1]);
-    radio.src = radio.src.replace(mode[0], mode[1]);
+  const grid = document.getElementById("grid");
+  if (grid) { // Home page
+    for (let i = 1; i <= 10; i++) {
+      const e = document.getElementById("bg_" + i);
+      e.src = e.src.replace(mode[0], mode[1]);
+    }
   }
 
   const homeButton = document.getElementById('homeImg');
   if (homeButton) { // Images page
     homeButton.src = homeButton.src.replace(mode[0], mode[1]);
   }
-
+ 
   switchMode.textContent = isDarkMode ? '☼' : '☾';
   const content = isDarkMode.toString();
   localStorage.setItem("dark-mode", content);

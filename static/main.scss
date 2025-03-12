@@ -126,7 +126,8 @@ button {
     display: flex;
     justify-content: center;
     position: absolute;
-    top: 10rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 // ------------------
@@ -147,40 +148,11 @@ button {
     }
 }
 
-#bulles {
-    display: flex;
-    justify-content: space-around;
-    z-index: 2;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 110vw;
-
-    #bullePhotos,
-    #bulleRadio {
-        max-width: 10rem;
-        cursor: pointer;
-    }
-
-    // #bullePhotos {
-    //     top: 5rem;
-    //     left: 5rem;
-
-    // }
-    // #bulleRadio {
-    //     top: 5rem;
-    //     right: 5rem;
-
-    // }
-}
-
 #grid {
     .parent {
         display: grid;
         grid-template-columns: repeat(10, 1fr);
-        grid-template-rows: repeat(8, 1fr);
-        grid-row-gap: 2rem;
+        grid-template-rows: repeat(8, 12.5vh);
         overflow: hidden;
 
         div {
@@ -189,27 +161,19 @@ button {
             align-items: center;
             position: relative;
 
-            p {
-                position: absolute;
-                text-align: center;
-                z-index: 5;
-                color: $dark-color;
-                font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-                font-weight: bold;
-            }
         }
     }
 
     .div1 {
-        grid-area: 1 / 1 / 3 / 3;
+        grid-area: 1 / 2 / 3 / 4;
     }
-
+    
     .div2 {
         grid-area: 3 / 2 / 5 / 3;
     }
-
+    
     .div3 {
-        grid-area: 2 / 4 / 4 / 6;
+        grid-area: 2 / 4 / 3 / 6;
     }
 
     .div4 {
@@ -217,151 +181,136 @@ button {
     }
 
     .div5 {
-        grid-area: 4 / 9 / 6 / 11;
+        grid-area: 4 / 9 / 5 / 11;
+
+        img {
+
+            max-height: 5rem;
+            width: auto;
+        }
     }
 
-    // étoiles
+    // nuages
     .div6 {
-        grid-area: 1 / 4 / 2 / 5;
+        grid-area: 6 / 2 / 7 / 4;
     }
 
     .div7 {
-        grid-area: 2 / 9 / 3 / 10;
+        grid-area: 7 / 4 / 8 / 7;
     }
 
     .div8 {
-        grid-area: 1 / 10 / 2 / 11;
+        grid-area: 6 / 8 / 7 / 10;
+
+        img {
+            max-width: 10rem;
+        }
     }
 
     .div9 {
-        grid-area: 3 / 4 / 3 / 5;
-    }
-
-    .div10 {
-        grid-area: 4 / 8 / 5 / 9;
-    }
-
-    .div11 {
-        grid-area: 3 / 7 / 4 / 8;
-    }
-
-    // .div12 { grid-area: 4 / 1 / 5 / 2; } 
-
-    // nuages
-    .div13 {
-        grid-area: 5 / 2 / 7 / 4;
-    }
-
-    .div14 {
-        grid-area: 7 / 4 / 9 / 6;
-    }
-
-    .div15 {
-        grid-area: 7 / 7 / 8 / 9;
-    }
-
-    .div16 {
-        grid-area: 8 / 8 / 9 / 10;
-    }
-
-    .div17 {
-        grid-area: 5 / 9 / 7 / 11;
-    }
-
-    .div18 {
-        grid-area: 4 / 5 / 5 / 6;
+        grid-area: 3 / 5 / 5 / 7;
         z-index: 0;
-        margin-left: 1rem;
-    }
-
-    .div19 {
-        grid-area: 3 / 8 / 5 / 9;
-    }
-
-    img {
-        width: 100%;
-        max-width: 8rem;
-        margin: auto;
-        pointer-events: none;
-        user-select: none;
-        -webkit-user-drag: none;
-    }
-
-    #bg_rocket {
-        max-width: 6rem;
-        transform: rotate(10deg);
-    }
-
-    #bg_pole {
-        max-width: 10rem;
-    }
-
-    .bg {
+        margin: 0 0 1rem 3.5rem;
         max-width: 5rem;
     }
 
+    .div10 {
+        grid-area: 3 / 8 / 4 / 10;
+
+        img {
+            max-width: 6.5rem;
+        }
+    }
+
+    // étoiles
+    .div11 {
+        grid-area: 1 / 4 / 2 / 5;
+    }
+
+    .div12 {
+        grid-area: 2 / 9 / 3 / 10;
+    }
+
+    .div13 {
+        grid-area: 1 / 10 / 2 / 11;
+    }
+
+    .div14 {
+        grid-area: 3 / 4 / 3 / 5;
+    }
+
+    .div15 {
+        grid-area: 4 / 8 / 5 / 9;
+    }
+
+    .div16 {
+        grid-area: 3 / 7 / 4 / 8;
+    }
+
+
+    img {
+        width: 100%;
+        min-width: 4rem;
+        max-width: 8rem;
+        margin: auto;
+        pointer-events: painted;
+        // user-select: none;
+        // -webkit-user-drag: none;
+    }
+
+    #bg_3 {
+        &.dark-mode {
+
+            min-width: 2rem;
+            max-width: 4rem;
+            transform: rotate(10deg);
+        }
+    }
+
     .star {
-        max-width: 1rem;
+        min-width: auto;
+        max-width: 0.6rem;
     }
 
-    .nuage {
+    @keyframes float {
+        0% {
+            transform: translate(0px, 0px);
+        }
+        
+        18% {
+            transform: translate(2.5px, -2.5px);
+        }
+
+        35% {
+            transform: translate(-2.5px, 5px);
+        }
+
+        50% {
+            transform: translate(-2.5px, -2.5px);
+        }
+
+        66% {
+            transform: translate(5px, 2.5px);
+        }
+
+        80% {
+            transform: translate(-2.5px, -2.5px);
+        }
+
+        100% {
+            transform: translate(0px, 0px);
+        }
+
+    }
+
+    .cloud {
         z-index: 2;
+        animation: float 10s ease-in-out infinite;
     }
 
-    @media (max-width: 600px) {
-        .parent {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(9, 1fr);
-            grid-column-gap: 0px;
-            grid-row-gap: 3rem;
-        }
-
-        .div1 {
-            grid-area: 1 / 1 / 3 / 3;
-        }
-
-        .div2 {
-            grid-area: 3 / 4 / 5 / 6;
-        }
-
-        .div3 {
-            grid-area: 5 / 1 / 7 / 3;
-        }
-
-        .div4 {
-            grid-area: 8 / 1 / 10 / 3;
-        }
-
-        .div5 {
-            grid-area: 6 / 4 / 8 / 6;
-        }
-
-        .div6 {
-            grid-area: 1 / 5 / 2 / 6;
-        }
-
-        //étoiles 
-        .div7 {
-            grid-area: 4 / 2 / 5 / 3;
-        }
-
-        .div8 {
-            grid-area: 9 / 4 / 10 / 5;
-        }
-
-        .div9 {
-            grid-area: 7 / 2 / 8 / 3;
-        }
-
-        .div10 {
-            grid-area: 8 / 5 / 9 / 6;
-        }
-
-        .div11 {
-            grid-area: 3 / 1 / 4 / 2;
-        }
-
-        // nuages
+    .cloud:hover {
+        animation: none;
+        transform: rotate(-10deg) !important;
+        cursor: pointer;
     }
 }

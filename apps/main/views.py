@@ -72,7 +72,7 @@ def fetch_images(request):
 
 # uncomment line 1 and comment line 2 to initiate database, 
 def images(request):
-    tags, dico = initiate_database()
+    # tags, dico = initiate_database()
     tags = TagModel.objects.values_list('title', flat=True)
     
     checked_tags = set(request.GET.getlist('tag')) or set()
@@ -89,3 +89,9 @@ def images(request):
 
 def home(request):
     return render(request, 'home.html')
+
+def webcam(request):
+    return render(request, 'webcam.html')
+
+def projection(request):
+    return render(request, 'projection.html')

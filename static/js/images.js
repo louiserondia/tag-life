@@ -2,13 +2,13 @@ let imagesData;
 let imageList;
 let currentBatch = 1;
 let prevBatch;
-const batchSize = 50;
-let loadedImages = new Set();
-let loadedImagesCopy = new Set();
 let imagesToLoad;
 let lastColumn = 0;
 let prevLastColumn;
 let hasShuffled = false;
+const batchSize = 30;
+const loadedImages = new Set();
+let loadedImagesCopy;
 export let edit = false;
 import { checkedTags, editCheckedTags } from "./tags.js";
 

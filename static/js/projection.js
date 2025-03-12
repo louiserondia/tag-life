@@ -1,6 +1,5 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Raycaster } from 'three';
+import * as THREE from '/static/js/libs/three.module.js';
+import { GLTFLoader } from '/static/js/libs/GLTFLoader.js';
 
 const scene = new THREE.Scene();
 let scaleFactor = window.innerWidth > 700 ? 1 : window.innerWidth / 700;
@@ -67,27 +66,7 @@ shadowLight.visible = false;
 scene.add(shadowLight);
 rotating.add(shadowLight);
 
-const deskLight = new THREE.SpotLight(0xeb9617, 2);
-deskLight.position.set( 2.2, 2.45, -2.4 );
-scene.add(deskLight);
-rotating.add(deskLight);
-deskLight.visible = false;
 
-const wallLight = new THREE.SpotLight(0xeb9617, 4);
-wallLight.position.set(1.7, 4.65, 2.35);
-wallLight.target.position.set(1.7, 0, 2.35);
-wallLight.penumbra = 0.05 ;
-wallLight.decay = 1;
-scene.add(wallLight);
-scene.add( wallLight.target ); 
-rotating.add(wallLight);
-rotating.add(wallLight.target);
-wallLight.visible = false;
-
-const dhelper = new THREE.PointLightHelper( deskLight, 0.2 );
-const whelper = new THREE.PointLightHelper( wallLight, 0.2 );
-const helper = new THREE.CameraHelper(dirLight.shadow.camera);
-// scene.add(whelper);
 
 const orange = 0xffd085;
 const blue = 0x7f89db
@@ -98,83 +77,41 @@ scene.background = null;
 
 const loader = new GLTFLoader();
 
-let miniRoom;
-loader.load('../media/models/mini_room.glb', (gltf) => {
-    miniRoom = gltf.scene;
-    scene.add(miniRoom);
-    rotating.add(miniRoom);
-    miniRoom.scale.set(2, 2, 2);
-    miniRoom.rotation.y = Math.PI;
-    miniRoom.castShadow = true;
-    miniRoom.receiveShadow = true;
-    miniRoom.traverse(function (node) {
+let projectionRoom;
+loader.load('../media/models/projection_room.glb', (gltf) => {
+    projectionRoom = gltf.scene;
+    scene.add(projectionRoom);
+    rotating.add(projectionRoom);
+    projectionRoom.scale.set(2, 2, 2);
+    projectionRoom.rotation.y = Math.PI;
+    projectionRoom.castShadow = true;
+    projectionRoom.receiveShadow = true;
+    projectionRoom.traverse(function (node) {
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
         }
     });
 }, undefined, (error) => {
-    console.error(error, "Error on loading of gltf miniRoom");
+    console.error(error, "Error on loading of gltf projectionRoom");
 });
 
-// let titleNeg;
-// loader.load('../media/models/title.glb', (gltf) => {
-//     titleNeg = gltf.scene;
-//     scene.add(titleNeg);
-//     rotating.add(titleNeg);
-//     titleNeg.scale.set(2, 2, 2);
-//     titleNeg.rotation.y = Math.PI;
-//     titleNeg.castShadow = true;
-//     titleNeg.receiveShadow = true;
-//     titleNeg.traverse(function (node) {
-//         if (node.isMesh) {
-//             node.castShadow = true;
-//             node.receiveShadow = true;
-//         }
-//     });
-// }, undefined, (error) => {
-//     console.error(error, "Error on loading of gltf miniRoom");
+// let isDarkMode = localStorage.getItem("dark-mode") === "true";
+// if (isDarkMode) {
+//     dirLight.visible = false;
+//     counterLight.visible = false;
+//     shadowLight.visible = true;
+//     ambientLight.color.setHex(blue);
+// }
+
+// const switchMode = document.getElementById("switchMode");
+// switchMode.addEventListener("click", () => {
+//   isDarkMode = !isDarkMode;
+//   dirLight.visible = !dirLight.visible;
+//   counterLight.visible = !counterLight.visible;
+//   shadowLight.visible = !shadowLight.visible;
+//   ambientLight.color.setHex(isDarkMode ? blue : orange);
 // });
-
-// const titleLight = new THREE.RectAreaLight(0x00ff44, 1, 5, 2.5);
-// titleLight.position.set( 0, 3, 3.68 );
-// titleLight.lookAt( 0, 3, -100 );
-// scene.add( titleLight );
-// rotating.add(titleLight);
-
-// const shadowBlocker = new THREE.Mesh(
-
-// const mat = new THREE.MeshStandardMaterial({ color: 0x000000, side: THREE.DoubleSide });
-// mat.opacity = 0.2;
-// mat.transparent = true;
-//     new THREE.PlaneGeometry(5, 5), // Ajuste la taille selon ton mur
-//     mat
-// );
-// shadowBlocker.position.set(0, 3, 3.8); 
-// scene.add(shadowBlocker);
-// rotating.add(shadowBlocker)
-
-// switch lights when switching to dark/lightmode
-let isDarkMode = localStorage.getItem("dark-mode") === "true";
-if (isDarkMode) {
-    dirLight.visible = false;
-    counterLight.visible = false;
-    shadowLight.visible = true;
-    wallLight.visible = true;
-    deskLight.visible = true;
-    ambientLight.color.setHex(blue);
-}
-
-const switchMode = document.getElementById("switchMode");
-switchMode.addEventListener("click", () => {
-  isDarkMode = !isDarkMode;
-  dirLight.visible = !dirLight.visible;
-  counterLight.visible = !counterLight.visible;
-  shadowLight.visible = !shadowLight.visible;
-  wallLight.visible = !wallLight.visible;
-  deskLight.visible = !deskLight.visible;
-  ambientLight.color.setHex(isDarkMode ? blue : orange);
-});
 
 let isDragging = false;
 let prevMousePosX = 0;
@@ -220,5 +157,3 @@ function animate() {
 }
 
 animate();
-
-const raycaster = new Raycaster();

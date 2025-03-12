@@ -16,34 +16,45 @@
 
     <div id="grid">
         <div class="parent">
-            <div class="div1"><img class="bg" id="bg_rocket" src="{% static 'img/rocket.png' %}"></div>
-            <div class="div2"><img class="bg" src="{% static 'img/planet.png' %}"></div>
-            <div class="div3"><img class="bg" src="{% static 'img/moon.png' %}"></div>
-            <div class="div4"><img src="{% static 'img/star_filante.png' %}"></div>
-            <div class="div5"><img src="{% static 'img/galaxy.png' %}"></div>
-            <div class="div6"><img class="star" src="{% static 'img/star_1.png' %}"></div>
-            <div class="div7"><img class="star" src="{% static 'img/star_1.png' %}"></div>
-            <div class="div8"><img class="star" src="{% static 'img/star_1.png' %}"></div>
-            <div class="div9"><img class="star" src="{% static 'img/star_1.png' %}"></div>
-            <div class="div10"><img class="star" src="{% static 'img/star_1.png' %}"></div>
-            <div class="div11"><img class="star" src="{% static 'img/star_1.png' %}"></div>
-            <!-- <div clas="div12"><img src="{% static 'img/star_1.png' %}"></div> -->
-            <div class="div13"><img class="nuage" src="{% static 'img/cloud_photos_4.png' %}"></div>
-            <div class="div14"><img class="nuage" src="{% static 'img/cloud_dessins.png' %}"></div>
-            <div class="div15"><img id="bg_pole" class="nuage" src="{% static 'img/cloud_pole_3.png' %}"></div>
-            <!-- <div class="div16"><img class="nuage" src="{% static 'img/nuage_1_white.png' %}"></div>
-            <div class="div17"><img class="nuage" src="{% static 'img/nuage_1_white.png' %}"></div> -->
-            <div class="div18"><img class="nuage" src="{% static 'img/cloud_blog.png' %}"></div>
-            <div class="div19"><img class="nuage" src="{% static 'img/cloud_music.png' %}"></div>
+            <div class="div1"><img draggable="false" id="bg_1" src="{% static 'img/bg_1_black.png' %}"></div>
+            <div class="div2"><img draggable="false" id="bg_2" src="{% static 'img/bg_2_black.png' %}"></div>
+            <div class="div3"><img draggable="false" id="bg_3" src="{% static 'img/bg_3_black.png' %}"></div>
+            <div class="div4"><img draggable="false" id="bg_4" src="{% static 'img/bg_4_black.png' %}"></div>
+            <div class="div5"><img draggable="false" id="bg_5" src="{% static 'img/bg_5_black.png' %}"></div>
+        
+            <div class="div6"><img draggable="false" id="bg_6" class="cloud" src="{% static 'img/bg_6_black.png' %}"></div>
+            <div class="div7"><img draggable="false" id="bg_7" class="cloud" src="{% static 'img/bg_7_black.png' %}"></div>
+            <div class="div8"><img draggable="false" id="bg_8" class="cloud" src="{% static 'img/bg_8_black.png' %}"></div>
+            <div class="div9"><img draggable="false" id="bg_9" class="cloud" src="{% static 'img/bg_9_black.png' %}"></div>
+            <div class="div10"><img draggable="false" id="bg_10" class="cloud" src="{% static 'img/bg_10_black.png' %}"></div>
+            
+            <div class="div11"><img draggable="false" class="star" src="{% static 'img/star_1.png' %}"></div>
+            <div class="div12"><img draggable="false" class="star" src="{% static 'img/star_1.png' %}"></div>
+            <div class="div13"><img draggable="false" class="star" src="{% static 'img/star_1.png' %}"></div>
+            <div class="div14"><img draggable="false" class="star" src="{% static 'img/star_1.png' %}"></div>
+            <div class="div15"><img draggable="false" class="star" src="{% static 'img/star_1.png' %}"></div>
+            <div class="div16"><img draggable="false" class="star" src="{% static 'img/star_1.png' %}"></div>
         </div> 
     </div>
     <div id="threejsContainer"></div>
-    <div id="titleContainer">
+    <!-- <div id="titleContainer">
         <img id="titleImg" src="{% static 'img/title_black.png' %}">
-    </div>
+    </div> -->
 
+    
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "/static/node_modules/three/build/three.module.js",
+                "three/addons/": "/static/node_modules/three/examples/jsm/"
+            }
+        }
+    </script>
     <script>
-        var imagesUrl = "{% url 'images' %}";
+        let imagesUrl = "{% url 'images' %}";
+        let webcamUrl = "{% url 'webcam' %}";
+        let projectionUrl = "{% url 'projection' %}";
     </script>
     <script type="module" src="{% static 'js/darkmode.js' %}"></script>
     <script type="module" src="{% static 'js/main.js' %}"></script>

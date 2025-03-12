@@ -122,7 +122,8 @@ $light-color: #e5e3ee;
 
 
 .images {
-    margin: 1rem;
+    margin: 1rem auto 0 auto;
+    padding: 0 1rem;
     overflow-y: hidden;
     display: flex;
     gap: 1rem;

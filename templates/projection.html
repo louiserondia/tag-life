@@ -1,0 +1,41 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Projection</title>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'images.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'webcam.css' %}"> -->
+</head>
+
+<body>
+
+    <div id="topRightButtons">
+        <button id="switchMode" class="top-right-buttons">☾</button>
+        <button id="home" class="top-right-buttons">
+            <img id="homeImg" src="{% static 'img/home_black.png' %}">
+        </button>
+    </div>
+
+    <div id="threejsContainer"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "/static/node_modules/three/build/three.module.js",
+                "three/addons/": "/static/node_modules/three/examples/jsm/"
+            }
+        }
+    </script>
+    <script> let homeUrl = "{% url 'home' %}"; </script>
+    <script type="module" src="{% static 'js/darkmode.js' %}"></script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
+    <script type="module" src="{% static 'js/projection.js' %}"></script>
+
+</body>
+
+</html>

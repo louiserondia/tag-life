@@ -20,15 +20,30 @@ document.addEventListener("DOMContentLoaded", function () {
   // window.addEventListener("scroll", updateTitlePosition);
   // updateTitlePosition();
 
-  let bullePhotos = document.getElementById('bullePhotos');
-  let bulleRadio = document.getElementById('bulleRadio');
+  let bullePhotos = document.getElementById('bg_6');
+  let bulleDessin = document.getElementById('bg_7');
+  let bullePoleDance = document.getElementById('bg_8');
 
   if (bullePhotos) {
     bullePhotos.addEventListener('click', () => {
       window.location.href = imagesUrl;
-    }); 
+    });
+  }
+
+  if (bulleDessin) {
+    bulleDessin.addEventListener('click', () => {
+      console.log('click dessin');
+      window.location.href = webcamUrl;
+    });
   }
   
+  if (bullePoleDance) {
+    bullePoleDance.addEventListener('click', () => {
+      console.log('click pole dance');
+      window.location.href = projectionUrl;
+    });
+  }
+
   let homeButton = document.getElementById('home');
   if (homeButton) {
     homeButton.addEventListener('click', () => {
@@ -39,3 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const clouds = document.querySelectorAll(".cloud");
+  clouds.forEach((cloud, index) => {
+    let delay = (index * 0.75) + "s";
+    cloud.style.animationDelay = delay;
+  });
+});

@@ -13,19 +13,17 @@ let scaleFactor = window.innerWidth > 700 ? 1 : window.innerWidth / 700;
 const aspect = window.innerWidth / (window.innerHeight * scaleFactor);
 const d = 6;
 
-const globalCameraPosition = new THREE.Vector3(10, 10, 10);
-const recordCameraPosition = new THREE.Vector3(10, 10, 1);
+const globalCameraPos = new THREE.Vector3(10, 10, 10);
 const globalCameraLookAt = new THREE.Vector3(0, 3, 0);
-const recordCameraLookAt = new THREE.Vector3(0, 3.5, 2.4);
 
 let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 0.1, 1000);
-camera.position.copy(globalCameraPosition);
+camera.position.copy(globalCameraPos);
 camera.lookAt(globalCameraLookAt);
 camera.zoom = 0.75;
 camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth , window.innerHeight  * scaleFactor);
+renderer.setSize(window.innerWidth, window.innerHeight * scaleFactor);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -80,7 +78,7 @@ scene.add(shadowLight);
 rotating.add(shadowLight);
 
 const deskLight = new THREE.SpotLight(0xa67717, 10);
-deskLight.position.set( 2.15, 1.2, -2.15 );
+deskLight.position.set(2.15, 1.2, -2.15);
 deskLight.visible = false;
 deskLight.decay = 1.2;
 
@@ -91,8 +89,8 @@ projLight.lookAt(-10, 3, -25);
 scene.add(deskLight, projLight);
 rotating.add(deskLight, projLight);
 
-const dhelper = new THREE.PointLightHelper( deskLight, 0.2 );
-const phelper = new RectAreaLightHelper( projLight, 0.2 );
+const dhelper = new THREE.PointLightHelper(deskLight, 0.2);
+const phelper = new RectAreaLightHelper(projLight, 0.2);
 // scene.add(dhelper);
 
 const orange = 0xffd085;
@@ -120,7 +118,6 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
             if (node.name === "walls") {
                 walls = node;
                 walls.material.transparent = true;
-                console.log(walls)
             }
         }
     });
@@ -132,10 +129,34 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
 // ---------- RAYCASTING -------------
 // -----------------------------------
 
-let dezoom = false;
-let zoomOnRecord = false;
+const recordCameraPos = new THREE.Vector3(10, 10, 10);
+const recordCameraLookAt = new THREE.Vector3(0, 3.5, 2.4);
+const screenCameraPos = new THREE.Vector3(1.2, 2.5, 3);
+const screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
 
-// Gérer le clic de la souris
+let elapsed = 0;
+
+function zoomOn(pos, lookAt, zoom, dezoom) {
+    const r = rotating.rotation.y;
+    function animateZoom() {
+        if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
+            camera.position.lerpVectors(pos[0], pos[1],  dezoom ? 1 - elapsed : elapsed);
+            const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], dezoom ? 1 - elapsed : elapsed);
+            camera.lookAt(nlookAt);
+            camera.zoom = zoom[0] + zoom[1] * elapsed;
+            camera.updateProjectionMatrix();
+            rotating.rotation.y = r - r * elapsed;
+            // walls.material.opacity = 1 - elapsed; // mettre ou pas ?
+
+            elapsed += dezoom ? -0.01 : 0.01;
+            requestAnimationFrame(animateZoom);
+        }
+    }
+    requestAnimationFrame(animateZoom);
+}
+
+let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
+
 window.addEventListener('click', (event) => {
     const rect = renderer.domElement.getBoundingClientRect();
     const coords = new THREE.Vector2(
@@ -148,11 +169,27 @@ window.addEventListener('click', (event) => {
 
     if (intersects.length > 0) {
         const selectedObject = intersects[0].object;
-        console.log('Objet sélectionné :', selectedObject.name);
         if (selectedObject.name.startsWith('record'))
-            zoomOnRecord = true;
-        else
-            dezoom = true;
+            zoomInfos = [recordCameraPos, recordCameraLookAt, 3];
+        else if (selectedObject.name.startsWith('screen'))
+            zoomInfos = [screenCameraPos, screenCameraLookAt, 2];
+        else {
+            zoomOn(
+                [zoomInfos[0], globalCameraPos],
+                [zoomInfos[1], globalCameraLookAt],
+                [0.75, zoomInfos[2]],
+                true
+            );
+            zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
+        }
+
+        if (zoomInfos[0] != globalCameraPos)
+            zoomOn(
+                [globalCameraPos, zoomInfos[0]],
+                [globalCameraLookAt, zoomInfos[1]],
+                [0.75, zoomInfos[2]],
+                false
+            );
     }
 });
 
@@ -180,8 +217,8 @@ window.addEventListener('mousemove', (e) => {
 });
 
 window.addEventListener('resize', () => {
-    const w = window.innerWidth ;
-    const h = window.innerHeight ;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
     scaleFactor = window.innerWidth > 700 ? 1 : window.innerWidth / 700;
 
     const a = w / (h * scaleFactor);
@@ -194,59 +231,32 @@ window.addEventListener('resize', () => {
     renderer.setSize(w, h * scaleFactor);
     renderer.setPixelRatio(window.devicePixelRatio);
 });
-let elapsed = 0;
 
 let isDarkMode = localStorage.getItem("dark-mode") === "true";
 if (isDarkMode) {
     dirLight.visible = false;
     counterLight.visible = false;
     shadowLight.visible = true;
-    // wallLight.visible = true;
     deskLight.visible = true;
     ambientLight.color.setHex(blue);
 }
 
 const switchMode = document.getElementById("switchMode");
 switchMode.addEventListener("click", () => {
-  isDarkMode = !isDarkMode;
-  dirLight.visible = !dirLight.visible;
-  counterLight.visible = !counterLight.visible;
-  shadowLight.visible = !shadowLight.visible;
-//   wallLight.visible = !wallLight.visible;
-  deskLight.visible = !deskLight.visible;
-  ambientLight.color.setHex(isDarkMode ? blue : orange);
+    isDarkMode = !isDarkMode;
+    dirLight.visible = !dirLight.visible;
+    counterLight.visible = !counterLight.visible;
+    shadowLight.visible = !shadowLight.visible;
+    deskLight.visible = !deskLight.visible;
+    ambientLight.color.setHex(isDarkMode ? blue : orange);
 });
 
-
 function animate() {
-    if (zoomOnRecord) {
-        // camera.position.lerpVectors(start, end, elapsed);
-        const lookAt = new THREE.Vector3().lerpVectors(globalCameraLookAt, recordCameraLookAt, elapsed);
-        camera.lookAt(lookAt);
-        camera.zoom = 0.75 + 3 * elapsed;
-        camera.updateProjectionMatrix();
-        walls.material.opacity = 1 - elapsed;
-
-        if (elapsed < 1)
-            elapsed += 1 / 120;
-        else
-            zoomOnRecord = false;
-    }
-    if (dezoom) {
-        const lookAt = new THREE.Vector3().lerpVectors(recordCameraLookAt, globalCameraLookAt, 1 - elapsed);
-        camera.lookAt(lookAt);
-        camera.zoom = 0.75 + 3 * elapsed;
-        camera.updateProjectionMatrix();
-        walls.material.opacity = 1 - elapsed;
-        
-        if (elapsed > 0)
-            elapsed -= 1 / 120;
-        else
-            dezoom = false;
+    if (elapsed <= 0) { // pas de rotation de la scène si on est dans le zoom
+        rotating.rotation.y += velocity;
+        velocity *= 0.95;
     }
     requestAnimationFrame(animate);
-    rotating.rotation.y += velocity;
-    velocity *= 0.95;
     renderer.render(scene, camera);
 }
 

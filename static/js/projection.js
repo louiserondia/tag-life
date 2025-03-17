@@ -8,22 +8,25 @@ const objects = [];
 let walls;
 
 const scene = new THREE.Scene();
-let scaleFactor = window.innerWidth > 700 ? 1 : window.innerWidth / 700;
+const w = window.innerWidth;
+const h = window.innerHeight;
+let scaleFactor = w > 700 ? 1 : w / 700;
 
-const aspect = window.innerWidth / (window.innerHeight * scaleFactor);
+const aspect = w / h;
 const d = 6;
 
 const globalCameraPos = new THREE.Vector3(10, 10, 10);
 const globalCameraLookAt = new THREE.Vector3(0, 3, 0);
+let currentCameraZoom = 0.75;
 
 let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 0.1, 1000);
 camera.position.copy(globalCameraPos);
 camera.lookAt(globalCameraLookAt);
-camera.zoom = 0.75;
+camera.zoom = currentCameraZoom * scaleFactor;
 camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight * scaleFactor);
+renderer.setSize(w, h);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -140,14 +143,15 @@ function zoomOn(pos, lookAt, zoom, dezoom) {
     const r = rotating.rotation.y;
     function animateZoom() {
         if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
-            camera.position.lerpVectors(pos[0], pos[1],  dezoom ? 1 - elapsed : elapsed);
+            camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
             const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], dezoom ? 1 - elapsed : elapsed);
             camera.lookAt(nlookAt);
-            camera.zoom = zoom[0] + zoom[1] * elapsed;
+            camera.zoom += (zoom - 0.75) * scaleFactor * (dezoom ? -0.01 : 0.01);
             camera.updateProjectionMatrix();
             rotating.rotation.y = r - r * elapsed;
             // walls.material.opacity = 1 - elapsed; // mettre ou pas ?
 
+            currentCameraZoom = dezoom ? 0.75 : zoom;
             elapsed += dezoom ? -0.01 : 0.01;
             requestAnimationFrame(animateZoom);
         }
@@ -167,34 +171,36 @@ window.addEventListener('click', (event) => {
     raycaster.setFromCamera(coords, camera);
     const intersects = raycaster.intersectObjects(objects, true);
 
-    if (intersects.length > 0) {
+    if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
         const selectedObject = intersects[0].object;
         if (selectedObject.name.startsWith('record'))
             zoomInfos = [recordCameraPos, recordCameraLookAt, 3];
         else if (selectedObject.name.startsWith('screen'))
             zoomInfos = [screenCameraPos, screenCameraLookAt, 2];
-        else {
+        else { // dezoom
             zoomOn(
                 [zoomInfos[0], globalCameraPos],
                 [zoomInfos[1], globalCameraLookAt],
-                [0.75, zoomInfos[2]],
+                zoomInfos[2],
                 true
             );
             zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
         }
 
-        if (zoomInfos[0] != globalCameraPos)
+        if (zoomInfos[0] != globalCameraPos) // zoom
             zoomOn(
                 [globalCameraPos, zoomInfos[0]],
                 [globalCameraLookAt, zoomInfos[1]],
-                [0.75, zoomInfos[2]],
+                zoomInfos[2],
                 false
             );
     }
 });
 
-const rayHelper = new THREE.ArrowHelper(raycaster.ray.direction, raycaster.ray.origin, 5, 0xff0000);
-// scene.add(rayHelper);
+// -----------------------------------
+// ------------ RESIZE ---------------
+// -----------------------------------
+
 
 let isDragging = false;
 let prevMousePosX = 0;
@@ -219,16 +225,18 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('resize', () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    scaleFactor = window.innerWidth > 700 ? 1 : window.innerWidth / 700;
+    scaleFactor = w > 700 ? 1 : w / 700;
 
-    const a = w / (h * scaleFactor);
-    camera.left = -d * a;
-    camera.right = d * a;
+    const aspect = w / h;
+    camera.left = -d * aspect;
+    camera.right = d * aspect;
     camera.top = d;
     camera.bottom = -d;
+
+    camera.zoom = currentCameraZoom * scaleFactor;
     camera.updateProjectionMatrix();
 
-    renderer.setSize(w, h * scaleFactor);
+    renderer.setSize(w, h);
     renderer.setPixelRatio(window.devicePixelRatio);
 });
 

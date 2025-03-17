@@ -123,11 +123,11 @@ button {
 // ------------------
 
 #threejsContainer {
-    display: flex;
-    justify-content: center;
+    margin: 0;
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 // ------------------
@@ -167,11 +167,11 @@ button {
     .div1 {
         grid-area: 1 / 2 / 3 / 4;
     }
-    
+
     .div2 {
         grid-area: 3 / 2 / 5 / 3;
     }
-    
+
     .div3 {
         grid-area: 2 / 4 / 3 / 6;
     }
@@ -276,7 +276,7 @@ button {
         0% {
             transform: translate(0px, 0px);
         }
-        
+
         18% {
             transform: translate(2.5px, -2.5px);
         }

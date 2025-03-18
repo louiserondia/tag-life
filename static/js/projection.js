@@ -129,7 +129,7 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
 });
 
 // -----------------------------------
-// ---------- RAYCASTING -------------
+// ------------- ZOOM ----------------
 // -----------------------------------
 let x1 = 1.2;
 let x2 = 2.5;
@@ -142,7 +142,6 @@ let screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
 let elapsed = 0;
 
 function zoomOn(pos, lookAt, zoom, dezoom) {
-    console.log(scene)
     const r = rotating.rotation.y;
     function animateZoom() {
         if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
@@ -165,6 +164,12 @@ function zoomOn(pos, lookAt, zoom, dezoom) {
 let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
 
 window.addEventListener('click', (event) => {
+
+    if (event.target.tagName == "IMG" 
+        || event.target.tagName == "P"
+        || event.target.id == "description"
+        || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
+
     const rect = renderer.domElement.getBoundingClientRect();
     const coords = new THREE.Vector2(
         ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -176,6 +181,7 @@ window.addEventListener('click', (event) => {
 
     if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
         const selectedObject = intersects[0].object;
+        
         if (selectedObject.name.startsWith('record'))
             zoomInfos = [recordCameraPos, recordCameraLookAt, 3];
         else if (selectedObject.name.startsWith('screen')) {
@@ -251,10 +257,10 @@ window.addEventListener('resize', () => {
     camera.bottom = -d;
 
     camera.zoom = currentCameraZoom * scaleFactor;
-    
+
     iframe.style.width = `${400 * scaleFactor}px`;
     iframe.style.height = `${275 * scaleFactor}px`;
-    
+
     if (w < 900 && screenCameraPos.x != x1 && currentCameraZoom == 2) {
         screenCameraPos.x = x1;
         screenCameraPos.y = 2;
@@ -285,6 +291,24 @@ function screenPresOn() {
 function screenPresOff() {
     screenPresBox.classList.remove("active");
 }
+
+// -----------------------------------
+// ------- DISPLAY DESCRIPTION -------
+// -----------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+    const thumbnails = document.querySelectorAll(".thumbnail");
+
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener("click", (event) => {
+            // Vérifie si une description est déjà ouverte et la ferme
+            // document.querySelectorAll(".thumbnailDescription").forEach(desc => desc.style.display = "none");
+
+            let description = document.getElementById(event.currentTarget.id + 'Description')
+            description.classList.toggle("show");
+        });
+    });
+});
 
 // -----------------------------------
 // ------------ DARKMODE -------------

@@ -9,7 +9,7 @@
     <title>Projection</title>
     <link rel="stylesheet" href="{% static 'main.css' %}">
     <link rel="stylesheet" href="{% static 'images.css' %}">
-    <!-- <link rel="stylesheet" href="{% static 'webcam.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'projection.css' %}">
 </head>
 
 <body>
@@ -22,6 +22,21 @@
     </div>
 
     <div id="threejsContainer"></div>
+
+    <div id="screenPresentation">
+        <div id="iframeContainer">
+            <iframe id="iframe" width="560" height="315"
+                frameborder="0"
+                allowfullscreen
+                referrerpolicy="strict-origin-when-cross-origin"
+                src="https://www.youtube.com/embed/IW9KKHcvMXM">
+            </iframe>
+        </div>
+        <div id="description">
+            
+        </div>
+
+    </div>
 
     <script type="importmap">
         {

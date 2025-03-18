@@ -303,10 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = document.getElementById("lightbox-img");
-
 const closeLightbox = document.getElementById("closeLightbox");
-// const nextImg = document.getElementById("nextImg");
-// const prevImg = document.getElementById("prevImg");
 
 function lightBoxOn(image) {
   lightbox.classList.add("active");
@@ -318,19 +315,10 @@ closeLightbox.addEventListener("click", () => {
 });
 
 lightbox.addEventListener("click", (e) => {
-  // if (e.target !== lightboxImg && e.target !== nextImg && e.target !== prevImg) {
   if (e.target !== lightboxImg) {
     lightbox.classList.remove("active");
   }
 });
-
-// nextImg.addEventListener('click', () => {
-//   const imgTitle = lightboxImg.src.split("/").pop();
-//   let index = imageList.findIndex(img => img.title == imgTitle)
-//   if (index == imageList.length - 1)
-//     index = -1;
-//   lightboxImg.src = imageList[index + 1];
-// });
 
 // ------------------
 //   INITIALISATION

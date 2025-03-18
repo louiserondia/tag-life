@@ -134,8 +134,8 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
 
 const recordCameraPos = new THREE.Vector3(10, 10, 10);
 const recordCameraLookAt = new THREE.Vector3(0, 3.5, 2.4);
-const screenCameraPos = new THREE.Vector3(1.2, 2.5, 3);
-const screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
+let screenCameraPos = new THREE.Vector3(w < 900 ? 1.2 : 2.5, w < 900 ? 2 : 2.5, 3);
+let screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
 
 let elapsed = 0;
 
@@ -146,12 +146,12 @@ function zoomOn(pos, lookAt, zoom, dezoom) {
             camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
             const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], dezoom ? 1 - elapsed : elapsed);
             camera.lookAt(nlookAt);
-            camera.zoom += (zoom - 0.75) * scaleFactor * (dezoom ? -0.01 : 0.01);
+            camera.zoom += (zoom[1] - zoom[0]) * scaleFactor * (dezoom ? -0.01 : 0.01);
             camera.updateProjectionMatrix();
             rotating.rotation.y = r - r * elapsed;
             // walls.material.opacity = 1 - elapsed; // mettre ou pas ?
 
-            currentCameraZoom = dezoom ? 0.75 : zoom;
+            currentCameraZoom = dezoom ? zoom[0] : zoom[1];
             elapsed += dezoom ? -0.01 : 0.01;
             requestAnimationFrame(animateZoom);
         }
@@ -175,30 +175,33 @@ window.addEventListener('click', (event) => {
         const selectedObject = intersects[0].object;
         if (selectedObject.name.startsWith('record'))
             zoomInfos = [recordCameraPos, recordCameraLookAt, 3];
-        else if (selectedObject.name.startsWith('screen'))
+        else if (selectedObject.name.startsWith('screen')) {
+            screenPresOn();
             zoomInfos = [screenCameraPos, screenCameraLookAt, 2];
+        }
         else { // dezoom
             zoomOn(
                 [zoomInfos[0], globalCameraPos],
                 [zoomInfos[1], globalCameraLookAt],
-                zoomInfos[2],
+                [0.75, zoomInfos[2]],
                 true
             );
             zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
+            screenPresOff();
         }
 
         if (zoomInfos[0] != globalCameraPos) // zoom
             zoomOn(
                 [globalCameraPos, zoomInfos[0]],
                 [globalCameraLookAt, zoomInfos[1]],
-                zoomInfos[2],
+                [0.75, zoomInfos[2]],
                 false
             );
     }
 });
 
 // -----------------------------------
-// ------------ RESIZE ---------------
+// --------- ORBIT CONTROL -----------
 // -----------------------------------
 
 
@@ -222,6 +225,17 @@ window.addEventListener('mousemove', (e) => {
     prevMousePosX = e.clientX;
 });
 
+
+// -----------------------------------
+// ------------- RESIZE---------------
+// -----------------------------------
+
+const iframe = document.getElementById('iframe');
+iframe.style.width = `${400 * scaleFactor}px`;
+iframe.style.height = `${275 * scaleFactor}px`;
+
+const description = document.getElementById('description');
+
 window.addEventListener('resize', () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -234,11 +248,46 @@ window.addEventListener('resize', () => {
     camera.bottom = -d;
 
     camera.zoom = currentCameraZoom * scaleFactor;
-    camera.updateProjectionMatrix();
-
+    
+    iframe.style.width = `${400 * scaleFactor}px`;
+    iframe.style.height = `${275 * scaleFactor}px`;
+    
     renderer.setSize(w, h);
     renderer.setPixelRatio(window.devicePixelRatio);
+    if (w < 900 && screenCameraPos.x != 1.2 && currentCameraZoom == 2) {
+        screenCameraPos.x = 1.2;
+        screenCameraPos.y = 2;
+        camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
+        // const w1 = w - description.style.height; 
+        // iframe.style.transform = ``;
+        console.log(description.style.height);
+    }
+    else if (w >= 900 && screenCameraPos.x != 2.5 && currentCameraZoom == 2) {
+        screenCameraPos.x = 2.5;
+        screenCameraPos.y = 2.5;
+        camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
+    }
+    camera.updateProjectionMatrix();
+
 });
+
+// -----------------------------------
+// ------ SCREEN PRESENTATION --------
+// -----------------------------------
+
+const screenPresBox = document.getElementById("screenPresentation");
+
+function screenPresOn() {
+    screenPresBox.classList.add("active");
+}
+
+function screenPresOff() {
+    screenPresBox.classList.remove("active");
+}
+
+// -----------------------------------
+// ------------ DARKMODE -------------
+// -----------------------------------
 
 let isDarkMode = localStorage.getItem("dark-mode") === "true";
 if (isDarkMode) {
@@ -258,6 +307,10 @@ switchMode.addEventListener("click", () => {
     deskLight.visible = !deskLight.visible;
     ambientLight.color.setHex(isDarkMode ? blue : orange);
 });
+
+// -----------------------------------
+// ------------- ANIMATE -------------
+// -----------------------------------
 
 function animate() {
     if (elapsed <= 0) { // pas de rotation de la scène si on est dans le zoom

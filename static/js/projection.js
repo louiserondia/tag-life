@@ -131,15 +131,18 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
 // -----------------------------------
 // ---------- RAYCASTING -------------
 // -----------------------------------
+let x1 = 1.2;
+let x2 = 2.5;
 
 const recordCameraPos = new THREE.Vector3(10, 10, 10);
 const recordCameraLookAt = new THREE.Vector3(0, 3.5, 2.4);
-let screenCameraPos = new THREE.Vector3(w < 900 ? 1.2 : 2.5, w < 900 ? 2 : 2.5, 3);
+let screenCameraPos = new THREE.Vector3(w < 900 ? x1 : x2, w < 900 ? 2 : 2.5, 3);
 let screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
 
 let elapsed = 0;
 
 function zoomOn(pos, lookAt, zoom, dezoom) {
+    console.log(scene)
     const r = rotating.rotation.y;
     function animateZoom() {
         if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
@@ -252,22 +255,20 @@ window.addEventListener('resize', () => {
     iframe.style.width = `${400 * scaleFactor}px`;
     iframe.style.height = `${275 * scaleFactor}px`;
     
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    if (w < 900 && screenCameraPos.x != 1.2 && currentCameraZoom == 2) {
-        screenCameraPos.x = 1.2;
+    if (w < 900 && screenCameraPos.x != x1 && currentCameraZoom == 2) {
+        screenCameraPos.x = x1;
         screenCameraPos.y = 2;
         camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
-        // const w1 = w - description.style.height; 
-        // iframe.style.transform = ``;
-        console.log(description.style.height);
     }
-    else if (w >= 900 && screenCameraPos.x != 2.5 && currentCameraZoom == 2) {
-        screenCameraPos.x = 2.5;
+    else if (w >= 900 && screenCameraPos.x != x2 && currentCameraZoom == 2) {
+        screenCameraPos.x = x2;
         screenCameraPos.y = 2.5;
         camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
     }
+
     camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(window.devicePixelRatio);
 
 });
 

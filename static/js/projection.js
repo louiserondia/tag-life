@@ -8,8 +8,8 @@ const objects = [];
 let walls;
 
 const scene = new THREE.Scene();
-const w = window.innerWidth;
-const h = window.innerHeight;
+let w = window.innerWidth;
+let h = window.innerHeight;
 let scaleFactor = w > 700 ? 1 : w / 700;
 
 const aspect = w / h;
@@ -165,9 +165,9 @@ let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
 
 window.addEventListener('click', (event) => {
 
-    if (event.target.tagName == "IMG" 
+    if (event.target.tagName == "IMG"
         || event.target.tagName == "P"
-        || event.target.id == "description"
+        || event.target.id.includes("escription")
         || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
 
     const rect = renderer.domElement.getBoundingClientRect();
@@ -181,7 +181,7 @@ window.addEventListener('click', (event) => {
 
     if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
         const selectedObject = intersects[0].object;
-        
+
         if (selectedObject.name.startsWith('record'))
             zoomInfos = [recordCameraPos, recordCameraLookAt, 3];
         else if (selectedObject.name.startsWith('screen')) {
@@ -243,11 +243,9 @@ const iframe = document.getElementById('iframe');
 iframe.style.width = `${400 * scaleFactor}px`;
 iframe.style.height = `${275 * scaleFactor}px`;
 
-const description = document.getElementById('description');
-
 window.addEventListener('resize', () => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    w = window.innerWidth;
+    h = window.innerHeight;
     scaleFactor = w > 700 ? 1 : w / 700;
 
     const aspect = w / h;
@@ -271,6 +269,8 @@ window.addEventListener('resize', () => {
         screenCameraPos.y = 2.5;
         camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
     }
+    if (descriptionOn)
+        handleThumbnailsHidden();
 
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
@@ -296,19 +296,40 @@ function screenPresOff() {
 // ------- DISPLAY DESCRIPTION -------
 // -----------------------------------
 
-document.addEventListener("DOMContentLoaded", () => {
-    const thumbnails = document.querySelectorAll(".thumbnail");
+const thumbnails = document.querySelectorAll(".thumbnail");
+const thumbnailDescriptions = document.querySelectorAll(".thumbnailDescription");
+let descriptionOn = false;
 
-    thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener("click", (event) => {
-            // Vérifie si une description est déjà ouverte et la ferme
-            // document.querySelectorAll(".thumbnailDescription").forEach(desc => desc.style.display = "none");
+function toggleShowDescription(description) {
+    document.querySelectorAll(".thumbnailDescription").forEach(d => {
+        if (d != description)
+            d.classList.remove("show"); // ferme si autre description déjà ouverte
+    });
+    description.classList.toggle("show");
+    descriptionOn = !descriptionOn;
 
-            let description = document.getElementById(event.currentTarget.id + 'Description')
-            description.classList.toggle("show");
-        });
+    if (w < 900) // cache les thumbnails mais si on resize, c'est dans la partie resize qu'on les réaffiche
+        thumbnails.forEach(t => t.classList.toggle("hidden"));
+}
+
+function handleThumbnailsHidden() {
+    if (w < 900)
+        thumbnails.forEach(t => t.classList.add("hidden"));
+    else
+        thumbnails.forEach(t => t.classList.remove("hidden"));
+}
+
+thumbnails.forEach(thumbnail => {
+    thumbnail.addEventListener("click", (event) => {
+        let description = document.getElementById(event.currentTarget.id + 'Description')
+        if (description) toggleShowDescription(description);
     });
 });
+
+thumbnailDescriptions.forEach(description => {
+    description.addEventListener("click", (event) => { toggleShowDescription(event.target) });
+});
+
 
 // -----------------------------------
 // ------------ DARKMODE -------------

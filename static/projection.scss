@@ -34,28 +34,29 @@
         max-width: 350px;
         background: rgba(236, 236, 236, 0.75);
         display: flex;
-        align-items: center;
         justify-content: center;
         border-radius: 15px;
 
         #thumbnailsContainer {
             width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
             margin: 2rem;
-            justify-content: space-evenly;
-            overflow-y: hidden;
+            overflow-y: auto;
+            gap: 1rem;
+            max-height: 80vh; // ?
 
             .thumbnail {
+                display: block;
                 width: 100%;
-                height: 15vh;
+                height: 125px;
+                min-height: 125px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 position: relative;
                 cursor: pointer;
-                
+
                 img {
                     border-radius: 15px;
                     position: absolute;
@@ -76,10 +77,14 @@
                 }
 
             }
+
+            .thumbnail.hidden {
+                display: none;
+            }
+
             .thumbnailDescription {
                 display: none;
-                margin-top: 10px;
-                padding: 10px;
+                padding: 0 10px;
                 background-color: rgba(196, 112, 112, 0.7);
                 color: white;
                 border-radius: 10px;
@@ -92,7 +97,7 @@
                 display: block;
                 opacity: 1;
             }
-            
+
         }
     }
 
@@ -121,6 +126,35 @@
             top: auto;
             bottom: 0;
             margin: auto auto 1rem auto;
+
+            #thumbnailsContainer {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-evenly;
+                margin: 1rem;
+
+                .thumbnail {
+                    width: 45%;
+                    min-width: 150px;
+                    min-height: auto;
+                    height: auto;
+
+                    p {
+                        font-size: 1.3rem;
+                        color: white;
+                        width: 90%;
+                        -webkit-text-stroke: 0px;
+                    }
+                }
+                
+                .thumbnailDescription.show {
+                    display: block;
+                    opacity: 1;
+                    width: 90%;
+;
+                }
+
+            }
         }
     }
 }

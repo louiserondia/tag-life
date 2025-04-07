@@ -157,7 +157,7 @@ function zoomOn(pos, lookAt, zoom, dezoom, name) {
             rotating.rotation.y = r - r * elapsed;
             if (name == 'record') {
                 objects.forEach((o) => {
-                    if (!startsWithAnyOf(o.name, ['record', 'turntable', 'table']))
+                    if (!startsWithAnyOf(o.name, ['record', 'turntable', 'table']) && elapsed < 0.8)
                            o.material.opacity = 1 - elapsed; // ça enlève les materiaux communs, mat uniques ?
                 });
             }
@@ -251,9 +251,9 @@ window.addEventListener('mousemove', (e) => {
 // ------------- RESIZE---------------
 // -----------------------------------
 
-const iframe = document.getElementById('iframe');
-iframe.style.width = `${400 * scaleFactor}px`;
-iframe.style.height = `${275 * scaleFactor}px`;
+const video = document.getElementById('video');
+video.style.width = `${400 * scaleFactor}px`;
+video.style.height = `${275 * scaleFactor}px`;
 
 window.addEventListener('resize', () => {
     w = window.innerWidth;
@@ -268,8 +268,8 @@ window.addEventListener('resize', () => {
 
     camera.zoom = currentCameraZoom * scaleFactor;
 
-    iframe.style.width = `${400 * scaleFactor}px`;
-    iframe.style.height = `${275 * scaleFactor}px`;
+    video.style.width = `${400 * scaleFactor}px`;
+    video.style.height = `${275 * scaleFactor}px`;
 
     if (w < 900 && screenCameraPos.x != x1 && currentCameraZoom == 2) {
         screenCameraPos.x = x1;
@@ -337,6 +337,10 @@ thumbnails.forEach(thumbnail => {
     thumbnail.addEventListener("click", (event) => {
         let description = document.getElementById(event.currentTarget.id + 'Description')
         if (description) toggleShowDescription(description);
+        if (!video.children[0].src.includes(thumbnail.id)) {
+            video.children[0].setAttribute('src', '/static/videos/' + thumbnail.id + '.mp4');
+            video.load();
+        }
     });
 });
 

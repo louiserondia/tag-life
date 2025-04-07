@@ -27,12 +27,10 @@
     
          
         <div id="iframeContainer">
-            <iframe id="iframe" width="560" height="315"
-                frameborder="0"
-                allowfullscreen
-                referrerpolicy="strict-origin-when-cross-origin"
-                src="https://www.youtube.com/embed/IW9KKHcvMXM?modestbranding=1&autohide=1&showinfo=0&controls=0">
-            </iframe>
+            <video id="video" controls>
+                <source src="{% static 'videos/mp3.mp4' %}" type="video/mp4">
+                Votre navigateur ne supporte pas la lecture vidéo.
+              </video>
         </div>
         <div id="description">
             <div id="thumbnailsContainer">

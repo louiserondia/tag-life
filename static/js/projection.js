@@ -4,8 +4,8 @@ import { Raycaster, Vector2 } from 'three';
 import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 
 const raycaster = new Raycaster();
-const objects = [];
-let walls;
+const objects = new Map();
+let objectsArray;
 
 const scene = new THREE.Scene();
 let w = window.innerWidth;
@@ -117,13 +117,13 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
-            objects.push(node);
-            if (node.name === "walls") {
-                walls = node;
-                walls.material.transparent = true;
-            }
+            objects.set(node.name, node);
+            // if (node.name === "walls")
+                node.material.transparent = true;
         }
     });
+    objectsArray = Array.from(objects.values());
+    // console.log(objects)
 }, undefined, (error) => {
     console.error(error, "Error on loading of gltf projectionRoom");
 });
@@ -141,7 +141,11 @@ let screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
 
 let elapsed = 0;
 
-function zoomOn(pos, lookAt, zoom, dezoom) {
+function startsWithAnyOf(object, names) {
+    return names.some(name => object.startsWith(name));
+}
+
+function zoomOn(pos, lookAt, zoom, dezoom, name) {
     const r = rotating.rotation.y;
     function animateZoom() {
         if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
@@ -151,7 +155,12 @@ function zoomOn(pos, lookAt, zoom, dezoom) {
             camera.zoom += (zoom[1] - zoom[0]) * scaleFactor * (dezoom ? -0.01 : 0.01);
             camera.updateProjectionMatrix();
             rotating.rotation.y = r - r * elapsed;
-            // walls.material.opacity = 1 - elapsed; // mettre ou pas ?
+            if (name == 'record') {
+                objects.forEach((o) => {
+                    if (!startsWithAnyOf(o.name, ['record', 'turntable', 'table']))
+                           o.material.opacity = 1 - elapsed; // ça enlève les materiaux communs, mat uniques ?
+                });
+            }
 
             currentCameraZoom = dezoom ? zoom[0] : zoom[1];
             elapsed += dezoom ? -0.01 : 0.01;
@@ -161,11 +170,11 @@ function zoomOn(pos, lookAt, zoom, dezoom) {
     requestAnimationFrame(animateZoom);
 }
 
-let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
+let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
 
 window.addEventListener('click', (event) => {
 
-    if (event.target.tagName == "IMG"
+    if ( event.target.tagName == "IMG"
         || event.target.tagName == "P"
         || event.target.id.includes("escription")
         || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
@@ -177,25 +186,27 @@ window.addEventListener('click', (event) => {
     );
 
     raycaster.setFromCamera(coords, camera);
-    const intersects = raycaster.intersectObjects(objects, true);
+    const intersects = raycaster.intersectObjects(objectsArray, true);
 
+        // console.log(objects.values())
     if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
         const selectedObject = intersects[0].object;
 
         if (selectedObject.name.startsWith('record'))
-            zoomInfos = [recordCameraPos, recordCameraLookAt, 3];
+            zoomInfos = [recordCameraPos, recordCameraLookAt, 3, 'record'];
         else if (selectedObject.name.startsWith('screen')) {
             screenPresOn();
-            zoomInfos = [screenCameraPos, screenCameraLookAt, 2];
+            zoomInfos = [screenCameraPos, screenCameraLookAt, 2, 'screen'];
         }
         else { // dezoom
             zoomOn(
                 [zoomInfos[0], globalCameraPos],
                 [zoomInfos[1], globalCameraLookAt],
                 [0.75, zoomInfos[2]],
-                true
+                true, 
+                zoomInfos[3]
             );
-            zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75];
+            zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
             screenPresOff();
         }
 
@@ -204,7 +215,8 @@ window.addEventListener('click', (event) => {
                 [globalCameraPos, zoomInfos[0]],
                 [globalCameraLookAt, zoomInfos[1]],
                 [0.75, zoomInfos[2]],
-                false
+                false, 
+                zoomInfos[3]
             );
     }
 });
@@ -307,6 +319,8 @@ function toggleShowDescription(description) {
     });
     description.classList.toggle("show");
     descriptionOn = !descriptionOn;
+
+    
 
     if (w < 900) // cache les thumbnails mais si on resize, c'est dans la partie resize qu'on les réaffiche
         thumbnails.forEach(t => t.classList.toggle("hidden"));

@@ -105,6 +105,8 @@ scene.background = null;
 
 const loader = new GLTFLoader();
 
+let screenMesh;
+
 let projectionRoom;
 loader.load('../media/models/projection_room_2.glb', (gltf) => {
     projectionRoom = gltf.scene;
@@ -118,8 +120,9 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
             node.castShadow = true;
             node.receiveShadow = true;
             objects.set(node.name, node);
-            // if (node.name === "walls")
-                node.material.transparent = true;
+            node.material.transparent = true;
+            if (node.name === "screen_1")
+                screenMesh = node;
         }
     });
     objectsArray = Array.from(objects.values());
@@ -145,8 +148,70 @@ function startsWithAnyOf(object, names) {
     return names.some(name => object.startsWith(name));
 }
 
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
+
+function createMarker(x, y) {
+    const marker = document.createElement('div');
+    marker.style.position = 'absolute';
+    marker.style.width = '10px';
+    marker.style.height = '10px';
+    marker.style.backgroundColor = 'red';
+    marker.style.borderRadius = '50%'; // rond (optionnel)
+    marker.style.left = `${x}px`;
+    marker.style.top = `${y}px`;
+    marker.style.transform = 'translate(-50%, -50%)';
+    marker.style.zIndex = '1000';
+
+    document.body.appendChild(marker);
+}
+
+function getScreenCorners(mesh, camera, canvas) {
+    const box = new THREE.Box3().setFromObject(mesh);
+    const points = [
+        new THREE.Vector3(box.min.x, box.min.y, box.min.z),
+        new THREE.Vector3(box.min.x, box.min.y, box.max.z),
+        new THREE.Vector3(box.min.x, box.max.y, box.min.z),
+        new THREE.Vector3(box.min.x, box.max.y, box.max.z),
+        new THREE.Vector3(box.max.x, box.min.y, box.min.z),
+        new THREE.Vector3(box.max.x, box.min.y, box.max.z),
+        new THREE.Vector3(box.max.x, box.max.y, box.min.z),
+        new THREE.Vector3(box.max.x, box.max.y, box.max.z),
+    ];
+
+    let minX = Infinity, maxX = -Infinity;
+    let minY = Infinity, maxY = -Infinity;
+
+    points.forEach(p => {
+        p.project(camera);
+
+        const x = (p.x * 0.5 + 0.5) * canvas.clientWidth;
+        const y = (1 - (p.y * 0.5 + 0.5)) * canvas.clientHeight;
+
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+    });
+
+    return {
+        topLeft: { x: minX, y: minY },
+        bottomRight: { x: maxX, y: maxY }
+    };
+}
+
+function getScreenMiddle(mesh) {
+    const corners = getScreenCorners(mesh, camera, container);
+
+    const midX = corners.topLeft.x + ((corners.bottomRight.x - corners.topLeft.x) / 2);
+    const midY = corners.topLeft.y + ((corners.bottomRight.y - corners.topLeft.y) / 2);
+
+    return { x: midX, y: midY };
+}
+
 function zoomOn(pos, lookAt, zoom, dezoom, name) {
     const r = rotating.rotation.y;
+
     function animateZoom() {
         if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
             camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
@@ -158,13 +223,18 @@ function zoomOn(pos, lookAt, zoom, dezoom, name) {
             if (name == 'record') {
                 objects.forEach((o) => {
                     if (!startsWithAnyOf(o.name, ['record', 'turntable', 'table']) && elapsed < 0.8)
-                           o.material.opacity = 1 - elapsed; // ça enlève les materiaux communs, mat uniques ?
+                        o.material.opacity = 1 - elapsed; // ça enlève les materiaux communs, mat uniques ?
                 });
             }
 
             currentCameraZoom = dezoom ? zoom[0] : zoom[1];
             elapsed += dezoom ? -0.01 : 0.01;
             requestAnimationFrame(animateZoom);
+        }
+        else {
+            const mid = getScreenMiddle(screenMesh);
+            video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
+            video.style.position = 'absolute';
         }
     }
     requestAnimationFrame(animateZoom);
@@ -174,7 +244,7 @@ let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
 
 window.addEventListener('click', (event) => {
 
-    if ( event.target.tagName == "IMG"
+    if (event.target.tagName == "IMG"
         || event.target.tagName == "P"
         || event.target.id.includes("escription")
         || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
@@ -188,7 +258,6 @@ window.addEventListener('click', (event) => {
     raycaster.setFromCamera(coords, camera);
     const intersects = raycaster.intersectObjects(objectsArray, true);
 
-        // console.log(objects.values())
     if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
         const selectedObject = intersects[0].object;
 
@@ -203,7 +272,7 @@ window.addEventListener('click', (event) => {
                 [zoomInfos[0], globalCameraPos],
                 [zoomInfos[1], globalCameraLookAt],
                 [0.75, zoomInfos[2]],
-                true, 
+                true,
                 zoomInfos[3]
             );
             zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
@@ -215,7 +284,7 @@ window.addEventListener('click', (event) => {
                 [globalCameraPos, zoomInfos[0]],
                 [globalCameraLookAt, zoomInfos[1]],
                 [0.75, zoomInfos[2]],
-                false, 
+                false,
                 zoomInfos[3]
             );
     }
@@ -271,6 +340,10 @@ window.addEventListener('resize', () => {
     video.style.width = `${400 * scaleFactor}px`;
     video.style.height = `${275 * scaleFactor}px`;
 
+    const mid = getScreenMiddle(screenMesh);
+    video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
+    video.style.position = 'absolute';
+
     if (w < 900 && screenCameraPos.x != x1 && currentCameraZoom == 2) {
         screenCameraPos.x = x1;
         screenCameraPos.y = 2;
@@ -320,7 +393,7 @@ function toggleShowDescription(description) {
     description.classList.toggle("show");
     descriptionOn = !descriptionOn;
 
-    
+
 
     if (w < 900) // cache les thumbnails mais si on resize, c'est dans la partie resize qu'on les réaffiche
         thumbnails.forEach(t => t.classList.toggle("hidden"));

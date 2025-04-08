@@ -24,6 +24,8 @@ taglife/settings.py
 taglife\settings.py
 static/*.css.map
 static/*.css
+static/videos/*
+static\videos\*
 node_modules
 old3js.js
 apps/main/static/js/libs/*

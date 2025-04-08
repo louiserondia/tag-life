@@ -2,6 +2,8 @@ media\uploads
 media\images
 media/uploads/*
 media/images/*
+media/uploads
+media/images
 myenv
 myenv/*
 db.sqlite3

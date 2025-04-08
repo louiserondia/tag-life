@@ -148,8 +148,8 @@ function startsWithAnyOf(object, names) {
     return names.some(name => object.startsWith(name));
 }
 
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+// const axesHelper = new THREE.AxesHelper(5);
+// scene.add(axesHelper);
 
 function createMarker(x, y) {
     const marker = document.createElement('div');

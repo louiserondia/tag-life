@@ -14,6 +14,11 @@ let scaleFactor = w > 700 ? 1 : w / 700;
 
 const aspect = w / h;
 const d = 6;
+const smallScreenSize = 750;
+
+
+const hits = document.getElementById('hits');
+const screenPresBox = document.getElementById("screenPresentation");
 
 const globalCameraPos = new THREE.Vector3(10, 10, 10);
 const globalCameraLookAt = new THREE.Vector3(0, 3, 0);
@@ -131,40 +136,111 @@ loader.load('../media/models/projection_room_2.glb', (gltf) => {
     console.error(error, "Error on loading of gltf projectionRoom");
 });
 
+
 // -----------------------------------
 // ------------- ZOOM ----------------
 // -----------------------------------
+
+
 let x1 = 1.2;
 let x2 = 2.5;
 
 const recordCameraPos = new THREE.Vector3(10, 10, 10);
 const recordCameraLookAt = new THREE.Vector3(0, 3.5, 2.4);
-let screenCameraPos = new THREE.Vector3(w < 900 ? x1 : x2, w < 900 ? 2 : 2.5, 3);
+let screenCameraPos = new THREE.Vector3(w < smallScreenSize ? x1 : x2, w < smallScreenSize ? 2 : 2.5, 3);
 let screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
 
 let elapsed = 0;
 
-function startsWithAnyOf(object, names) {
-    return names.some(name => object.startsWith(name));
+function zoomOn(pos, lookAt, zoom, dezoom, name) {
+    const r = rotating.rotation.y;
+    if (dezoom) {
+        hits.classList.remove("active");
+        screenPresBox.classList.remove("active");
+    } 
+    
+    function animateZoom() {
+        if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
+            camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
+            const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], dezoom ? 1 - elapsed : elapsed);
+            camera.lookAt(nlookAt);
+            camera.zoom += (zoom[1] - zoom[0]) * scaleFactor * (dezoom ? -0.01 : 0.01);
+            camera.updateProjectionMatrix();
+            rotating.rotation.y = r - r * elapsed;
+            currentCameraZoom = dezoom ? zoom[0] : zoom[1];
+            elapsed += dezoom ? -0.01 : 0.01;
+            requestAnimationFrame(animateZoom);
+        }
+        else {
+            const mid = getScreenMiddle(screenMesh);
+            video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
+            video.style.position = 'absolute';
+            
+            if (name == 'record' && !dezoom) hits.classList.add("active");
+            else if (name == 'screen' && !dezoom) screenPresBox.classList.add("active");
+        }
+    }
+    requestAnimationFrame(animateZoom);
 }
 
-// const axesHelper = new THREE.AxesHelper(5);
-// scene.add(axesHelper);
+// -----------------------------------
+// ----------- RAYCASTER -------------
+// -----------------------------------
 
-function createMarker(x, y) {
-    const marker = document.createElement('div');
-    marker.style.position = 'absolute';
-    marker.style.width = '10px';
-    marker.style.height = '10px';
-    marker.style.backgroundColor = 'red';
-    marker.style.borderRadius = '50%'; // rond (optionnel)
-    marker.style.left = `${x}px`;
-    marker.style.top = `${y}px`;
-    marker.style.transform = 'translate(-50%, -50%)';
-    marker.style.zIndex = '1000';
 
-    document.body.appendChild(marker);
-}
+let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
+
+window.addEventListener('click', (event) => {
+
+    if (event.target.tagName == "IMG"
+        || event.target.tagName == "P"
+        || event.target.id.includes("escription")
+        || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    const coords = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -(((event.clientY - rect.top) / rect.height) * 2 - 1)
+    );
+
+    raycaster.setFromCamera(coords, camera);
+    const intersects = raycaster.intersectObjects(objectsArray, true);
+
+    
+    if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
+        const selectedObject = intersects[0].object;
+        
+        if (selectedObject.name.startsWith('record') && zoomInfos[3] != 'screen')
+            zoomInfos = [recordCameraPos, recordCameraLookAt, 3, 'record'];
+        else if (selectedObject.name.startsWith('screen') && zoomInfos[3] != 'record')
+            zoomInfos = [screenCameraPos, screenCameraLookAt, 2, 'screen'];
+        else { // dezoom
+            zoomOn(
+                [zoomInfos[0], globalCameraPos],
+                [zoomInfos[1], globalCameraLookAt],
+                [0.75, zoomInfos[2]],
+                true,
+                zoomInfos[3]
+            );
+            zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
+        }
+
+        if (zoomInfos[0] != globalCameraPos) // zoom
+            zoomOn(
+                [globalCameraPos, zoomInfos[0]],
+                [globalCameraLookAt, zoomInfos[1]],
+                [0.75, zoomInfos[2]],
+                false,
+                zoomInfos[3]
+            );
+    }
+});
+
+
+// -----------------------------------
+// -------- SCREEN TRACKER -----------
+// -----------------------------------
+
 
 function getScreenCorners(mesh, camera, canvas) {
     const box = new THREE.Box3().setFromObject(mesh);
@@ -179,11 +255,14 @@ function getScreenCorners(mesh, camera, canvas) {
         new THREE.Vector3(box.max.x, box.max.y, box.max.z),
     ];
 
+    const projectionMatrix = camera.projectionMatrix;
+    const modelViewMatrix = camera.matrixWorldInverse;
     let minX = Infinity, maxX = -Infinity;
     let minY = Infinity, maxY = -Infinity;
 
     points.forEach(p => {
-        p.project(camera);
+        p.applyMatrix4(modelViewMatrix); // Transformation en espace de la caméra
+        p.applyMatrix4(projectionMatrix); // Projection 3D -> 2D
 
         const x = (p.x * 0.5 + 0.5) * canvas.clientWidth;
         const y = (1 - (p.y * 0.5 + 0.5)) * canvas.clientHeight;
@@ -209,86 +288,6 @@ function getScreenMiddle(mesh) {
     return { x: midX, y: midY };
 }
 
-function zoomOn(pos, lookAt, zoom, dezoom, name) {
-    const r = rotating.rotation.y;
-
-    function animateZoom() {
-        if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
-            camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
-            const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], dezoom ? 1 - elapsed : elapsed);
-            camera.lookAt(nlookAt);
-            camera.zoom += (zoom[1] - zoom[0]) * scaleFactor * (dezoom ? -0.01 : 0.01);
-            camera.updateProjectionMatrix();
-            rotating.rotation.y = r - r * elapsed;
-            if (name == 'record') {
-                objects.forEach((o) => {
-                    if (!startsWithAnyOf(o.name, ['record', 'turntable', 'table']) && elapsed < 0.8)
-                        o.material.opacity = 1 - elapsed; // ça enlève les materiaux communs, mat uniques ?
-                });
-            }
-
-            currentCameraZoom = dezoom ? zoom[0] : zoom[1];
-            elapsed += dezoom ? -0.01 : 0.01;
-            requestAnimationFrame(animateZoom);
-        }
-        else {
-            const mid = getScreenMiddle(screenMesh);
-            video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
-            video.style.position = 'absolute';
-        }
-    }
-    requestAnimationFrame(animateZoom);
-}
-
-let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
-
-window.addEventListener('click', (event) => {
-
-    if (event.target.tagName == "IMG"
-        || event.target.tagName == "P"
-        || event.target.id.includes("escription")
-        || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
-
-    const rect = renderer.domElement.getBoundingClientRect();
-    const coords = new THREE.Vector2(
-        ((event.clientX - rect.left) / rect.width) * 2 - 1,
-        -(((event.clientY - rect.top) / rect.height) * 2 - 1)
-    );
-
-    raycaster.setFromCamera(coords, camera);
-    const intersects = raycaster.intersectObjects(objectsArray, true);
-
-    if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
-        const selectedObject = intersects[0].object;
-
-        if (selectedObject.name.startsWith('record'))
-            zoomInfos = [recordCameraPos, recordCameraLookAt, 3, 'record'];
-        else if (selectedObject.name.startsWith('screen')) {
-            screenPresOn();
-            zoomInfos = [screenCameraPos, screenCameraLookAt, 2, 'screen'];
-        }
-        else { // dezoom
-            zoomOn(
-                [zoomInfos[0], globalCameraPos],
-                [zoomInfos[1], globalCameraLookAt],
-                [0.75, zoomInfos[2]],
-                true,
-                zoomInfos[3]
-            );
-            zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
-            screenPresOff();
-        }
-
-        if (zoomInfos[0] != globalCameraPos) // zoom
-            zoomOn(
-                [globalCameraPos, zoomInfos[0]],
-                [globalCameraLookAt, zoomInfos[1]],
-                [0.75, zoomInfos[2]],
-                false,
-                zoomInfos[3]
-            );
-    }
-});
 
 // -----------------------------------
 // --------- ORBIT CONTROL -----------
@@ -340,16 +339,13 @@ window.addEventListener('resize', () => {
     video.style.width = `${400 * scaleFactor}px`;
     video.style.height = `${275 * scaleFactor}px`;
 
-    const mid = getScreenMiddle(screenMesh);
-    video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
-    video.style.position = 'absolute';
 
-    if (w < 900 && screenCameraPos.x != x1 && currentCameraZoom == 2) {
+    if (w < smallScreenSize && screenCameraPos.x != x1 && currentCameraZoom == 2) {
         screenCameraPos.x = x1;
         screenCameraPos.y = 2;
         camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
     }
-    else if (w >= 900 && screenCameraPos.x != x2 && currentCameraZoom == 2) {
+    else if (w >= smallScreenSize && screenCameraPos.x != x2 && currentCameraZoom == 2) {
         screenCameraPos.x = x2;
         screenCameraPos.y = 2.5;
         camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
@@ -357,25 +353,15 @@ window.addEventListener('resize', () => {
     if (descriptionOn)
         handleThumbnailsHidden();
 
+    const mid = getScreenMiddle(screenMesh);
+    video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
+    video.style.position = 'absolute';
+
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
     renderer.setPixelRatio(window.devicePixelRatio);
 
 });
-
-// -----------------------------------
-// ------ SCREEN PRESENTATION --------
-// -----------------------------------
-
-const screenPresBox = document.getElementById("screenPresentation");
-
-function screenPresOn() {
-    screenPresBox.classList.add("active");
-}
-
-function screenPresOff() {
-    screenPresBox.classList.remove("active");
-}
 
 // -----------------------------------
 // ------- DISPLAY DESCRIPTION -------
@@ -395,12 +381,12 @@ function toggleShowDescription(description) {
 
 
 
-    if (w < 900) // cache les thumbnails mais si on resize, c'est dans la partie resize qu'on les réaffiche
+    if (w < smallScreenSize) // cache les thumbnails mais si on resize, c'est dans la partie resize qu'on les réaffiche
         thumbnails.forEach(t => t.classList.toggle("hidden"));
 }
 
 function handleThumbnailsHidden() {
-    if (w < 900)
+    if (w < smallScreenSize)
         thumbnails.forEach(t => t.classList.add("hidden"));
     else
         thumbnails.forEach(t => t.classList.remove("hidden"));

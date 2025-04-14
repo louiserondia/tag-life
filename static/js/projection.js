@@ -157,8 +157,8 @@ function zoomOn(pos, lookAt, zoom, dezoom, name) {
     if (dezoom) {
         hits.classList.remove("active");
         screenPresBox.classList.remove("active");
-    } 
-    
+    }
+
     function animateZoom() {
         if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
             camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
@@ -175,9 +175,11 @@ function zoomOn(pos, lookAt, zoom, dezoom, name) {
             const mid = getScreenMiddle(screenMesh);
             video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
             video.style.position = 'absolute';
-            
+
             if (name == 'record' && !dezoom) hits.classList.add("active");
             else if (name == 'screen' && !dezoom) screenPresBox.classList.add("active");
+
+            if (dezoom) video.pause();
         }
     }
     requestAnimationFrame(animateZoom);
@@ -187,15 +189,15 @@ function zoomOn(pos, lookAt, zoom, dezoom, name) {
 // ----------- RAYCASTER -------------
 // -----------------------------------
 
+function isHtml(e) {
+    return (e.nodeName != "CANVAS" && e.id != "hits" && e.id != "screenPresentation");
+}
 
 let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
 
 window.addEventListener('click', (event) => {
 
-    if (event.target.tagName == "IMG"
-        || event.target.tagName == "P"
-        || event.target.id.includes("escription")
-        || event.target.id == "thumbnailsContainer") return; // si je clique sur un élément html devant le canvas
+    if (isHtml(event.target)) return; // si je clique sur un élément html devant le canvas
 
     const rect = renderer.domElement.getBoundingClientRect();
     const coords = new THREE.Vector2(
@@ -206,10 +208,10 @@ window.addEventListener('click', (event) => {
     raycaster.setFromCamera(coords, camera);
     const intersects = raycaster.intersectObjects(objectsArray, true);
 
-    
+
     if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
         const selectedObject = intersects[0].object;
-        
+
         if (selectedObject.name.startsWith('record') && zoomInfos[3] != 'screen')
             zoomInfos = [recordCameraPos, recordCameraLookAt, 3, 'record'];
         else if (selectedObject.name.startsWith('screen') && zoomInfos[3] != 'record')
@@ -379,8 +381,6 @@ function toggleShowDescription(description) {
     description.classList.toggle("show");
     descriptionOn = !descriptionOn;
 
-
-
     if (w < smallScreenSize) // cache les thumbnails mais si on resize, c'est dans la partie resize qu'on les réaffiche
         thumbnails.forEach(t => t.classList.toggle("hidden"));
 }
@@ -405,6 +405,40 @@ thumbnails.forEach(thumbnail => {
 
 thumbnailDescriptions.forEach(description => {
     description.addEventListener("click", (event) => { toggleShowDescription(event.target) });
+});
+
+// -----------------------------------
+// ---- DISPLAY AUDIO DESCRIPTION ----
+// -----------------------------------
+
+function toggleAudioDescription(target) {
+
+    while (!target.classList.contains("audio-title"))
+        target = target.parentElement;
+
+    let description = target.nextElementSibling;
+    document.querySelectorAll(".audio-description").forEach(d => {
+        if (d != description)
+            d.classList.remove("active"); // ferme si autre description déjà ouverte
+    });
+    description.classList.toggle("active");
+    descriptionOn = !descriptionOn;
+
+}
+
+const audioTitles = document.querySelectorAll('.audio-title');
+audioTitles.forEach(a => {
+    a.addEventListener('click', (e) => { toggleAudioDescription(e.target) });
+});
+
+const audioDescriptions = document.querySelectorAll('.audio-description');
+audioDescriptions.forEach(a => {
+    a.addEventListener('click', (e) => {
+        let target = e.target;
+        while (!target.classList.contains("audio-description"))
+            target = target.parentElement;
+        target.classList.remove("active")
+    });
 });
 
 

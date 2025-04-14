@@ -170,13 +170,15 @@
     height: 100vh;
     transition: opacity .3s ease, visibility .3s ease;
     justify-content: center;
+    align-items: center;
 
     #hitsContainer {
         border-radius: 10px;
-        margin: 2rem;
+        margin: 4rem;
         width: 100%;
         height: max-content;
         max-width: 750px;
+        max-height: 750vh;
         background-color: rgba(236, 236, 236, 0.75);
         display: flex;
         flex-direction: column;
@@ -226,6 +228,12 @@
                 display: flex;
                 opacity: 1;
             }
+        }
+    }
+
+    @media (max-width: 500px) {
+        #hitsContainer {
+            margin: 2rem;
         }
     }
 }

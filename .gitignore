@@ -28,6 +28,7 @@ static/*.css.map
 static/*.css
 static/videos/*
 static\videos\*
+static/img
 node_modules
 old3js.js
 apps/main/static/js/libs/*

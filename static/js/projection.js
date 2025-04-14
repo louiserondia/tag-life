@@ -422,7 +422,8 @@ function toggleAudioDescription(target) {
             d.classList.remove("active"); // ferme si autre description déjà ouverte
     });
     description.classList.toggle("active");
-    descriptionOn = !descriptionOn;
+    if (description.classList.contains('active'))
+        description.style.backgroundImage = `url(/static/img/${description.id.replace("AudioDescription", "")}.png)`;
 
 }
 

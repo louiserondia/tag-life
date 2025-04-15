@@ -411,36 +411,54 @@ thumbnailDescriptions.forEach(description => {
 // ---- DISPLAY AUDIO DESCRIPTION ----
 // -----------------------------------
 
-function toggleAudioDescription(target) {
+// function toggleAudioDescription(target) {
 
-    while (!target.classList.contains("audio-title"))
+//     while (!target.classList.contains("audio-title"))
+//         target = target.parentElement;
+
+//     let description = target.nextElementSibling;
+//     document.querySelectorAll(".audio-description").forEach(d => {
+//         if (d != description)
+//             d.classList.remove("active"); // ferme si autre description déjà ouverte
+//     });
+//     description.classList.toggle("active");
+//     if (description.classList.contains('active'))
+//         description.style.backgroundImage = `url(/static/img/${description.id.replace("AudioDescription", "")}.png)`;
+
+// }
+
+function toggleAudioDescription(target) {
+    console.log(target);
+    while (!target.classList.contains("hits-row"))
         target = target.parentElement;
 
-    let description = target.nextElementSibling;
-    document.querySelectorAll(".audio-description").forEach(d => {
-        if (d != description)
-            d.classList.remove("active"); // ferme si autre description déjà ouverte
+    hitsRows.forEach(r => {
+        if (r != target)
+            r.classList.remove("active");
     });
-    description.classList.toggle("active");
-    if (description.classList.contains('active'))
-        description.style.backgroundImage = `url(/static/img/${description.id.replace("AudioDescription", "")}.png)`;
-
+    target.classList.toggle("active");
 }
 
-const audioTitles = document.querySelectorAll('.audio-title');
-audioTitles.forEach(a => {
-    a.addEventListener('click', (e) => { toggleAudioDescription(e.target) });
+const hitsRows = document.querySelectorAll('.hits-row');
+hitsRows.forEach(r => {
+    r.addEventListener('click', (e) => { toggleAudioDescription(e.target) });
 });
 
-const audioDescriptions = document.querySelectorAll('.audio-description');
-audioDescriptions.forEach(a => {
-    a.addEventListener('click', (e) => {
-        let target = e.target;
-        while (!target.classList.contains("audio-description"))
-            target = target.parentElement;
-        target.classList.remove("active")
-    });
-});
+
+// const audioTitles = document.querySelectorAll('.audio-title');
+// audioTitles.forEach(a => {
+//     a.addEventListener('click', (e) => { toggleAudioDescription(e.target) });
+// });
+
+// const audioDescriptions = document.querySelectorAll('.audio-description');
+// audioDescriptions.forEach(a => {
+//     a.addEventListener('click', (e) => {
+//         let target = e.target;
+//         while (!target.classList.contains("audio-description"))
+//             target = target.parentElement;
+//         target.classList.remove("active")
+//     });
+// });
 
 
 // -----------------------------------

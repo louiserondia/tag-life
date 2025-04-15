@@ -196,13 +196,21 @@ button {
     }
 
     .div7 {
-        grid-area: 7 / 4 / 8 / 7;
+        grid-area: 6 / 5 / 9 / 7;
+        max-width: 6rem;
+        display: flex;
+        margin-top: 1rem;
+
+        img {
+            min-width: 4.5rem;
+        }
     }
 
     .div8 {
         grid-area: 6 / 8 / 7 / 10;
 
         img {
+            min-width: 6rem;
             max-width: 10rem;
         }
     }
@@ -216,7 +224,7 @@ button {
 
     .div10 {
         grid-area: 3 / 8 / 4 / 10;
-
+        z-index: -1;
         img {
             max-width: 6.5rem;
         }

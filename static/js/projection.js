@@ -41,8 +41,26 @@ container.appendChild(renderer.domElement);
 const rotating = new THREE.Group();
 scene.add(rotating);
 
-const dirLight = new THREE.DirectionalLight(0xffc95e, 8);
-dirLight.position.set(12, 8, -6);
+
+const orange = 0xffd085;
+const blue = 0x7f89db
+const yellow = 0xffe099;
+const lightBlue = 0xe3fffd;
+const darkBlue = '#080126';
+const colors = [
+    // '#83c9de', // blue clair
+    '#dec983', // jaune orange
+    '#9d88d1', // rose mauve
+    '#ddc0eb', // rose clair
+    '#7ebf85', // vert
+    '#d2de83', // jaune pale
+    '#8392de', // bleu mauve
+    '#9dc284', // vert pale un peu kaki 
+    '#83a4de', // bleu pale
+]; 
+
+const dirLight = new THREE.DirectionalLight(yellow, 3);
+dirLight.position.set(12, 8, -2);
 dirLight.target.position.set(0, 0, 0);
 dirLight.castShadow = true;
 dirLight.shadow.camera.left = -10;
@@ -55,8 +73,8 @@ dirLight.shadow.mapSize.height = 2048;
 dirLight.shadow.bias = -0.005;
 scene.add(dirLight);
 
-const counterLight = new THREE.DirectionalLight(0xffc95e, 1.25);
-counterLight.position.set(-5, 8, -10);
+const counterLight = new THREE.DirectionalLight(orange, .5);
+counterLight.position.set(-5, 100, -10);
 counterLight.target.position.set(0, 0, 0);
 counterLight.castShadow = true;
 counterLight.shadow.camera.left = -10;
@@ -69,23 +87,7 @@ counterLight.shadow.mapSize.height = 2048;
 counterLight.shadow.bias = -0.005;
 scene.add(counterLight);
 
-const shadowLight = new THREE.DirectionalLight(0xffc95e, 0.5);
-shadowLight.position.set(5, 20, -10);
-shadowLight.target.position.set(0, 0, 0);
-shadowLight.castShadow = true;
-shadowLight.shadow.camera.left = -10;
-shadowLight.shadow.camera.right = 10;
-shadowLight.shadow.camera.top = 10;
-shadowLight.shadow.camera.near = 5;
-shadowLight.shadow.camera.far = 30;
-shadowLight.shadow.mapSize.width = 2048;
-shadowLight.shadow.mapSize.height = 2048;
-shadowLight.shadow.bias = -0.005;
-shadowLight.visible = false;
-scene.add(shadowLight);
-rotating.add(shadowLight);
-
-const deskLight = new THREE.SpotLight(0xa67717, 10);
+const deskLight = new THREE.SpotLight(0xa67717, 5);
 deskLight.position.set(2.15, 1.2, -2.15);
 deskLight.visible = false;
 deskLight.decay = 1.2;
@@ -97,14 +99,18 @@ projLight.lookAt(-10, 3, -25);
 scene.add(deskLight, projLight);
 rotating.add(deskLight, projLight);
 
+const body = document.querySelector('body');
+body.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
 const dhelper = new THREE.PointLightHelper(deskLight, 0.2);
 const phelper = new RectAreaLightHelper(projLight, 0.2);
-// scene.add(dhelper);
+const chelper = new THREE.DirectionalLightHelper(counterLight, 0.2);
+scene.add(chelper);
 
-const orange = 0xffd085;
-const blue = 0x7f89db
+const axisHelper = new THREE.AxesHelper(5);
+scene.add(axisHelper);
 
-const ambientLight = new THREE.AmbientLight(0xf5e5c6, 1);
+const ambientLight = new THREE.AmbientLight(lightBlue, 1.5);
 scene.add(ambientLight);
 scene.background = null;
 
@@ -113,7 +119,7 @@ const loader = new GLTFLoader();
 let screenMesh;
 
 let projectionRoom;
-loader.load('../media/models/projection_room_2.glb', (gltf) => {
+loader.load('../media/models/projection_room_3.glb', (gltf) => {
     projectionRoom = gltf.scene;
     scene.add(projectionRoom);
     rotating.add(projectionRoom);
@@ -411,22 +417,6 @@ thumbnailDescriptions.forEach(description => {
 // ---- DISPLAY AUDIO DESCRIPTION ----
 // -----------------------------------
 
-// function toggleAudioDescription(target) {
-
-//     while (!target.classList.contains("audio-title"))
-//         target = target.parentElement;
-
-//     let description = target.nextElementSibling;
-//     document.querySelectorAll(".audio-description").forEach(d => {
-//         if (d != description)
-//             d.classList.remove("active"); // ferme si autre description déjà ouverte
-//     });
-//     description.classList.toggle("active");
-//     if (description.classList.contains('active'))
-//         description.style.backgroundImage = `url(/static/img/${description.id.replace("AudioDescription", "")}.png)`;
-
-// }
-
 function toggleAudioDescription(target) {
     console.log(target);
     while (!target.classList.contains("hits-row"))
@@ -444,23 +434,6 @@ hitsRows.forEach(r => {
     r.addEventListener('click', (e) => { toggleAudioDescription(e.target) });
 });
 
-
-// const audioTitles = document.querySelectorAll('.audio-title');
-// audioTitles.forEach(a => {
-//     a.addEventListener('click', (e) => { toggleAudioDescription(e.target) });
-// });
-
-// const audioDescriptions = document.querySelectorAll('.audio-description');
-// audioDescriptions.forEach(a => {
-//     a.addEventListener('click', (e) => {
-//         let target = e.target;
-//         while (!target.classList.contains("audio-description"))
-//             target = target.parentElement;
-//         target.classList.remove("active")
-//     });
-// });
-
-
 // -----------------------------------
 // ------------ DARKMODE -------------
 // -----------------------------------
@@ -469,9 +442,9 @@ let isDarkMode = localStorage.getItem("dark-mode") === "true";
 if (isDarkMode) {
     dirLight.visible = false;
     counterLight.visible = false;
-    shadowLight.visible = true;
     deskLight.visible = true;
     ambientLight.color.setHex(blue);
+    body.style.backgroundColor = darkBlue;
 }
 
 const switchMode = document.getElementById("switchMode");
@@ -479,9 +452,9 @@ switchMode.addEventListener("click", () => {
     isDarkMode = !isDarkMode;
     dirLight.visible = !dirLight.visible;
     counterLight.visible = !counterLight.visible;
-    shadowLight.visible = !shadowLight.visible;
     deskLight.visible = !deskLight.visible;
-    ambientLight.color.setHex(isDarkMode ? blue : orange);
+    ambientLight.color.setHex(isDarkMode ? blue : lightBlue);
+    body.style.backgroundColor = isDarkMode ? darkBlue : colors[Math.floor(Math.random() * colors.length)]; 
 });
 
 // -----------------------------------

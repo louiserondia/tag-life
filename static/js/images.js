@@ -7,7 +7,7 @@ let lastColumn = 0;
 let prevLastColumn;
 let hasShuffled = false;
 const batchSize = 30;
-const loadedImages = new Set();
+let loadedImages = new Set();
 let loadedImagesCopy;
 export let edit = false;
 import { checkedTags, editCheckedTags } from "./tags.js";
@@ -19,7 +19,7 @@ async function fetchImagesData() {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
-    return data.images_data;
+    return data;
   } catch (error) {
     console.error("Erreur lors de la récupération des images:", error);
   }
@@ -38,8 +38,9 @@ function shuffle(src) {
 async function init() {
   imagesData = await fetchImagesData();
   const listFromLocalStorage = localStorage.getItem("imageList");
-  if (!listFromLocalStorage) {
-    imageList = shuffle(imagesData);
+  if (!listFromLocalStorage) 
+  {
+    imageList = shuffle(Object.keys(imagesData));
     localStorage.setItem("imageList", JSON.stringify(imageList));
   } else {
     imageList = JSON.parse(listFromLocalStorage);
@@ -73,13 +74,11 @@ function resetColumns() {
 }
 
 // Create images' boxes and their title and tags, which appear when clicked on
-
 function createImg(image, box) {
   const img = document.createElement("img");
-  img.src = image.path;
-  img.id = `${image.title}`;
+  img.src = '../static/img/photos/' + image;
+  img.id = `${image}`;
   img.onclick = () => lightBoxOn(img);
-  // img.onclick = () => toggleImageInfos(image.title);
   box.appendChild(img);
   img.addEventListener("load", () => {
     requestIdleCallback(() => {
@@ -88,40 +87,6 @@ function createImg(image, box) {
   });
 }
 
-function createTitle(name, box) {
-  const title = document.createElement("h2");
-  title.id = `title-${name}`;
-  title.hidden = true;
-  title.textContent = name;
-  box.appendChild(title);
-}
-
-export function addTagsToTagContainer(tags, tagsContainer) {
-  const prev = [...tagsContainer.children];
-  tags.forEach((tag) => {
-    if (prev.some((p) => p.innerHTML === tag)) return;
-    const t = document.createElement("h3");
-    t.textContent = tag;
-    tagsContainer.appendChild(t);
-  });
-}
-
-function createTagsContainer(name, box, tags) {
-  const tagsContainer = document.createElement("div");
-  tagsContainer.classList.add("tags-container");
-  tagsContainer.id = `tags-${name}`;
-  tagsContainer.hidden = true;
-  addTagsToTagContainer(tags, tagsContainer);
-  box.appendChild(tagsContainer);
-}
-
-function toggleImageInfos(id) {
-  if (edit) return;
-  const title = document.getElementById("title-" + id);
-  title.toggleAttribute("hidden");
-  const tags = document.getElementById("tags-" + id);
-  tags.toggleAttribute("hidden");
-}
 
 // -------------------------
 //   INIT / CREATE COLUMNS
@@ -155,9 +120,7 @@ function createColumns(images) {
 
     box.classList.add("box");
 
-    createTitle(image.title, box);
     createImg(image, box);
-    createTagsContainer(image.title, box, image.tags);
 
     column.appendChild(box);
     loadedImages.add(image);

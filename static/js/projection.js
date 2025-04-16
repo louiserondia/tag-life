@@ -48,16 +48,21 @@ const yellow = 0xffe099;
 const lightBlue = 0xe3fffd;
 const darkBlue = '#080126';
 const colors = [
-    // '#83c9de', // blue clair
-    '#dec983', // jaune orange
-    '#9d88d1', // rose mauve
-    '#ddc0eb', // rose clair
-    '#7ebf85', // vert
+    '#deb583', // orange
     '#d2de83', // jaune pale
-    '#8392de', // bleu mauve
+    '#e8db4d', // jaune petant
+    '#dec983', // jaune orange
+    '#7ebf85', // vert
     '#9dc284', // vert pale un peu kaki 
+    '#b6c9cf', // blue clair
     '#83a4de', // bleu pale
-]; 
+    '#595fb3', // bleu foncé
+    '#8392de', // bleu mauve
+    '#9d88d1', // rose mauve
+    '#e0b5f5', // rose clair
+    '#f3defc', // rose très clair
+    '#b35959', // rouge
+];
 
 const dirLight = new THREE.DirectionalLight(yellow, 3);
 dirLight.position.set(12, 8, -2);
@@ -99,16 +104,13 @@ projLight.lookAt(-10, 3, -25);
 scene.add(deskLight, projLight);
 rotating.add(deskLight, projLight);
 
-const body = document.querySelector('body');
-body.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
 const dhelper = new THREE.PointLightHelper(deskLight, 0.2);
 const phelper = new RectAreaLightHelper(projLight, 0.2);
 const chelper = new THREE.DirectionalLightHelper(counterLight, 0.2);
-scene.add(chelper);
+// scene.add(chelper);
 
 const axisHelper = new THREE.AxesHelper(5);
-scene.add(axisHelper);
+// scene.add(axisHelper);
 
 const ambientLight = new THREE.AmbientLight(lightBlue, 1.5);
 scene.add(ambientLight);
@@ -119,7 +121,7 @@ const loader = new GLTFLoader();
 let screenMesh;
 
 let projectionRoom;
-loader.load('../media/models/projection_room_3.glb', (gltf) => {
+loader.load('../media/models/projection_room_4.glb', (gltf) => {
     projectionRoom = gltf.scene;
     scene.add(projectionRoom);
     rotating.add(projectionRoom);
@@ -137,7 +139,6 @@ loader.load('../media/models/projection_room_3.glb', (gltf) => {
         }
     });
     objectsArray = Array.from(objects.values());
-    // console.log(objects)
 }, undefined, (error) => {
     console.error(error, "Error on loading of gltf projectionRoom");
 });
@@ -347,17 +348,30 @@ window.addEventListener('resize', () => {
     video.style.width = `${400 * scaleFactor}px`;
     video.style.height = `${275 * scaleFactor}px`;
 
-
-    if (w < smallScreenSize && screenCameraPos.x != x1 && currentCameraZoom == 2) {
-        screenCameraPos.x = x1;
-        screenCameraPos.y = 2;
+    if (zoomInfos[3] == 'screen') { // on est zoomé
+        if (w < smallScreenSize)
+            screenCameraPos = new THREE.Vector3(x1, 2, screenCameraPos.z);
+        else
+            screenCameraPos = new THREE.Vector3(x2, 2.5, screenCameraPos.z);
         camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
     }
-    else if (w >= smallScreenSize && screenCameraPos.x != x2 && currentCameraZoom == 2) {
-        screenCameraPos.x = x2;
-        screenCameraPos.y = 2.5;
-        camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
+    else if (zoomInfos[3] == 'dezoom') {
+        if (w < smallScreenSize)
+            screenCameraPos = new THREE.Vector3(x1, 2, screenCameraPos.z);
+        else
+            screenCameraPos = new THREE.Vector3(x2, 2.5, screenCameraPos.z);
     }
+    console.log(screenCameraPos)
+    // if (w < smallScreenSize && screenCameraPos.x != x1 && currentCameraZoom == 2) {
+    //     screenCameraPos.x = x1;
+    //     screenCameraPos.y = 2;
+    //     camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
+    // }
+    // else if (w >= smallScreenSize && screenCameraPos.x != x2 && currentCameraZoom == 2) {
+    //     screenCameraPos.x = x2;
+    //     screenCameraPos.y = 2.5;
+    //     camera.position.set(screenCameraPos.x, screenCameraPos.y, screenCameraPos.z);
+    // }
     if (descriptionOn)
         handleThumbnailsHidden();
 
@@ -418,7 +432,6 @@ thumbnailDescriptions.forEach(description => {
 // -----------------------------------
 
 function toggleAudioDescription(target) {
-    console.log(target);
     while (!target.classList.contains("hits-row"))
         target = target.parentElement;
 
@@ -438,6 +451,10 @@ hitsRows.forEach(r => {
 // ------------ DARKMODE -------------
 // -----------------------------------
 
+const body = document.querySelector('body');
+let prevIndex = Math.floor(Math.random() * colors.length);
+body.style.backgroundColor = colors[prevIndex];
+
 let isDarkMode = localStorage.getItem("dark-mode") === "true";
 if (isDarkMode) {
     dirLight.visible = false;
@@ -454,7 +471,16 @@ switchMode.addEventListener("click", () => {
     counterLight.visible = !counterLight.visible;
     deskLight.visible = !deskLight.visible;
     ambientLight.color.setHex(isDarkMode ? blue : lightBlue);
-    body.style.backgroundColor = isDarkMode ? darkBlue : colors[Math.floor(Math.random() * colors.length)]; 
+
+    if (isDarkMode)
+        body.style.backgroundColor = darkBlue;
+    else {
+        let colorIndex = prevIndex;
+        while (colorIndex == prevIndex)
+            colorIndex = Math.floor(Math.random() * colors.length);
+        prevIndex = colorIndex;
+        body.style.backgroundColor = colors[colorIndex];
+    }
 });
 
 // -----------------------------------

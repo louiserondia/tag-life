@@ -1,20 +1,9 @@
 import { getCookie } from "./get-cookie.js";
 import { toggleSet } from "./utils.js";
-import { addTagsToTagContainer } from "../../../static/js/images.js";
 
 let edit = false;
 let checkedImages = new Set();
 let tags = new Set();
-
-function updateTagsContainers(images, newTags) {
-  images.forEach((image) => {
-    const imageEl = document.getElementById(image);
-    if (imageEl) {
-      const ctn = imageEl.nextElementSibling;
-      addTagsToTagContainer(newTags, ctn);
-    }
-  });
-}
 
 async function tryAddTagListToImageListRequest() {
   try {
@@ -28,7 +17,6 @@ async function tryAddTagListToImageListRequest() {
     });
 
     const data = await response.json();
-    updateTagsContainers(data.images, data.tags);
 
     if (!response.ok) throw new Error("Failed to add tags : ");
   } catch (error) {

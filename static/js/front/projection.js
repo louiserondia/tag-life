@@ -24,7 +24,7 @@ const globalCameraPos = new THREE.Vector3(10, 10, 10);
 const globalCameraLookAt = new THREE.Vector3(0, 3, 0);
 let currentCameraZoom = 0.75;
 
-let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, 0.1, 1000);
+let camera = new THREE.OrthographicCamera(- d * aspect, d * aspect, d, - d, -10, 1000);
 camera.position.copy(globalCameraPos);
 camera.lookAt(globalCameraLookAt);
 camera.zoom = currentCameraZoom * scaleFactor;
@@ -156,37 +156,51 @@ const recordCameraPos = new THREE.Vector3(10, 10, 10);
 const recordCameraLookAt = new THREE.Vector3(0, 3.5, 2.4);
 let screenCameraPos = new THREE.Vector3(w < smallScreenSize ? x1 : x2, w < smallScreenSize ? 2 : 2.5, 3);
 let screenCameraLookAt = new THREE.Vector3(-10, 2.5, -25);
+let booksCameraPos = new THREE.Vector3(10, 10, 10);
+let booksCameraLookAt = new THREE.Vector3(0, 5, 2.4);
+let calendarCameraPos = new THREE.Vector3(5, 4, 3);
+let calendarCameraLookAt = new THREE.Vector3(-2, 1.5, -10);
 
-let elapsed = 0;
+let isZooming = false;
 
-function zoomOn(pos, lookAt, zoom, dezoom, name) {
-    const r = rotating.rotation.y;
-    if (dezoom) {
+function zoomOn(pos, lookAt, zoom, name) {
+    function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+    
+    if (name == 'dezoom') {
         hits.classList.remove("active");
         screenPresBox.classList.remove("active");
     }
+    
+    const startTime = performance.now();
+    const duration = 1000;
+    const r = rotating.rotation.y;
 
     function animateZoom() {
-        if ((!dezoom && elapsed < 1) || (dezoom && elapsed > 0)) {
-            camera.position.lerpVectors(pos[0], pos[1], dezoom ? 1 - elapsed : elapsed);
-            const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], dezoom ? 1 - elapsed : elapsed);
-            camera.lookAt(nlookAt);
-            camera.zoom += (zoom[1] - zoom[0]) * scaleFactor * (dezoom ? -0.01 : 0.01);
-            camera.updateProjectionMatrix();
-            rotating.rotation.y = r - r * elapsed;
-            currentCameraZoom = dezoom ? zoom[0] : zoom[1];
-            elapsed += dezoom ? -0.01 : 0.01;
+        const elapsed = performance.now() - startTime;
+        let t = Math.min(elapsed / duration, 1);
+        if (name == 'dezoom') t = 1 - t;
+        const easedT = easeInOutQuad(t);
+
+        camera.position.lerpVectors(pos[0], pos[1], easedT);
+        const nlookAt = new THREE.Vector3().lerpVectors(lookAt[0], lookAt[1], easedT);
+        camera.lookAt(nlookAt);
+        camera.zoom = (zoom[0] + (zoom[1] - zoom[0]) * easedT) * scaleFactor;
+        camera.updateProjectionMatrix();
+        rotating.rotation.y = r - r * easedT;
+
+        if (t > 0 && t < 1)
             requestAnimationFrame(animateZoom);
-        }
         else {
             const mid = getScreenMiddle(screenMesh);
             video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
             video.style.position = 'absolute';
 
-            if (name == 'record' && !dezoom) hits.classList.add("active");
-            else if (name == 'screen' && !dezoom) screenPresBox.classList.add("active");
-
-            if (dezoom) video.pause();
+            if (name == 'record') hits.classList.add("active");
+            else if (name == 'screen') screenPresBox.classList.add("active");
+            else if (name == 'dezoom') video.pause();
+            isZooming = false;
         }
     }
     requestAnimationFrame(animateZoom);
@@ -202,48 +216,44 @@ function isHtml(e) {
 
 let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
 
-window.addEventListener('click', (event) => {
+// window.addEventListener('click', (event) => {
 
-    if (isHtml(event.target)) return; // si je clique sur un élément html devant le canvas
+function clickToZoom(event) {
+
+    if (isHtml(event.target) || isZooming) return; // si je clique sur un élément html devant le canvas
 
     const rect = renderer.domElement.getBoundingClientRect();
     const coords = new THREE.Vector2(
         ((event.clientX - rect.left) / rect.width) * 2 - 1,
         -(((event.clientY - rect.top) / rect.height) * 2 - 1)
     );
-
     raycaster.setFromCamera(coords, camera);
     const intersects = raycaster.intersectObjects(objectsArray, true);
 
-
-    if (intersects.length > 0 && (elapsed <= 0 || elapsed >= 1)) {
+    if (intersects.length > 0) {
         const selectedObject = intersects[0].object;
 
-        if (selectedObject.name.startsWith('record') && zoomInfos[3] != 'screen')
+        if (selectedObject.name.startsWith('record') && zoomInfos[3] == 'dezoom')
             zoomInfos = [recordCameraPos, recordCameraLookAt, 3, 'record'];
-        else if (selectedObject.name.startsWith('screen') && zoomInfos[3] != 'record')
+        else if (selectedObject.name.startsWith('screen') && zoomInfos[3] == 'dezoom')
             zoomInfos = [screenCameraPos, screenCameraLookAt, 2, 'screen'];
-        else { // dezoom
-            zoomOn(
-                [zoomInfos[0], globalCameraPos],
-                [zoomInfos[1], globalCameraLookAt],
-                [0.75, zoomInfos[2]],
-                true,
-                zoomInfos[3]
-            );
-            zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
-        }
+        else if (selectedObject.name.startsWith('calendar') && zoomInfos[3] == 'dezoom')
+            zoomInfos = [calendarCameraPos, calendarCameraLookAt, 4, 'calendar'];
+        else if (selectedObject.name.startsWith('books') && zoomInfos[3] == 'dezoom')
+            zoomInfos = [booksCameraPos, booksCameraLookAt, 3, 'books'];
+        else if (!selectedObject.name.startsWith(zoomInfos[3]) && zoomInfos[3] != 'dezoom')
+            zoomInfos[3] = 'dezoom';
+        else return;
 
-        if (zoomInfos[0] != globalCameraPos) // zoom
-            zoomOn(
-                [globalCameraPos, zoomInfos[0]],
-                [globalCameraLookAt, zoomInfos[1]],
-                [0.75, zoomInfos[2]],
-                false,
-                zoomInfos[3]
-            );
+        isZooming = true;
+        zoomOn(
+            [globalCameraPos, zoomInfos[0]],
+            [globalCameraLookAt, zoomInfos[1]],
+            [0.75, zoomInfos[2]],
+            zoomInfos[3]
+        );
     }
-});
+}
 
 
 // -----------------------------------
@@ -302,6 +312,7 @@ function getScreenMiddle(mesh) {
 // --------- ORBIT CONTROL -----------
 // -----------------------------------
 
+const VELOCITY_THRESHOLD = 0.001;
 
 let isDragging = false;
 let prevMousePosX = 0;
@@ -312,7 +323,10 @@ window.addEventListener('mousedown', (e) => {
     prevMousePosX = e.clientX;
 });
 
-window.addEventListener('mouseup', () => isDragging = false);
+window.addEventListener('mouseup', (e) => {
+    if (Math.abs(velocity) < VELOCITY_THRESHOLD) clickToZoom(e);
+    isDragging = false;
+});
 
 window.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
@@ -361,7 +375,6 @@ window.addEventListener('resize', () => {
         else
             screenCameraPos = new THREE.Vector3(x2, 2.5, screenCameraPos.z);
     }
-    console.log(screenCameraPos)
     // if (w < smallScreenSize && screenCameraPos.x != x1 && currentCameraZoom == 2) {
     //     screenCameraPos.x = x1;
     //     screenCameraPos.y = 2;
@@ -488,9 +501,13 @@ switchMode.addEventListener("click", () => {
 // -----------------------------------
 
 function animate() {
-    if (elapsed <= 0) { // pas de rotation de la scène si on est dans le zoom
-        rotating.rotation.y += velocity;
-        velocity *= 0.95;
+    if (zoomInfos[3] == 'dezoom') { // pas de rotation de la scène si on est dans le zoom
+        if (Math.abs(velocity) > VELOCITY_THRESHOLD) {
+            rotating.rotation.y += velocity;
+            velocity *= 0.95;
+        }
+        else velocity = 0;
+        
     }
     requestAnimationFrame(animate);
     renderer.render(scene, camera);

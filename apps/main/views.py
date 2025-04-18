@@ -1,13 +1,6 @@
-import os
-import json
 from django.shortcuts import render
-from django.core.files import File
-from django.conf import settings
 from django.http import JsonResponse
-from .models import ImageModel, TagModel
-from .utils import clear_all
-from .json_manager import write_to_json_file, parse_json_from_file, printDico, format_images_to_json
-from .tag_manager import add_tags
+from .json_manager import write_to_json_file, parse_json_from_file, printDico
 
 # Send all images to frontend formated to json
 
@@ -26,7 +19,7 @@ def fetch_images(request):
     for k, v in images.items():
         if all(e in v for e in checked_tags):
             selecta.append(k)
-            
+
     return JsonResponse({'images': selecta})
 
 

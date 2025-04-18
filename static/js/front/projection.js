@@ -121,7 +121,7 @@ const loader = new GLTFLoader();
 let screenMesh;
 
 let projectionRoom;
-loader.load('../media/models/projection_room_4.glb', (gltf) => {
+loader.load('../static/models/projection_room_4.glb', (gltf) => {
     projectionRoom = gltf.scene;
     scene.add(projectionRoom);
     rotating.add(projectionRoom);

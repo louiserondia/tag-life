@@ -10,3 +10,4 @@ node_modules
 old3js.js
 apps/main/static/js/libs
 **/__pycache__/
+.gitattributes

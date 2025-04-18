@@ -99,7 +99,7 @@ scene.background = null;
 const loader = new GLTFLoader();
 
 let miniRoom;
-loader.load('../media/models/mini_room.glb', (gltf) => {
+loader.load('../static/models/mini_room.glb', (gltf) => {
     miniRoom = gltf.scene;
     scene.add(miniRoom);
     rotating.add(miniRoom);

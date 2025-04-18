@@ -1,5 +1,5 @@
 import { getCookie } from "./get-cookie.js";
-import { updateTagList } from "../../../static/js/tags.js";
+import { updateTagList } from "../front/tags.js";
 
 
 async function tryAddNewTagRequest() {

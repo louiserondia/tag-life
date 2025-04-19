@@ -16,8 +16,9 @@ const aspect = w / h;
 const d = 6;
 const smallScreenSize = 750;
 
-
 const hits = document.getElementById('hits');
+const books = document.getElementById('books');
+const calendar = document.getElementById('calendar');
 const screenPresBox = document.getElementById("screenPresentation");
 
 const globalCameraPos = new THREE.Vector3(10, 10, 10);
@@ -166,11 +167,13 @@ function zoomOn(pos, lookAt, zoom, name) {
 
     if (name == 'dezoom') {
         hits.classList.remove("active");
+        books.classList.remove("active");
+        calendar.classList.remove("active");
         screenPresBox.classList.remove("active");
     }
 
     const startTime = performance.now();
-    const duration = name == 'calendar' ? 1500 : 1000;
+    const duration = name == 'calendar' ? 1250 : 1000;
     const r = rotating.rotation.y;
 
     function animateZoom() {
@@ -198,6 +201,8 @@ function zoomOn(pos, lookAt, zoom, name) {
             video.style.position = 'absolute';
 
             if (name == 'record') hits.classList.add("active");
+            if (name == 'books') books.classList.add("active");
+            if (name == 'calendar') calendar.classList.add("active");
             else if (name == 'screen') screenPresBox.classList.add("active");
             else if (name == 'dezoom') video.pause();
             isZooming = false;
@@ -211,7 +216,7 @@ function zoomOn(pos, lookAt, zoom, name) {
 // -----------------------------------
 
 function isHtml(e) {
-    return (e.nodeName != "CANVAS" && e.id != "hits" && e.id != "screenPresentation");
+    return (e.nodeName != "CANVAS" && e.id != "hits" && e.id != "calendar" && e.id != "books" && e.id != "screenPresentation");
 }
 
 let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
@@ -421,6 +426,7 @@ thumbnails.forEach(thumbnail => {
 thumbnailDescriptions.forEach(description => {
     description.addEventListener("click", (event) => { toggleShowDescription(event.target) });
 });
+
 
 // -----------------------------------
 // ---- DISPLAY AUDIO DESCRIPTION ----

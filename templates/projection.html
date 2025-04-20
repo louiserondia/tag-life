@@ -268,42 +268,48 @@
 
     <div id="books">
         <div id="booksContainer">
-                <div id="booksImg">
-                    <img src="{% static 'img/leLong.png' %}" alt="">
+            <div id="booksCloseContainer">
+                <p id="booksClose">X</p>
+            </div>
+            <div id="booksImgContainer">
+                <img id="booksImg" src="{% static 'img/books/elise_0.jpg' %}" alt="">
+            </div>
+            <div id="booksButtons">
+                <div id="booksPrevBook" class="books-button">
+                    <h3>◁◁</h3>
+                    <p>livre prec</p>
                 </div>
-                <div id="booksButtons">
-                    <div class="books-button">
-                        <h3>◁◁</h3>
-                        <p>livre prec</p>
-                    </div>
-                    <div class="books-button">
-                        <h3>◁</h3>
-                        <p>page prec</p>
-                    </div>
-                    <div class="books-button">
-                        <h3>▷</h3>
-                        <p>page suiv</p>
-                    </div>
-                    <div class="books-button">
-                        <h3>▷▷</h3>
-                        <p>livre suiv</p>
-                    </div>
+                <div id="booksPrevPage" class="books-button">
+                    <h3>◁</h3>
+                    <p>page prec</p>
                 </div>
+                <div id="booksNextPage" class="books-button">
+                    <h3>▷</h3>
+                    <p>page suiv</p>
+                </div>
+                <div id="booksNextBook" class="books-button">
+                    <h3>▷▷</h3>
+                    <p>livre suiv</p>
+                </div>
+            </div>
 
         </div>
     </div>
 
     <div id="calendar">
         <div id="calendarContainer">
-            <div id="calendarImg">
-                <img src="{% static 'img/leLong.png' %}" alt="">
+            <div id="calendarCloseContainer">
+                <p id="calendarClose">X</p>
+            </div>
+            <div id="calendarImgContainer">
+                <img id="calendarImg" src="{% static 'img/calendar/0.jpg' %}" alt="">
             </div>
             <div id="calendarButtons">
-                <div class="calendar-button">
+                <div id="calendarPrev" class="calendar-button">
                     <h3>◁</h3>
                     <p>page prec</p>
                 </div>
-                <div class="calendar-button">
+                <div id="calendarNext" class="calendar-button">
                     <h3>▷</h3>
                     <p>page suiv</p>
                 </div>

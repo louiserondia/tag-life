@@ -216,14 +216,23 @@ function zoomOn(pos, lookAt, zoom, name) {
 // -----------------------------------
 
 function isHtml(e) {
-    return (e.nodeName != "CANVAS" && e.id != "hits" && e.id != "calendar" && e.id != "books" && e.id != "screenPresentation");
+    return (
+        e.nodeName != "CANVAS"
+        && e.id != "hits" 
+        && e.id != "calendar" 
+        && e.id != "calendarClose" 
+        && e.id != "books" 
+        && e.id != "booksClose"
+        && e.id != "screenPresentation"
+    );
 }
 
 let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
 
 function clickToZoom(event) {
-
+    
     if (isHtml(event.target) || isZooming) return; // si je clique sur un élément html devant le canvas ou que je suis déjà entrain de zoomer
+    console.log("yooo");
 
     const rect = renderer.domElement.getBoundingClientRect();
     const coords = new THREE.Vector2(
@@ -385,6 +394,110 @@ window.addEventListener('resize', () => {
 
 });
 
+
+// -----------------------------------
+// --------- BOOKS CAROUSEL ----------
+// -----------------------------------
+
+function getFileName(src) {
+    return src.slice(src.lastIndexOf('/') + 1, -4);
+}
+
+function getBookIndex(src) {
+    src = getFileName(src);
+    return bookList.indexOf(src.slice(0, src.lastIndexOf('_')));
+}
+function getBookPage(src) {
+    src = getFileName(src);
+    return Number(src.slice(src.lastIndexOf('_') + 1));
+}
+
+const bookList = ['000', 'field', 'elise'];
+const booksPagesCount = {
+    '000': 3,
+    'field': 3,
+    'elise': 3
+};
+
+const booksImg = document.getElementById('booksImg');
+let bookIndex = getBookIndex(booksImg.src);
+let bookPage = getBookPage(booksImg.src);
+
+const booksPrevBook = document.getElementById('booksPrevBook');
+const booksPrevPage = document.getElementById('booksPrevPage');
+const booksNextPage = document.getElementById('booksNextPage');
+const booksNextBook = document.getElementById('booksNextBook');
+
+const booksButtons = [
+    booksPrevBook,
+    booksPrevPage,
+    booksNextPage,
+    booksNextBook
+];
+
+function clickOnBooksButton(button) {
+    const pageCount = booksPagesCount[bookList[bookIndex]];
+    
+    if (button === 'booksPrevBook') {
+        bookIndex = (bookIndex - 1 + bookList.length) % bookList.length;
+        bookPage = 0;
+    }
+    else if (button === 'booksNextBook') {
+        bookIndex = (bookIndex + 1) % bookList.length;
+        bookPage = 0;
+    }
+    else if (button === 'booksPrevPage')
+        bookPage = (bookPage - 1 + pageCount) % pageCount;
+    else if (button === 'booksNextPage')
+        bookPage = (bookPage + 1) % pageCount;
+    
+    const img = `${bookList[bookIndex]}_${bookPage}`;
+    booksImg.setAttribute('src', `/static/img/books/${img}.jpg`);
+
+}
+
+booksButtons.forEach(button => {
+    button.addEventListener('click', (e) => clickOnBooksButton(button.id));
+});
+
+
+// -----------------------------------
+// --------- BOOKS CAROUSEL ----------
+// -----------------------------------
+
+
+const calendarPagesCount = 3;
+const calendarImg = document.getElementById('calendarImg');
+let calendarPage = getBookPage(calendarImg.src);
+
+const calendarPrev = document.getElementById('calendarPrev');
+const calendarNext = document.getElementById('calendarNext');
+
+const calendarButtons = [
+    calendarPrev,
+    calendarNext
+];
+
+function clickOnCalendarButton(button) {
+    if (button === 'calendarPrev')
+        calendarPage = (calendarPage - 1 + calendarPagesCount) % calendarPagesCount;
+    else if (button === 'calendarNext')
+        calendarPage = (calendarPage + 1) % calendarPagesCount;
+
+    calendarImg.setAttribute('src', `/static/img/calendar/${calendarPage}.jpg`);
+}
+
+calendarButtons.forEach(button => {
+    button.addEventListener('click', (e) => clickOnCalendarButton(button.id));
+});
+
+// document.getElementById('calendarClose').addEventListener('click', () =>  { 
+// console.log('yoooo')
+//     books.classList.remove("active")
+// });
+// document.getElementById('booksClose').addEventListener('click', () => calendar.classList.remove("active"));
+
+
 // -----------------------------------
 // ------- DISPLAY DESCRIPTION -------
 // -----------------------------------
@@ -491,7 +604,7 @@ switchMode.addEventListener("click", () => {
 function animate() {
     if (zoomInfos[3] == 'dezoom') { // pas de rotation de la scène si on est dans le zoom
         rotating.rotation.y += velocity;
-        velocity *= 0.95;
+        velocity *= 0.93;
     }
     if (Math.abs(velocity) < VELOCITY_THRESHOLD) velocity = 0;
     requestAnimationFrame(animate);

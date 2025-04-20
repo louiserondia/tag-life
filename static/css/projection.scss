@@ -326,8 +326,8 @@
         border-radius: 10px;
         margin: 4rem;
         width: 100%;
-        height: 75%;
-        max-width: 750px;
+        max-height: 75%;
+        max-width: 550px;
         background-color: rgba(236, 236, 236, 0.75);
         display: flex;
         flex-direction: column;
@@ -336,7 +336,19 @@
         overflow-y: auto;
         justify-content: space-around;
 
-        #calendarImg, #booksImg {
+        #calendarCloseContainer, #booksCloseContainer {
+            p {
+                width: fit-content;
+                margin: -.5rem 0;
+                color: black;
+                font-size: x-large;
+                font-weight: 600;
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+                cursor: pointer;
+            }
+        }
+
+        #calendarImgContainer, #booksImgContainer {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -346,6 +358,7 @@
                 border-radius: 10px;
                 max-height: 90%;
                 max-width: 90%;
+                max-height: 500px;
             }
         }
 
@@ -361,15 +374,24 @@
                 justify-content: center;
 
                 h3 {
-                    font-size: x-large;
+                    font-size: xx-large;
                 }
-
-                p {}
+                
+                p {
+                    font-size: large;
+                }
 
                 h3,
                 p {
+                    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+                    font-weight: bold;
                     margin: 0;
+                    color: black;
                 }
+            }
+            .calendar-button.hidden, .books-button.hidden {
+                opacity: 0;
+                display: none;
             }
         }
     }
@@ -378,4 +400,12 @@
 #calendar.active, #books.active {
     opacity: 1;
     visibility: visible;
+}
+
+@media (max-width: 500px) {
+    #calendar, #books {
+        #calendarContainer, #booksContainer {
+            margin: 1.5rem;
+        }
+}
 }

@@ -374,11 +374,22 @@
                 justify-content: center;
 
                 h3 {
+                    cursor: pointer;
                     font-size: xx-large;
                 }
                 
                 p {
+                    // position: absolute;
+                    display: none;
                     font-size: large;
+                }
+                
+                h3:hover + p {
+                    display: block;
+                }
+
+                h3:hover + p.hidden {
+                    display: none;
                 }
 
                 h3,

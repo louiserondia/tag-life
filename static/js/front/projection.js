@@ -218,10 +218,10 @@ function zoomOn(pos, lookAt, zoom, name) {
 function isHtml(e) {
     return (
         e.nodeName != "CANVAS"
-        && e.id != "hits" 
-        && e.id != "calendar" 
-        && e.id != "calendarClose" 
-        && e.id != "books" 
+        && e.id != "hits"
+        && e.id != "calendar"
+        && e.id != "calendarClose"
+        && e.id != "books"
         && e.id != "booksClose"
         && e.id != "screenPresentation"
     );
@@ -230,9 +230,8 @@ function isHtml(e) {
 let zoomInfos = [globalCameraPos, globalCameraLookAt, 0.75, 'dezoom'];
 
 function clickToZoom(event) {
-    
+
     if (isHtml(event.target) || isZooming) return; // si je clique sur un élément html devant le canvas ou que je suis déjà entrain de zoomer
-    console.log("yooo");
 
     const rect = renderer.domElement.getBoundingClientRect();
     const coords = new THREE.Vector2(
@@ -437,7 +436,7 @@ const booksButtons = [
 
 function clickOnBooksButton(button) {
     const pageCount = booksPagesCount[bookList[bookIndex]];
-    
+
     if (button === 'booksPrevBook') {
         bookIndex = (bookIndex - 1 + bookList.length) % bookList.length;
         bookPage = 0;
@@ -450,10 +449,14 @@ function clickOnBooksButton(button) {
         bookPage = (bookPage - 1 + pageCount) % pageCount;
     else if (button === 'booksNextPage')
         bookPage = (bookPage + 1) % pageCount;
-    
+
     const img = `${bookList[bookIndex]}_${bookPage}`;
     booksImg.setAttribute('src', `/static/img/books/${img}.jpg`);
 
+    if (bookPage && bookIndex)
+        booksButtons.forEach(b => b.querySelector('p').classList.add('hidden'));
+    else
+        booksButtons.forEach(b => b.querySelector('p').classList.remove('hidden'));
 }
 
 booksButtons.forEach(button => {
@@ -485,18 +488,16 @@ function clickOnCalendarButton(button) {
         calendarPage = (calendarPage + 1) % calendarPagesCount;
 
     calendarImg.setAttribute('src', `/static/img/calendar/${calendarPage}.jpg`);
+
+    if (calendarPage)
+        calendarButtons.forEach(b => b.querySelector('p').classList.add('hidden'));
+    else
+        calendarButtons.forEach(b => b.querySelector('p').classList.remove('hidden'));
 }
 
 calendarButtons.forEach(button => {
     button.addEventListener('click', (e) => clickOnCalendarButton(button.id));
 });
-
-// document.getElementById('calendarClose').addEventListener('click', () =>  { 
-// console.log('yoooo')
-//     books.classList.remove("active")
-// });
-// document.getElementById('booksClose').addEventListener('click', () => calendar.classList.remove("active"));
-
 
 // -----------------------------------
 // ------- DISPLAY DESCRIPTION -------

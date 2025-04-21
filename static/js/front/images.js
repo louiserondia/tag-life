@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
   shuffleButton.addEventListener("click", () => {
     hasShuffled = true;
     loadedImages.clear();
-    imageList = shuffle(imagesData);
+    imageList = shuffle(Object.keys(imagesData));
     localStorage.setItem("imageList", JSON.stringify(imageList));
     resetColumns();
     updateColumns(imageList);

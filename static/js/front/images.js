@@ -2,13 +2,14 @@ let imagesData;
 let imageList;
 let currentBatch = 1;
 let prevBatch;
-let imagesToLoad;
+let numberOfImagesToLoad;
 let lastColumn = 0;
 let prevLastColumn;
 let hasShuffled = false;
 const batchSize = 30;
-let loadedImages = new Set();
-let loadedImagesCopy;
+let loadedImages = new Set(); // used to resize and keep what we loaded from scrolling 
+let noImagesFromTags = false; // if no image fits tag selection, this variable is true
+
 export let edit = false;
 import { checkedTags, editCheckedTags } from "./tags.js";
 
@@ -32,25 +33,26 @@ function shuffle(src) {
     const j = Math.floor(Math.random() * (i + 1));
     [images[i], images[j]] = [images[j], images[i]];
   }
+
   return images;
 }
 
 async function init() {
   imagesData = await fetchImagesData();
+
   const listFromLocalStorage = localStorage.getItem("imageList");
-  if (!listFromLocalStorage) 
-  {
+  if (!listFromLocalStorage) {
     imageList = shuffle(Object.keys(imagesData));
     localStorage.setItem("imageList", JSON.stringify(imageList));
-  } else {
+  }
+  else
     imageList = JSON.parse(listFromLocalStorage);
-  }
   if (imageList && imageList.length) {
-    updateColumns();
+    updateColumns(imageList);
     setupInfiniteScroll();
-  } else {
-    console.error("Erreur: Aucun image disponible");
   }
+  else
+    console.error("Erreur: Aucun image disponible");
 }
 
 // ---------------------------
@@ -59,15 +61,11 @@ async function init() {
 
 function resetColumns() {
   if (checkedTags.size || hasShuffled) {
-    loadedImagesCopy = new Set(loadedImages);
-    loadedImages.clear();
     prevBatch = currentBatch;
     currentBatch = 1;
     prevLastColumn = lastColumn;
     lastColumn = 0;
   } else {
-    loadedImages = new Set(loadedImagesCopy);
-    loadedImagesCopy.clear();
     currentBatch = prevBatch;
     lastColumn = prevLastColumn;
   }
@@ -92,32 +90,15 @@ function createImg(image, box) {
 //   INIT / CREATE COLUMNS
 // -------------------------
 
-function initializeColumns(images, nColumns) {
-  const container = document.getElementById("images");
-  container.innerHTML = "";
-
-  for (let i = 0; i < nColumns; i++) {
-    const column = document.createElement("div");
-    column.classList.add("column");
-    container.appendChild(column);
-  }
-
-  if (loadedImages.size) {
-    createColumns(loadedImages);
-  } else {
-    createColumns(images.slice(0, batchSize));
-  }
-}
+const imageContainer = document.getElementById("images");
 
 function createColumns(images) {
-  const container = document.getElementById("images");
-  const nColumns = container.children.length;
-  imagesToLoad = Math.min(batchSize, images.length);
+  const nColumns = getNumberOfColumns();
+  numberOfImagesToLoad = Math.min(batchSize, images.length);
 
   images.forEach((image) => {
-    const column = container.children[lastColumn];
+    const column = imageContainer.children[lastColumn];
     const box = document.createElement("div");
-
     box.classList.add("box");
 
     createImg(image, box);
@@ -126,6 +107,22 @@ function createColumns(images) {
     loadedImages.add(image);
     lastColumn = (lastColumn + 1) % nColumns;
   });
+}
+
+function initializeColumns(images) {
+  const nColumns = getNumberOfColumns();
+  imageContainer.innerHTML = "";
+
+  for (let i = 0; i < nColumns; i++) {
+    const column = document.createElement("div");
+    column.classList.add("column");
+    imageContainer.appendChild(column);
+  }
+
+  if (loadedImages.size) // to resize we keep the images loaded before
+    createColumns(loadedImages);
+  else
+    createColumns(images.slice(0, batchSize));
 }
 
 // -------------------------
@@ -139,16 +136,15 @@ function getNumberOfColumns() {
   return 5;
 }
 
-function updateColumns() {
+function updateColumns(images) {
   lastColumn = 0;
-  const nColumns = getNumberOfColumns();
-  initializeColumns(imageList, nColumns);
+  initializeColumns(images);
   hasShuffled = false;
 }
 
 function imageLoaded() {
-  imagesToLoad--;
-  if (!imagesToLoad) {
+  numberOfImagesToLoad--;
+  if (!numberOfImagesToLoad) {
     const logo = document.getElementById("loadingLogo");
     logo.style.display = "none";
   }
@@ -176,7 +172,8 @@ function setupInfiniteScroll() {
       if (entry.isIntersecting && imageList.length != loadedImages.size) {
         const logo = document.getElementById("loadingLogo");
         logo.style.display = "block";
-        loadNextBatch();
+        if (!numberOfImagesToLoad && !noImagesFromTags)
+          loadNextBatch();
       }
     });
   });
@@ -190,20 +187,28 @@ function setupInfiniteScroll() {
 // ---------------------
 
 export function updateImagesAndUrl() {
-  const clientUrl = new URL("/", window.location.origin);
+  const clientUrl = new URL("/images/", window.location.origin);
   const url = new URL("/api/images/", window.location.origin);
+  
   for (const tag of checkedTags) {
     if (tag.length === 0) continue;
     url.searchParams.append("tag", tag);
     clientUrl.searchParams.append("tag", tag);
   }
   window.history.pushState({}, "", clientUrl);
+
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
+      loadedImages.clear();
       resetColumns();
-      imageList = data.images;
-      updateColumns();
+      if (!checkedTags.size) {
+        updateColumns(imageList);
+      }
+      else {
+        noImagesFromTags = !data.images.length ? true : false;
+        updateColumns(data.images);
+      }
     })
     .catch((error) => {
       console.error("error dans updateImagesAndUrl : " + error);
@@ -253,10 +258,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const shuffleButton = document.getElementById("shuffle");
   shuffleButton.addEventListener("click", () => {
     hasShuffled = true;
+    loadedImages.clear();
     imageList = shuffle(imagesData);
     localStorage.setItem("imageList", JSON.stringify(imageList));
     resetColumns();
-    updateColumns();
+    updateColumns(imageList);
   });
 });
 
@@ -287,5 +293,5 @@ lightbox.addEventListener("click", (e) => {
 //   INITIALISATION
 // ------------------
 
-window.addEventListener("resize", updateColumns);
+window.addEventListener("resize", () => updateColumns(loadedImages));
 window.addEventListener("DOMContentLoaded", init);

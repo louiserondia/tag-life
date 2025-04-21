@@ -122,13 +122,12 @@ $light-color: #e5e3ee;
 
 
 .images {
-    margin: 1rem auto 0 auto;
+    margin: 1rem 0;
     padding: 0 1rem;
     overflow-y: hidden;
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    width: 100%;
 
     .column {
         flex: 1;

@@ -325,7 +325,7 @@ function getScreenMiddle(mesh) {
 // --------- ORBIT CONTROL -----------
 // -----------------------------------
 
-const VELOCITY_THRESHOLD = 0.01;
+const VELOCITY_THRESHOLD = 0.001;
 
 let isDragging = false;
 let prevMousePosX = 0;
@@ -461,7 +461,19 @@ function clickOnBooksButton(button) {
 
 booksButtons.forEach(button => {
     button.addEventListener('click', (e) => clickOnBooksButton(button.id));
+    const arrowButton = button.querySelector('.arrow-button');
+    const arrowDescription = button.querySelector('.arrow-description');
+    arrowButton.addEventListener("mousemove", (e) => {
+        arrowDescription.style.left = `${e.offsetX -25}px`; // Décalage pour ne pas être pile sous la souris
+        arrowDescription.style.top = `${e.offsetY - 75}px`;
+    });
+    
+    arrowButton.addEventListener("mouseleave", () => {
+        arrowDescription.style.left = "-9999px"; // Optionnel pour s'assurer qu'il disparaît
+    });
 });
+
+
 
 
 // -----------------------------------
@@ -496,7 +508,17 @@ function clickOnCalendarButton(button) {
 }
 
 calendarButtons.forEach(button => {
-    button.addEventListener('click', (e) => clickOnCalendarButton(button.id));
+    button.addEventListener('click', () => clickOnCalendarButton(button.id));
+    const arrowButton = button.querySelector('.arrow-button');
+    const arrowDescription = button.querySelector('.arrow-description');
+    arrowButton.addEventListener("mousemove", (e) => {
+        arrowDescription.style.left = `${e.offsetX * 2 - 35}px`; // Décalage pour ne pas être pile sous la souris
+        arrowDescription.style.top = `${e.offsetY - 50}px`;
+    });
+    
+    arrowButton.addEventListener("mouseleave", () => {
+        arrowDescription.style.left = "-9999px"; // Optionnel pour s'assurer qu'il disparaît
+    });
 });
 
 // -----------------------------------
@@ -605,7 +627,7 @@ switchMode.addEventListener("click", () => {
 function animate() {
     if (zoomInfos[3] == 'dezoom') { // pas de rotation de la scène si on est dans le zoom
         rotating.rotation.y += velocity;
-        velocity *= 0.93;
+        velocity *= 0.95;
     }
     if (Math.abs(velocity) < VELOCITY_THRESHOLD) velocity = 0;
     requestAnimationFrame(animate);

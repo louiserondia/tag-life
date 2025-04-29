@@ -122,7 +122,7 @@ function initializeColumns(images) {
   if (loadedImages.size) // to resize we keep the images loaded before
     createColumns(loadedImages);
   else
-    createColumns(images.slice(0, batchSize));
+    createColumns(images.slice(0, batchSize)); // faire attention si j'envoie pas un array
 }
 
 // -------------------------
@@ -293,5 +293,5 @@ lightbox.addEventListener("click", (e) => {
 //   INITIALISATION
 // ------------------
 
-window.addEventListener("resize", () => updateColumns(loadedImages));
+window.addEventListener("resize", () => updateColumns([...loadedImages]));
 window.addEventListener("DOMContentLoaded", init);

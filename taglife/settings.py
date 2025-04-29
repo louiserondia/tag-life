@@ -38,12 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'csp',
 
     # mes applications
     'apps.main',
 ]
-
-INSTALLED_APPS += ['csp']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -137,9 +136,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.youtube.com", "https://www.gstatic.com")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
-CSP_FRAME_SRC = ("https://www.youtube.com", "https://www.youtube-nocookie.com")
-CSP_IMG_SRC = ("'self'", "data:")
-CSP_CONNECT_SRC = ("'self'",)
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'connect-src': ("'self'",),
+        'default-src': ("'self'",),
+        'frame-src': (
+            'https://www.youtube.com',
+            'https://www.youtube-nocookie.com',
+        ),
+        'img-src': ("'self'", 'data:'),
+        'script-src': (
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            'https://www.youtube.com',
+            'https://www.gstatic.com',
+        ),
+        'style-src': ("'self'", "'unsafe-inline'"),
+    }
+}

@@ -117,43 +117,6 @@ loader.load('../static/models/mini_room.glb', (gltf) => {
     console.error(error, "Error on loading of gltf miniRoom");
 });
 
-// let titleNeg;
-// loader.load('../media/models/title.glb', (gltf) => {
-//     titleNeg = gltf.scene;
-//     scene.add(titleNeg);
-//     rotating.add(titleNeg);
-//     titleNeg.scale.set(2, 2, 2);
-//     titleNeg.rotation.y = Math.PI;
-//     titleNeg.castShadow = true;
-//     titleNeg.receiveShadow = true;
-//     titleNeg.traverse(function (node) {
-//         if (node.isMesh) {
-//             node.castShadow = true;
-//             node.receiveShadow = true;
-//         }
-//     });
-// }, undefined, (error) => {
-//     console.error(error, "Error on loading of gltf miniRoom");
-// });
-
-// const titleLight = new THREE.RectAreaLight(0x00ff44, 1, 5, 2.5);
-// titleLight.position.set( 0, 3, 3.68 );
-// titleLight.lookAt( 0, 3, -100 );
-// scene.add( titleLight );
-// rotating.add(titleLight);
-
-// const shadowBlocker = new THREE.Mesh(
-
-// const mat = new THREE.MeshStandardMaterial({ color: 0x000000, side: THREE.DoubleSide });
-// mat.opacity = 0.2;
-// mat.transparent = true;
-//     new THREE.PlaneGeometry(5, 5), // Ajuste la taille selon ton mur
-//     mat
-// );
-// shadowBlocker.position.set(0, 3, 3.8); 
-// scene.add(shadowBlocker);
-// rotating.add(shadowBlocker)
-
 // switch lights when switching to dark/lightmode
 let isDarkMode = localStorage.getItem("dark-mode") === "true";
 if (isDarkMode) {
@@ -177,8 +140,9 @@ switchMode.addEventListener("click", () => {
 });
 
 let isDragging = false;
-let prevMousePosX = 0;
+let prevMousePosX;
 let velocity = 0;
+let scheduled = false;
 
 window.addEventListener('mousedown', (e) => {
     isDragging = true;
@@ -190,9 +154,14 @@ window.addEventListener('mouseup', () => isDragging = false);
 window.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
 
-    const deltaX = e.clientX - prevMousePosX;
-    velocity = deltaX * 0.0025;
-    
+    if (!scheduled) {
+        scheduled = true;
+        setTimeout(function() {
+          scheduled = false;
+          const deltaX = e.clientX - prevMousePosX;
+          velocity = -deltaX * 0.0015; // vérifier si ça marche sur tous les devices
+        }, 10); // fix la différence de rotation entre souris / trackpad et ordis
+    }
     prevMousePosX = e.clientX;
 });
 

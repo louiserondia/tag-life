@@ -360,6 +360,7 @@
 
         #calendarImgContainer,
         #booksImgContainer {
+            position: relative;
             flex: 1;
 
             display: flex;
@@ -383,7 +384,6 @@
 
             .calendar-button,
             .books-button {
-                position: relative;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -396,42 +396,25 @@
                     font-size: xx-large;
                 }
             }
-
-            .books-button {
-                .arrow-description {
-                    height: 4rem;
-                    width: max-content;
-
-                    position: absolute;
-                    top: 100%;
-                    left: 50%;
-                    transform: translateX(-50%);
-
-                    display: none;
-                    font-size: large;
-                    pointer-events: none;
-                    
-                    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-                    font-weight: bold;
-                    margin: 0;
-                    color: black;
-                }
-
-                .arrow-button:hover+.arrow-description {
-                    display: block;
-                }
-
-                .arrow-button:hover+.arrow-description.hidden {
-                    display: none;
-                }
-            }
-
-            .books-button.hidden {
-                opacity: 0;
-                display: none;
-            }
         }
     }
+}
+
+.arrow-description {
+    height: 4rem;
+    width: max-content;
+
+    position: absolute;
+    top: 83%;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity .3s ease;
+    // display: none;
+    opacity: 0;
+    font-size: large;
+    pointer-events: none;
+
+    margin: 0;
 }
 
 #calendar.active,

@@ -7,8 +7,9 @@ const raycaster = new Raycaster();
 const objects = new Map();
 let objectsArray;
 
-function scaleFactorFormula(w) { // le 1.2 c que je zoom de base un peu
-    return w > 700 ? 1.2 : 1.2 * ((w / 700) + ((700 - w) / 4) / 700); // augmenter le /4 pour que ça dezoom + vite
+function scaleFactorFormula(w) {
+  // le 1.2 c que je zoom de base un peu
+  return w > 700 ? 1.2 : 1.2 * (w / 700 + (700 - w) / 4 / 700); // augmenter le /4 pour que ça dezoom + vite
 }
 
 const scene = new THREE.Scene();
@@ -391,7 +392,7 @@ video.style.height = `${275 * scaleFactor}px`;
 window.addEventListener("resize", () => {
   w = window.innerWidth;
   h = window.innerHeight;
-  scaleFactor = scaleFactorFormula(w); 
+  scaleFactor = scaleFactorFormula(w);
 
   const aspect = w / h;
   camera.left = -d * aspect;
@@ -475,28 +476,35 @@ function clickOnBooksButton(button) {
 
   const img = `${bookList[bookIndex]}_${bookPage}`;
   booksImg.setAttribute("src", `/static/img/books/${img}.jpg`);
+  arrowTourner.style.opacity = '0';
+  arrowChanger.style.opacity = '0';
 
-  if (bookPage && bookIndex)
-    booksButtons.forEach((b) => b.querySelector("p").classList.add("hidden"));
-  else
-    booksButtons.forEach((b) =>
-      b.querySelector("p").classList.remove("hidden")
-    );
 }
 
 booksButtons.forEach((button) => {
   button.addEventListener("click", (e) => clickOnBooksButton(button.id));
+});
 
-  const arrowButton = button.querySelector(".arrow-button");
-  const arrowDescription = button.querySelector(".arrow-description");
+const arrowTourner = document.getElementById('arrowTourner');
+const arrowChanger = document.getElementById('arrowChanger');
 
-  arrowButton.addEventListener("mousemove", (e) => {
-    arrowDescription.style.left = `${e.offsetX - 25}px`; // Décalage pour ne pas être pile sous la souris
-    arrowDescription.style.top = `${e.offsetY - 75}px`;
+document.querySelectorAll('.single-arrow').forEach(button => {
+  button.addEventListener('mouseenter', () => {
+    if (!bookPage && !bookIndex)
+      arrowTourner.style.opacity = '1';
   });
+  button.addEventListener('mouseleave', () => {
+    arrowTourner.style.opacity = '0';
+  });
+});
 
-  arrowButton.addEventListener("mouseleave", () => {
-    arrowDescription.style.left = "-9999px";
+document.querySelectorAll('.double-arrow').forEach(button => {
+  button.addEventListener('mouseenter', () => {
+    if (!bookPage && !bookIndex)
+      arrowChanger.style.opacity = '1';
+  });
+  button.addEventListener('mouseleave', () => {
+    arrowChanger.style.opacity = '0';
   });
 });
 

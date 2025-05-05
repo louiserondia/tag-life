@@ -1,3 +1,13 @@
+img {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+// prevents user-selection cross-browser
+
 #screenPresentation {
     width: 100%;
     height: 100%;
@@ -25,6 +35,15 @@
         margin: auto 1rem auto auto;
         background: rgba(236, 236, 236, 0.75);
         border-radius: 15px;
+
+        video {
+            z-index: -1;
+        }
+
+        video::-webkit-media-controls-panel {
+            background-image: none !important;
+            filter: brightness(0.4);
+        }
 
         #thumbnailsContainer {
             width: 100%;
@@ -121,38 +140,36 @@
 }
 
 
-@media (max-width: 751px) {
+@media (max-width: 801px) {
     #screenPresentation {
         flex-direction: column !important;
 
         #description {
             width: 80%;
             height: 45%;
-            max-width: 100%;
-            max-height: 300px;
+            max-width: 400px;
+            max-height: 225px;
 
             top: auto;
             bottom: 0;
             margin: auto auto 1rem auto;
 
             #thumbnailsContainer {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: space-evenly;
-
                 margin: 1rem;
+                overflow-y: auto;
 
                 .thumbnail {
-                    width: 45%;
-                    min-width: 150px;
-                    min-height: auto;
-                    height: auto;
+                    min-height: 10rem;
 
                     p {
                         font-size: 1.3rem;
                         color: white;
                         width: 90%;
                         -webkit-text-stroke: 0px;
+                    }
+
+                    img {
+                        height: 10rem;
                     }
                 }
 
@@ -208,6 +225,7 @@
             padding: 0.5rem 1rem;
             gap: 1rem;
             justify-content: space-between;
+            flex-direction: row;
 
             .hits-left {
                 display: flex;
@@ -267,7 +285,7 @@
 
                 img {
                     max-width: 100%;
-                    max-height: 10rem;
+                    max-height: 15rem;
 
                     display: none;
                     margin: 0.5rem 0;
@@ -282,7 +300,7 @@
 
                 .audio-description,
                 a {
-                    display: block;
+                    display: inline;
                     opacity: 1;
 
                 }
@@ -299,23 +317,12 @@
                 }
             }
         }
-    }
 
-    @media (max-width: 500px) {
-        #hitsContainer {
-            margin: 2rem;
+        @media (max-width: 600px) {
+            .hits-row {
+                flex-direction: column;
+            }
         }
-    }
-}
-
-@media (max-width: 550px) {
-    .hits-row {
-        flex-direction: column;
-        gap: 0;
-    }
-
-    a {
-        margin: 1rem 0 0 0;
     }
 }
 
@@ -364,8 +371,17 @@
             flex: 1;
 
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            gap: 1rem;
+
+            p {
+                margin: 0;
+                font-size: large;
+                font-weight: bold;
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            }
 
             img {
                 max-height: 70vh;
@@ -433,4 +449,20 @@
             margin: 1.5rem;
         }
     }
+}
+
+
+
+
+// Enlever les scrollbars 
+
+#hitsContainer::-webkit-scrollbar,
+#thumbnailsContainer::-webkit-scrollbar {
+    display: none;
+}
+
+#hitsContainer,
+#thumbnailsContainer {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

@@ -19,7 +19,7 @@ let scaleFactor = scaleFactorFormula(w);
 
 const aspect = w / h;
 const d = 6;
-const smallScreenSize = 750;
+const smallScreenSize = 800;
 
 const hits = document.getElementById("hits");
 const books = document.getElementById("books");
@@ -386,8 +386,8 @@ window.addEventListener("mousemove", (e) => {
 // -----------------------------------
 
 const video = document.getElementById("video");
-video.style.width = `${400 * scaleFactor}px`;
-video.style.height = `${275 * scaleFactor}px`;
+// video.style.width = `${400 * scaleFactor}px`;
+video.style.height = `${250 * scaleFactor}px`;
 
 window.addEventListener("resize", () => {
   w = window.innerWidth;
@@ -402,8 +402,8 @@ window.addEventListener("resize", () => {
 
   camera.zoom = currentCameraZoom * scaleFactor;
 
-  video.style.width = `${400 * scaleFactor}px`;
-  video.style.height = `${275 * scaleFactor}px`;
+  // video.style.width = `${400 * scaleFactor}px`;
+  video.style.height = `${250 * scaleFactor}px`;
 
   if (zoomInfos[3] == "screen") {
     if (w < smallScreenSize) scene.position.set(0, 0, 0);
@@ -446,6 +446,7 @@ const booksPagesCount = {
 };
 
 const booksImg = document.getElementById("booksImg");
+const booksTitle = document.getElementById("booksTitle");
 let bookIndex = getBookIndex(booksImg.src);
 let bookPage = getBookPage(booksImg.src);
 
@@ -476,6 +477,7 @@ function clickOnBooksButton(button) {
 
   const img = `${bookList[bookIndex]}_${bookPage}`;
   booksImg.setAttribute("src", `/static/img/books/${img}.jpg`);
+  booksTitle.innerText = bookList[bookIndex];
   arrowTourner.style.opacity = '0';
   arrowChanger.style.opacity = '0';
 

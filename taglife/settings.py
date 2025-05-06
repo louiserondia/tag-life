@@ -136,22 +136,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CONTENT_SECURITY_POLICY = {
-    'DIRECTIVES': {
-        'connect-src': ("'self'",),
-        'default-src': ("'self'",),
-        'frame-src': (
-            'https://www.youtube.com',
-            'https://www.youtube-nocookie.com',
-        ),
-        'img-src': ("'self'", 'data:'),
-        'script-src': (
-            "'self'",
-            "'unsafe-inline'",
-            "'unsafe-eval'",
-            'https://www.youtube.com',
-            'https://www.gstatic.com',
-        ),
-        'style-src': ("'self'", "'unsafe-inline'"),
-    }
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.youtube.com", "https://www.gstatic.com")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+CSP_FRAME_SRC = ("https://www.mixcloud.com", "https://player-widget.mixcloud.com")
+CSP_IMG_SRC = ("'self'", "data:")
+CSP_CONNECT_SRC = ("'self'",)
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'ERROR',  # Réduire à ERROR uniquement
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'ERROR',
+    },
 }

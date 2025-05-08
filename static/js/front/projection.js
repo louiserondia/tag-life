@@ -133,6 +133,14 @@ scene.background = null;
 const loader = new GLTFLoader();
 
 let screenMesh;
+let rabbits = new Array();
+
+function assignMesh(node) {
+  console.log("yoooo")
+  node.geometry.computeVertexNormals();
+  node.geometry.attributes.position.originalPosition = node.geometry.attributes.position.array.slice();
+  return node;
+}
 
 let projectionRoom;
 loader.load(
@@ -150,7 +158,9 @@ loader.load(
         node.receiveShadow = true;
         objects.set(node.name, node);
         node.material.transparent = true;
+        console.log(node.name);
         if (node.name === "screen_1") screenMesh = node;
+        if (node.name.startsWith("rabbit")) rabbits.push(assignMesh(node));
       }
     });
     objectsArray = Array.from(objects.values());
@@ -449,11 +459,11 @@ function getBookPage(src) {
   return Number(src.slice(src.lastIndexOf("_") + 1));
 }
 
-const bookList = ["000", "field", "elise"];
+const bookList = ["000", "Fieldwave", "Für Elise"];
 const booksPagesCount = {
   "000": 3,
-  field: 3,
-  elise: 3,
+  "Fieldwave": 6,
+  "Für Elise": 5,
 };
 
 const booksImg = document.getElementById("booksImg");
@@ -487,7 +497,7 @@ function clickOnBooksButton(button) {
   else if (button === "booksNextPage") bookPage = (bookPage + 1) % pageCount;
 
   const img = `${bookList[bookIndex]}_${bookPage}`;
-  booksImg.setAttribute("src", `/static/img/books/${img}.jpg`);
+  booksImg.setAttribute("src", `/static/img/books/${img}.png`);
   booksTitle.innerText = bookList[bookIndex];
   arrowTourner.style.opacity = '0';
   arrowChanger.style.opacity = '0';
@@ -652,6 +662,36 @@ switchMode.addEventListener("click", () => {
   }
 });
 
+const clock = new THREE.Clock();
+
+function wave(mesh) {
+  if (mesh) {
+    const positionAttr = mesh.geometry.attributes.position;
+    const original = positionAttr.originalPosition;
+    const time = clock.getElapsedTime();
+
+    if (!mesh.geometry.boundingBox)
+      mesh.geometry.computeBoundingBox();
+
+    const bounds = mesh.geometry.boundingBox;
+    const minX = bounds.min.y, maxX = bounds.max.y;
+    const rangeX = maxX - minX;
+    for (let i = 0; i < positionAttr.count; i++) {
+
+      const [x, y, z] = [original[i * 3], original[i * 3 + 1], original[i * 3 + 2]];
+      const weightX = (y - minX) / rangeX;
+
+      const wavelength = 5;
+      const frequency = 3;
+      const width = 0.03;
+
+      const wave = Math.cos(y * wavelength + time * frequency) * width * weightX; // ajuster la fréquence et amplitude + poids permet de faire moins d'un côté 
+      positionAttr.array[i * 3] = x + wave; // onde sur x
+    }
+    positionAttr.needsUpdate = true;
+  }
+}
+
 // -----------------------------------
 // ------------- ANIMATE -------------
 // -----------------------------------
@@ -663,6 +703,8 @@ function animate() {
     rotating.rotation.y %= 2 * Math.PI;
     velocity *= 0.95;
   }
+  rabbits.forEach(rabbit => wave(rabbit));
+  // console.log(rabbit)
 
   if (Math.abs(velocity) < VELOCITY_THRESHOLD) velocity = 0;
   requestAnimationFrame(animate);

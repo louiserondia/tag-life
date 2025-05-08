@@ -7,7 +7,7 @@ const scene = new THREE.Scene();
 function scaleFactorFormula(w, h) {
     const widthFactor = w > 700 ? 1.1 : 1.1 * (w / 700 + (700 - w) / 4 / 700); // augmenter le /4 pour que ça dezoom + vite
     const heightFactor = h > 700 ? 1 : 1 + (700 - h) / 500; // Ajuster /500 pour doser (+ on divise, moins ça zoom)
-    
+
     return widthFactor * heightFactor;
 }
 
@@ -106,8 +106,17 @@ scene.background = null;
 
 const loader = new GLTFLoader();
 
+let chair;
+let leftCurtain, rightCurtain;
+
+function assignMesh(node) {
+    node.geometry.computeVertexNormals();
+    node.geometry.attributes.position.originalPosition = node.geometry.attributes.position.array.slice();
+    return node;
+}
+
 let miniRoom;
-loader.load('../static/models/mini_room.glb', (gltf) => {
+loader.load('../static/models/mini_room_1.glb', (gltf) => {
     miniRoom = gltf.scene;
     scene.add(miniRoom);
     rotating.add(miniRoom);
@@ -120,6 +129,8 @@ loader.load('../static/models/mini_room.glb', (gltf) => {
             node.castShadow = true;
             node.receiveShadow = true;
         }
+        if (node.name == "curtain") leftCurtain = assignMesh(node);
+        else if (node.name == "curtain001") rightCurtain = assignMesh(node);
     });
 }, undefined, (error) => {
     console.error(error, "Error on loading of gltf miniRoom");
@@ -189,7 +200,43 @@ window.addEventListener('resize', () => {
     renderer.setPixelRatio(window.devicePixelRatio);
 });
 
+const clock = new THREE.Clock();
+
+function wave(mesh) {
+    if (mesh) {
+        const positionAttr = mesh.geometry.attributes.position;
+        const original = positionAttr.originalPosition;
+        const time = clock.getElapsedTime();
+
+        if (!mesh.geometry.boundingBox)
+            mesh.geometry.computeBoundingBox();
+
+        const bounds = mesh.geometry.boundingBox;
+        const minX = bounds.min.x, maxX = bounds.max.x, minY = bounds.min.y, maxY = bounds.max.y, minZ = bounds.min.z, maxZ = bounds.max.z;
+        const rangeX = maxX - minX, rangeY = maxY - minY, rangeZ = maxZ - minZ;
+
+        for (let i = 0; i < positionAttr.count; i++) {
+            const [x, y, z] = [original[i * 3], original[i * 3 + 1], original[i * 3 + 2]];
+
+            const weightY = (y - maxY) / rangeY;
+            const weightZ = mesh.name == "curtain" ? (z - maxZ) / rangeZ : (z - minZ) / rangeZ;
+
+            const wavelength = 5;
+            const frequency = 1.5;
+            const width = 0.1;
+
+            const wave = Math.sin(z * wavelength + time * frequency) * width * weightZ * weightY; // ajuster la fréquence et amplitude + poids permet de faire moins d'un côté 
+            positionAttr.array[i * 3] = x + wave; // onde sur x
+        }
+        positionAttr.needsUpdate = true;
+    }
+}
+
 function animate() {
+
+    wave(leftCurtain);
+    wave(rightCurtain);
+
     requestAnimationFrame(animate);
     rotating.rotation.y += velocity;
     velocity *= 0.95;

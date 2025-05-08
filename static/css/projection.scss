@@ -231,6 +231,7 @@ img {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
+                width: 100%;
 
                 .audio-title {
                     width: 100%;
@@ -287,8 +288,8 @@ img {
                 opacity: 0;
 
                 img {
-                    max-width: 100%;
                     max-height: 15rem;
+                    min-width: 15rem;
 
                     display: none;
                     margin: 0.5rem 0;
@@ -309,6 +310,8 @@ img {
 
                     margin-bottom: 0.5rem;
                     opacity: 1;
+                    gap: 1rem;
+
 
                     div {
                         display: flex;
@@ -338,6 +341,13 @@ img {
         @media (max-width: 600px) {
             .hits-row {
                 flex-direction: column;
+
+                .hits-right {
+                    img {
+                        min-width: 0;
+                        margin: 0 0 0.5rem 0;
+                    }
+                }
             }
         }
     }

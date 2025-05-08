@@ -3,7 +3,15 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Raycaster } from 'three';
 
 const scene = new THREE.Scene();
-let scaleFactor = window.innerWidth > 700 ? 1 : window.innerWidth / 700;
+
+function scaleFactorFormula(w, h) {
+    const widthFactor = w > 700 ? 1.1 : 1.1 * (w / 700 + (700 - w) / 4 / 700); // augmenter le /4 pour que ça dezoom + vite
+    const heightFactor = h > 700 ? 1 : 1 + (700 - h) / 500; // Ajuster /500 pour doser (+ on divise, moins ça zoom)
+    
+    return widthFactor * heightFactor;
+}
+
+let scaleFactor = scaleFactorFormula(window.innerWidth, window.innerHeight);
 
 const aspect = window.innerWidth / (window.innerHeight * 0.75 * scaleFactor);
 const d = 6;
@@ -68,7 +76,7 @@ scene.add(shadowLight);
 rotating.add(shadowLight);
 
 const deskLight = new THREE.SpotLight(0xeb9617, 2);
-deskLight.position.set( 2.2, 2.45, -2.4 );
+deskLight.position.set(2.2, 2.45, -2.4);
 scene.add(deskLight);
 rotating.add(deskLight);
 deskLight.visible = false;
@@ -76,16 +84,16 @@ deskLight.visible = false;
 const wallLight = new THREE.SpotLight(0xeb9617, 4);
 wallLight.position.set(1.7, 4.65, 2.35);
 wallLight.target.position.set(1.7, 0, 2.35);
-wallLight.penumbra = 0.05 ;
+wallLight.penumbra = 0.05;
 wallLight.decay = 1;
 scene.add(wallLight);
-scene.add( wallLight.target ); 
+scene.add(wallLight.target);
 rotating.add(wallLight);
 rotating.add(wallLight.target);
 wallLight.visible = false;
 
-const dhelper = new THREE.PointLightHelper( deskLight, 0.2 );
-const whelper = new THREE.PointLightHelper( wallLight, 0.2 );
+const dhelper = new THREE.PointLightHelper(deskLight, 0.2);
+const whelper = new THREE.PointLightHelper(wallLight, 0.2);
 const helper = new THREE.CameraHelper(dirLight.shadow.camera);
 // scene.add(whelper);
 
@@ -130,13 +138,13 @@ if (isDarkMode) {
 
 const switchMode = document.getElementById("switchMode");
 switchMode.addEventListener("click", () => {
-  isDarkMode = !isDarkMode;
-  dirLight.visible = !dirLight.visible;
-  counterLight.visible = !counterLight.visible;
-  shadowLight.visible = !shadowLight.visible;
-  wallLight.visible = !wallLight.visible;
-  deskLight.visible = !deskLight.visible;
-  ambientLight.color.setHex(isDarkMode ? blue : orange);
+    isDarkMode = !isDarkMode;
+    dirLight.visible = !dirLight.visible;
+    counterLight.visible = !counterLight.visible;
+    shadowLight.visible = !shadowLight.visible;
+    wallLight.visible = !wallLight.visible;
+    deskLight.visible = !deskLight.visible;
+    ambientLight.color.setHex(isDarkMode ? blue : orange);
 });
 
 let isDragging = false;
@@ -156,10 +164,10 @@ window.addEventListener('mousemove', (e) => {
 
     if (!scheduled) {
         scheduled = true;
-        setTimeout(function() {
-          scheduled = false;
-          const deltaX = e.clientX - prevMousePosX;
-          velocity = -deltaX * 0.0015; // vérifier si ça marche sur tous les devices
+        setTimeout(function () {
+            scheduled = false;
+            const deltaX = e.clientX - prevMousePosX;
+            velocity = -deltaX * 0.0015; // vérifier si ça marche sur tous les devices
         }, 10); // fix la différence de rotation entre souris / trackpad et ordis
     }
     prevMousePosX = e.clientX;
@@ -168,15 +176,15 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('resize', () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    scaleFactor = w > 700 ? 1 : w / 700;
-    
+    scaleFactor = scaleFactorFormula(w, h);
+
     const a = w / (h * 0.75 * scaleFactor);
     camera.left = -d * a;
     camera.right = d * a;
     camera.top = d;
     camera.bottom = -d;
     camera.updateProjectionMatrix();
-    
+
     renderer.setSize(w, h * 0.75 * scaleFactor);
     renderer.setPixelRatio(window.devicePixelRatio);
 });

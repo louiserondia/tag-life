@@ -7,15 +7,17 @@ const raycaster = new Raycaster();
 const objects = new Map();
 let objectsArray;
 
-function scaleFactorFormula(w) {
-  // le 1.2 c que je zoom de base un peu
-  return w > 700 ? 1.2 : 1.2 * (w / 700 + (700 - w) / 4 / 700); // augmenter le /4 pour que ça dezoom + vite
+function scaleFactorFormula(w, h) {
+  const widthFactor = w > 700 ? 1.1 : 1.1 * (w / 700 + (700 - w) / 4 / 700); // augmenter le /4 pour que ça dezoom + vite
+  const heightFactor = h > 700 ? 1 : 1 + (700 - h) / 500; // Ajuster /500 pour doser (+ on divise, moins ça zoom)
+
+  return widthFactor * heightFactor;
 }
 
 const scene = new THREE.Scene();
 let w = window.innerWidth;
 let h = window.innerHeight;
-let scaleFactor = scaleFactorFormula(w);
+let scaleFactor = scaleFactorFormula(w, h);
 
 const aspect = w / h;
 const d = 6;
@@ -356,17 +358,18 @@ let prevMousePosX = 0;
 let velocity = 0;
 let scheduled = false;
 
-window.addEventListener("mousedown", (e) => {
+function startTurning(e) {
   isDragging = true;
   prevMousePosX = e.clientX;
-});
+}
 
-window.addEventListener("mouseup", (e) => {
-  if (Math.abs(velocity) < VELOCITY_THRESHOLD) clickToZoom(e);
+function stopTurning(e) {
+  if (Math.abs(velocity) < VELOCITY_THRESHOLD)
+    clickToZoom(e);
   isDragging = false;
-});
+}
 
-window.addEventListener("mousemove", (e) => {
+function turn(e) {
   if (!isDragging) return;
 
   if (!scheduled) {
@@ -379,7 +382,15 @@ window.addEventListener("mousemove", (e) => {
   }
   //p-e augmenter le temps d'attente et diminuer le 0.00025
   prevMousePosX = e.clientX;
-});
+}
+
+window.addEventListener("mousedown", (e) => startTurning(e));
+window.addEventListener("mouseup", (e) => stopTurning(e));
+window.addEventListener("mousemove", (e) => turn(e));
+
+window.addEventListener("touchstart", (e) => startTurning(e.touches[0]));
+window.addEventListener("touchend", (e) => stopTurning(e));
+window.addEventListener("touchmove", (e) => turn(e.touches[0]));
 
 // -----------------------------------
 // ------------- RESIZE --------------
@@ -392,7 +403,7 @@ video.style.height = `${250 * scaleFactor}px`;
 window.addEventListener("resize", () => {
   w = window.innerWidth;
   h = window.innerHeight;
-  scaleFactor = scaleFactorFormula(w);
+  scaleFactor = scaleFactorFormula(w, h);
 
   const aspect = w / h;
   camera.left = -d * aspect;

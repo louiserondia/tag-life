@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { Raycaster } from 'three';
 
 const scene = new THREE.Scene();
@@ -106,17 +107,40 @@ scene.background = null;
 
 const loader = new GLTFLoader();
 
-let chair;
-let leftCurtain, rightCurtain;
+let leftCurtain, rightCurtain, plant;
+
+function mergeMeshesFromGroup(group) {
+    const geometries = [];
+
+    group.traverse((child) => {
+        if (child.isMesh && child.geometry) {
+            // IMPORTANT : Appliquer les transformations à la géométrie
+            child.updateWorldMatrix(true, false);
+            const geom = child.geometry.clone();
+            geom.applyMatrix4(child.matrixWorld);
+
+            geometries.push(geom);
+        }
+    });
+
+    if (geometries.length === 0) return null;
+
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, false);
+    const mergedMesh = new THREE.Mesh(mergedGeometry);
+    mergedMesh.name = group.name;
+    return mergedMesh;
+}
 
 function assignMesh(node) {
+    // const merged = mergeMeshesFromGroup(node);
     node.geometry.computeVertexNormals();
     node.geometry.attributes.position.originalPosition = node.geometry.attributes.position.array.slice();
+    // console.log(node);
     return node;
 }
 
 let miniRoom;
-loader.load('../static/models/mini_room_1.glb', (gltf) => {
+loader.load('../static/models/mini_room_2.glb', (gltf) => {
     miniRoom = gltf.scene;
     scene.add(miniRoom);
     rotating.add(miniRoom);
@@ -131,6 +155,8 @@ loader.load('../static/models/mini_room_1.glb', (gltf) => {
         }
         if (node.name == "curtain") leftCurtain = assignMesh(node);
         else if (node.name == "curtain001") rightCurtain = assignMesh(node);
+        else if (node.name == "monstera") plant = assignMesh(node);
+
     });
 }, undefined, (error) => {
     console.error(error, "Error on loading of gltf miniRoom");
@@ -202,7 +228,7 @@ window.addEventListener('resize', () => {
 
 const clock = new THREE.Clock();
 
-function wave(mesh) {
+function curtainWave(mesh) {
     if (mesh) {
         const positionAttr = mesh.geometry.attributes.position;
         const original = positionAttr.originalPosition;
@@ -221,21 +247,78 @@ function wave(mesh) {
             const weightY = (y - maxY) / rangeY;
             const weightZ = mesh.name == "curtain" ? (z - maxZ) / rangeZ : (z - minZ) / rangeZ;
 
+            // ajuster la fréquence et amplitude + poids permet de faire moins d'un côté 
             const wavelength = 5;
             const frequency = 1.5;
             const width = 0.1;
 
-            const wave = Math.sin(z * wavelength + time * frequency) * width * weightZ * weightY; // ajuster la fréquence et amplitude + poids permet de faire moins d'un côté 
+            let wave = Math.sin(z * wavelength + time * frequency);
+            wave = mesh.name == "curtain" ? (wave + 1) / 2 : (wave - 1) / 2;
+            wave *= width * weightY * weightZ;
             positionAttr.array[i * 3] = x + wave; // onde sur x
         }
         positionAttr.needsUpdate = true;
     }
 }
 
-function animate() {
 
-    wave(leftCurtain);
-    wave(rightCurtain);
+function windEffect(mesh) {
+    if (mesh) {
+        const positionAttr = mesh.geometry.attributes.position;
+        const original = positionAttr.originalPosition;
+        const time = clock.getElapsedTime();
+
+        if (!mesh.geometry.boundingBox)
+            mesh.geometry.computeBoundingBox();
+
+        const bounds = mesh.geometry.boundingBox;
+        const minX = bounds.min.x, maxX = bounds.max.x, minY = bounds.min.y, maxY = bounds.max.y, minZ = bounds.min.z, maxZ = bounds.max.z;
+        const rangeX = maxX - minX, rangeY = maxY - minY, rangeZ = maxZ - minZ;
+
+
+        for (let i = 0; i < positionAttr.count; i++) {
+
+            const [x, y, z] = [original[i * 3], original[i * 3 + 1], original[i * 3 + 2]];
+            const [weightX, weightY, weightZ] = [(x - minX) / rangeX, (y - minY) / rangeY, (z - minZ) / rangeZ];
+
+            const xProgress = (x - minX) / rangeX;
+            const delay = xProgress * 1.2;
+            const delayedPhase = y * 2 + (time - delay) * 2;
+            const phase = y * 2 + time * 2;
+
+            const dx = x - (minX + rangeX / 2);
+            const dz = z - (minZ + rangeZ / 2);
+            const distXZ = Math.sqrt(dx * dx + dz * dz); // distance du centre
+            const maxDist = Math.sqrt((rangeX / 2) ** 2 + (rangeZ / 2) ** 2);
+            const edgeWeight = Math.pow(distXZ / maxDist, 6); // exponentiel pour que ce soit l'effet que au bout
+
+            let waveX = (
+                Math.sin(phase) * 0.02 +
+                Math.sin(phase * 0.5 + 5) * 0.015
+            ) * weightY * 0.8;
+
+            let waveY = (
+                Math.sin(delayedPhase) * 0.02 +
+                Math.sin(delayedPhase * 0.5 + 5) * 0.015
+            ) * edgeWeight * 2.5;
+
+            let waveZ = (
+                Math.sin(phase) * 0.015 +
+                Math.sin(phase * 0.5 + 5) * 0.02
+            ) * weightY;
+
+            positionAttr.array[i * 3] = x - waveX; // onde sur x
+            positionAttr.array[i * 3 + 1] = y + waveY;
+            positionAttr.array[i * 3 + 2] = z - waveZ * 0.8;
+        }
+        positionAttr.needsUpdate = true;
+    }
+}
+
+function animate() {
+    curtainWave(leftCurtain);
+    curtainWave(rightCurtain);
+    windEffect(plant);
 
     requestAnimationFrame(animate);
     rotating.rotation.y += velocity;
@@ -244,5 +327,3 @@ function animate() {
 }
 
 animate();
-
-const raycaster = new Raycaster();

@@ -162,6 +162,8 @@ loader.load('../static/models/mini_room_2.glb', (gltf) => {
     console.error(error, "Error on loading of gltf miniRoom");
 });
 
+let isDrawingCurtains = false;
+
 // switch lights when switching to dark/lightmode
 let isDarkMode = localStorage.getItem("dark-mode") === "true";
 if (isDarkMode) {
@@ -171,6 +173,7 @@ if (isDarkMode) {
     wallLight.visible = true;
     deskLight.visible = true;
     ambientLight.color.setHex(blue);
+    isDrawingCurtains = true;
 }
 
 const switchMode = document.getElementById("switchMode");
@@ -182,6 +185,7 @@ switchMode.addEventListener("click", () => {
     wallLight.visible = !wallLight.visible;
     deskLight.visible = !deskLight.visible;
     ambientLight.color.setHex(isDarkMode ? blue : orange);
+    isDrawingCurtains = true;
 });
 
 let isDragging = false;
@@ -227,6 +231,42 @@ window.addEventListener('resize', () => {
 });
 
 const clock = new THREE.Clock();
+
+let distCurtain = 0;
+let maxCurtain = 3;
+
+function drawCurtains() {
+    if (leftCurtain && rightCurtain) {
+        [leftCurtain, rightCurtain].forEach((curtain) => {
+            const way = isDarkMode ? 1 : -1;
+            const positionAttr = curtain.geometry.attributes.position;
+            const original = positionAttr.originalPosition;
+
+            if (!curtain.geometry.boundingBox)
+                curtain.geometry.computeBoundingBox();
+
+            const speed = 0.01;
+            const bounds = curtain.geometry.boundingBox;
+            const minZ = bounds.min.z, maxZ = bounds.max.z;
+            const rangeZ = maxZ - minZ;
+
+            for (let i = 0; i < positionAttr.count; i++) {
+                const z = original[i * 3 + 2];
+                const weightZ = curtain.name == "curtain" ? (z - maxZ) / rangeZ : (z - minZ) / rangeZ;
+
+                let movement = maxCurtain * speed * weightZ * way;
+                positionAttr.array[i * 3 + 2] += movement;
+            }
+            distCurtain += speed * maxCurtain;
+
+            if (Math.abs(distCurtain) >= Math.abs(maxCurtain)) {
+                isDrawingCurtains = !isDrawingCurtains;
+                distCurtain = 0;
+            }
+            positionAttr.needsUpdate = true;
+        });
+    }
+}
 
 function curtainWave(mesh) {
     if (mesh) {
@@ -316,6 +356,7 @@ function windEffect(mesh) {
 }
 
 function animate() {
+    if (isDrawingCurtains) drawCurtains();
     curtainWave(leftCurtain);
     curtainWave(rightCurtain);
     windEffect(plant);

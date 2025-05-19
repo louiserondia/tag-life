@@ -459,9 +459,9 @@ function getBookPage(src) {
   return Number(src.slice(src.lastIndexOf("_") + 1));
 }
 
-const bookList = ["000", "Fieldwave", "Für Elise"];
+const bookList = ["Grenouille", "Fieldwave", "Für Elise"];
 const booksPagesCount = {
-  "000": 3,
+  "Grenouille": 6,
   "Fieldwave": 6,
   "Für Elise": 5,
 };
@@ -535,7 +535,7 @@ document.querySelectorAll('.double-arrow').forEach(button => {
 // ------- CALENDAR CAROUSEL ---------
 // -----------------------------------
 
-const calendarPagesCount = 3;
+const calendarPagesCount = 12;
 const calendarImg = document.getElementById("calendarImg");
 let calendarPage = getBookPage(calendarImg.src);
 
@@ -562,9 +562,7 @@ calendarButtons.forEach((button) => {
 // -----------------------------------
 
 const thumbnails = document.querySelectorAll(".thumbnail");
-const thumbnailDescriptions = document.querySelectorAll(
-  ".thumbnailDescription"
-);
+const thumbnailDescriptions = document.querySelectorAll(".thumbnailDescription");
 let descriptionOn = false;
 
 function toggleShowDescription(description) {
@@ -596,6 +594,8 @@ thumbnails.forEach((thumbnail) => {
         "/static/videos/" + thumbnail.id + ".mp4"
       );
       video.load();
+      video.currentTime = 0;
+      progressBarVideo.value = 0;
     }
   });
 });
@@ -605,6 +605,36 @@ thumbnailDescriptions.forEach((description) => {
     toggleShowDescription(event.target);
   });
 });
+
+// -----------------------------------
+// --------- VIDEO TIMELINE ----------
+// -----------------------------------
+
+const playBtnVideo = document.getElementById('playBtnVideo');
+const pauseBtnVideo = document.getElementById('pauseBtnVideo');
+const progressBarVideo = document.getElementById('progressBarVideo');
+
+playBtnVideo.addEventListener('click', () => {
+  video.play();
+});
+
+pauseBtnVideo.addEventListener('click', () => {
+  video.pause();
+});
+
+// Mettre à jour la barre quand la vidéo joue
+video.addEventListener('timeupdate', () => {
+  const value = (video.currentTime / video.duration) * 100;
+  progressBarVideo.value = value;
+});
+
+// Quand on clique sur la barre
+progressBarVideo.addEventListener('input', () => {
+  const time = (progressBarVideo.value / 100) * video.duration;
+  video.currentTime = time;
+});
+
+
 
 // -----------------------------------
 // ---- DISPLAY AUDIO DESCRIPTION ----

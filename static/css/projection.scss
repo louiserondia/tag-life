@@ -23,6 +23,28 @@ img {
     opacity: 0;
     visibility: hidden;
     transition: opacity .3s ease, visibility .3s ease;
+    
+    #videoContainer {
+
+        video {
+            position: absolute;
+            z-index: -1;
+        }
+        
+        video::-webkit-media-controls-panel {
+            background-image: none !important;
+            filter: brightness(0.4);
+        }
+        
+        #videoControls {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            #progressBarVideo {
+                width: 100%;
+            }
+        }
+    }
 
     #description {
         width: 50%;
@@ -36,23 +58,6 @@ img {
         background: rgba(236, 236, 236, 0.75);
         border-radius: 15px;
 
-        #videoContainer {
-
-            video {
-                z-index: -1;
-            }
-            
-            video::-webkit-media-controls-panel {
-                background-image: none !important;
-                filter: brightness(0.4);
-            }
-            
-            #videoControls {
-                .progress-bar {
-                    width: 100%;
-                }
-            }
-        }
 
         #thumbnailsContainer {
             width: 100%;
@@ -458,7 +463,7 @@ img {
     width: max-content;
 
     position: absolute;
-    top: 83%;
+    bottom: 1rem;
     left: 50%;
     transform: translateX(-50%);
     transition: opacity .3s ease;

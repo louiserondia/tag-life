@@ -136,7 +136,6 @@ let screenMesh;
 let rabbits = new Array();
 
 function assignMesh(node) {
-  console.log("yoooo")
   node.geometry.computeVertexNormals();
   node.geometry.attributes.position.originalPosition = node.geometry.attributes.position.array.slice();
   return node;
@@ -158,7 +157,6 @@ loader.load(
         node.receiveShadow = true;
         objects.set(node.name, node);
         node.material.transparent = true;
-        console.log(node.name);
         if (node.name === "screen_1") screenMesh = node;
         if (node.name.startsWith("rabbit")) rabbits.push(assignMesh(node));
       }
@@ -222,8 +220,10 @@ function zoomOn(pos, lookAt, zoom, name) {
     else {
       const mid = getScreenMiddle(screenMesh);
       video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
-      video.style.position = "absolute";
-
+      videoControls.style.transform = `translate(-50%,0) translate(${mid.x}px, 0)`;
+      videoControls.style.top = `${getScreenMiddle(screenMesh).y + video.clientHeight / 2}px`;
+      videoControls.style.width = `${video.clientWidth}px`;
+      
       if (name == "record") hits.classList.add("active");
       else if (name == "books") books.classList.add("active");
       else if (name == "calendar") calendar.classList.add("active");
@@ -322,10 +322,8 @@ function getScreenCorners(mesh, camera, canvas) {
 
   const projectionMatrix = camera.projectionMatrix;
   const modelViewMatrix = camera.matrixWorldInverse;
-  let minX = Infinity,
-    maxX = -Infinity;
-  let minY = Infinity,
-    maxY = -Infinity;
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
 
   points.forEach((p) => {
     p.applyMatrix4(modelViewMatrix); // Transformation en espace de la caméra
@@ -410,6 +408,7 @@ const video = document.getElementById("video");
 // video.style.width = `${400 * scaleFactor}px`;
 video.style.height = `${250 * scaleFactor}px`;
 
+
 window.addEventListener("resize", () => {
   w = window.innerWidth;
   h = window.innerHeight;
@@ -423,7 +422,6 @@ window.addEventListener("resize", () => {
 
   camera.zoom = currentCameraZoom * scaleFactor;
 
-  // video.style.width = `${400 * scaleFactor}px`;
   video.style.height = `${250 * scaleFactor}px`;
 
   if (zoomInfos[3] == "screen") {
@@ -435,7 +433,9 @@ window.addEventListener("resize", () => {
 
   const mid = getScreenMiddle(screenMesh);
   video.style.transform = `translate(-50%, -50%) translate(${mid.x}px, ${mid.y}px)`;
-  video.style.position = "absolute";
+  videoControls.style.transform = `translate(-50%, 0) translate(${mid.x}px, 0)`;
+  videoControls.style.top = `${mid.y + video.clientHeight / 2}px`;
+  videoControls.style.width = `${video.clientWidth}px`;
 
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
@@ -558,7 +558,7 @@ calendarButtons.forEach((button) => {
 });
 
 // -----------------------------------
-// ------- DISPLAY DESCRIPTION -------
+// ----- THUMBNAILS DESCRIPTION ------
 // -----------------------------------
 
 const thumbnails = document.querySelectorAll(".thumbnail");
@@ -610,9 +610,12 @@ thumbnailDescriptions.forEach((description) => {
 // --------- VIDEO TIMELINE ----------
 // -----------------------------------
 
+const videoControls = document.getElementById('videoControls');
 const playBtnVideo = document.getElementById('playBtnVideo');
 const pauseBtnVideo = document.getElementById('pauseBtnVideo');
 const progressBarVideo = document.getElementById('progressBarVideo');
+
+console.log(video.style.width)
 
 playBtnVideo.addEventListener('click', () => {
   video.play();
@@ -734,7 +737,6 @@ function animate() {
     velocity *= 0.95;
   }
   rabbits.forEach(rabbit => wave(rabbit));
-  // console.log(rabbit)
 
   if (Math.abs(velocity) < VELOCITY_THRESHOLD) velocity = 0;
   requestAnimationFrame(animate);

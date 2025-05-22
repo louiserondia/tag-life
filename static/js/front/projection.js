@@ -223,7 +223,7 @@ function zoomOn(pos, lookAt, zoom, name) {
       videoControls.style.transform = `translate(-50%,0) translate(${mid.x}px, 0)`;
       videoControls.style.top = `${getScreenMiddle(screenMesh).y + video.clientHeight / 2}px`;
       videoControls.style.width = `${video.clientWidth}px`;
-      
+
       if (name == "record") hits.classList.add("active");
       else if (name == "books") books.classList.add("active");
       else if (name == "calendar") calendar.classList.add("active");
@@ -382,7 +382,7 @@ function turn(e) {
 
   if (!scheduled) {
     scheduled = true;
-    setTimeout(function () {
+    setTimeout(() => {
       scheduled = false;
       const deltaX = e.clientX - prevMousePosX;
       velocity = -deltaX * 0.0015;
@@ -405,9 +405,8 @@ window.addEventListener("touchmove", (e) => turn(e.touches[0]));
 // -----------------------------------
 
 const video = document.getElementById("video");
-// video.style.width = `${400 * scaleFactor}px`;
 video.style.height = `${250 * scaleFactor}px`;
-
+video.currentTime = 0;
 
 window.addEventListener("resize", () => {
   w = window.innerWidth;
@@ -594,8 +593,13 @@ thumbnails.forEach((thumbnail) => {
         "/static/videos/" + thumbnail.id + ".mp4"
       );
       video.load();
+      video.pause();
       video.currentTime = 0;
       progressBarVideo.value = 0;
+
+      video.addEventListener('loadedmetadata', () => {
+        videoControls.style.width = `${video.clientWidth}px`;
+      }, { once: true });
     }
   });
 });
@@ -607,36 +611,74 @@ thumbnailDescriptions.forEach((description) => {
 });
 
 // -----------------------------------
+// --------- AUDIO TIMELINE ----------
+// -----------------------------------
+
+const progressBarsAudio = document.querySelectorAll('.progress-bar-audio');
+
+progressBarsAudio.forEach((bar) => {
+  const parent = bar.parentElement; 
+  const audio = parent.querySelector('audio');
+  const play = parent.querySelector('.play-audio');
+  
+  play.addEventListener('click', () => {
+    if (audio.paused) audio.play();
+    else audio.pause();
+  });
+  
+  bar.addEventListener('click', (e) => {
+    const rect = bar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = clickX / rect.width;
+    const time = ratio * audio.duration;
+    audio.currentTime = time;
+  });
+  
+  // Mettre à jour la barre quand l'audio joue
+  audio.addEventListener('timeupdate', () => {
+    if (!isNaN(audio.duration) && !isSeeking) {
+      const value = (audio.currentTime / audio.duration) * 100;
+      bar.value = value;
+    }
+  });
+  
+});
+
+// -----------------------------------
 // --------- VIDEO TIMELINE ----------
 // -----------------------------------
 
 const videoControls = document.getElementById('videoControls');
-const playBtnVideo = document.getElementById('playBtnVideo');
-const pauseBtnVideo = document.getElementById('pauseBtnVideo');
 const progressBarVideo = document.getElementById('progressBarVideo');
+let isSeeking = false; // isSeeking permet de pas avoir de glitch quand on met a jour currentTime
 
-console.log(video.style.width)
-
-playBtnVideo.addEventListener('click', () => {
-  video.play();
-});
-
-pauseBtnVideo.addEventListener('click', () => {
-  video.pause();
+video.addEventListener('click', () => {
+  if (video.paused) video.play();
+  else video.pause();
 });
 
 // Mettre à jour la barre quand la vidéo joue
 video.addEventListener('timeupdate', () => {
-  const value = (video.currentTime / video.duration) * 100;
-  progressBarVideo.value = value;
+  if (!isNaN(video.duration) && !isSeeking) {
+    const value = (video.currentTime / video.duration) * 100;
+    progressBarVideo.value = value;
+  }
 });
 
 // Quand on clique sur la barre
-progressBarVideo.addEventListener('input', () => {
-  const time = (progressBarVideo.value / 100) * video.duration;
+progressBarVideo.addEventListener('click', (e) => {
+  isSeeking = true;
+  const rect = progressBarVideo.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const ratio = clickX / rect.width;
+  const time = ratio * video.duration;
   video.currentTime = time;
+  progressBarVideo.value = time / video.duration * 100;
 });
 
+progressBarVideo.addEventListener('change', () => {
+  isSeeking = false;
+});
 
 
 // -----------------------------------
@@ -650,12 +692,17 @@ function toggleAudioDescription(target) {
     if (r != target) r.classList.remove("active");
   });
   target.classList.toggle("active");
+  document.querySelectorAll('audio').forEach((audio) => {
+    audio.pause();
+  });
 }
 
 const hitsRows = document.querySelectorAll(".hits-row");
 hitsRows.forEach((r) => {
   r.addEventListener("click", (e) => {
-    toggleAudioDescription(e.target);
+    if (!e.target.classList.contains('progress-bar-audio')
+      && !e.target.classList.contains('play-audio'))
+      toggleAudioDescription(e.target);
   });
 });
 

@@ -23,23 +23,22 @@ img {
     opacity: 0;
     visibility: hidden;
     transition: opacity .3s ease, visibility .3s ease;
-    
+
     #videoContainer {
 
         video {
             position: absolute;
             z-index: -1;
         }
-        
+
         video::-webkit-media-controls-panel {
             background-image: none !important;
             filter: brightness(0.4);
         }
-        
+
         #videoControls {
             position: absolute;
-            display: flex;
-            flex-direction: column;
+
             #progressBarVideo {
                 width: 100%;
             }
@@ -269,32 +268,23 @@ img {
                     background-size: cover;
                     background-position: center;
 
-                    div {
+                    p {
+                        margin: 0;
+                        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+                        font-size: 0.9rem;
+                        line-height: 120%;
+                        text-decoration: none;
+                        color: black;
+                    }
 
-                        p,
-                        a {
-                            margin: 0;
-                            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-                            font-size: 0.9rem;
-                            line-height: 120%;
-                            text-decoration: none;
-                            color: black;
-                        }
-
-                        a {
-                            width: fit-content;
-                            height: 1.5rem;
-
-                            display: none;
-                            opacity: 0;
-                            cursor: pointer;
-                            text-decoration: none;
-                            margin: auto 0 0 0;
+                    .timeline-audio {
+                        display: flex;
+                        flex-direction: row;
+                        input {
+                            width: 100%;
                         }
                     }
                 }
-
-
             }
 
             .hits-right {
@@ -325,18 +315,6 @@ img {
                     margin-bottom: 0.5rem;
                     opacity: 1;
                     gap: 1rem;
-
-
-                    div {
-                        display: flex;
-                        flex-direction: column;
-
-                        a {
-                            display: inline;
-                            opacity: 1;
-
-                        }
-                    }
                 }
             }
 

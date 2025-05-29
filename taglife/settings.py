@@ -159,6 +159,7 @@ CONTENT_SECURITY_POLICY = {
             "'unsafe-eval'",
             'https://www.youtube.com',
             'https://www.gstatic.com',
+            'https://unpkg.com',
         ),
         'style-src': ("'self'", "'unsafe-inline'"),
     }

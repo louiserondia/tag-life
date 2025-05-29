@@ -1,0 +1,466 @@
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#screenPresentation {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#screenPresentation #videoContainer video {
+  position: absolute;
+  z-index: -1;
+}
+#screenPresentation #videoContainer video::-webkit-media-controls-panel {
+  background-image: none !important;
+  filter: brightness(0.4);
+}
+#screenPresentation #videoContainer #videoControls {
+  position: absolute;
+  display: flex;
+}
+#screenPresentation #videoContainer #videoControls .play-video {
+  margin: 0.5rem 0;
+  font-size: x-large;
+  cursor: pointer;
+  padding-bottom: 0.2rem;
+  line-height: 100%;
+  transform: scaleX(1.5);
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+}
+#screenPresentation #videoContainer #videoControls #progressBarVideo {
+  width: 100%;
+}
+#screenPresentation #description {
+  width: 50%;
+  height: 80%;
+  max-width: 315px;
+  display: flex;
+  justify-content: center;
+  margin: auto 1rem auto auto;
+  background: rgba(236, 236, 236, 0.75);
+  border-radius: 15px;
+}
+#screenPresentation #description #thumbnailsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem;
+  overflow-y: auto;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnail {
+  width: 100%;
+  height: 140px;
+  min-height: 140px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnail img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 10px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnail p {
+  width: 75%;
+  position: absolute;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  font-size: xx-large;
+  font-weight: bold;
+  color: transparent;
+  text-align: center;
+  -webkit-text-stroke: 2px white;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnail.hidden {
+  display: none;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnailDescription {
+  display: none;
+  opacity: 0;
+  color: white;
+  background-color: rgba(219, 130, 47, 0.5);
+  border-radius: 5px;
+  transition: opacity 0.3s ease-in-out;
+  padding: 1rem;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnailDescription h4 {
+  font-family: "Old English Text MT";
+  font-size: xx-large;
+  margin: 0;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnailDescription p {
+  margin: 0.5rem 0;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 0.9rem;
+  line-height: 120%;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnailDescription p::first-letter {
+  font-family: "Old English Text MT";
+  font-size: xx-large;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnailDescription.show {
+  display: block;
+  opacity: 1;
+}
+#screenPresentation #description #thumbnailsContainer .thumbnailDescription.dark-mode {
+  background-color: rgba(30, 20, 160, 0.5);
+}
+
+@media (max-width: 801px) {
+  #screenPresentation {
+    flex-direction: column !important;
+  }
+  #screenPresentation #description {
+    width: 80%;
+    height: 45%;
+    max-width: 400px;
+    max-height: 225px;
+    top: auto;
+    bottom: 0;
+    margin: auto auto 1rem auto;
+  }
+  #screenPresentation #description #thumbnailsContainer {
+    margin: 1rem;
+    overflow-y: auto;
+  }
+  #screenPresentation #description #thumbnailsContainer .thumbnail {
+    min-height: 10rem;
+  }
+  #screenPresentation #description #thumbnailsContainer .thumbnail p {
+    font-size: 1.3rem;
+    color: white;
+    width: 90%;
+    -webkit-text-stroke: 0px;
+  }
+  #screenPresentation #description #thumbnailsContainer .thumbnail img {
+    height: 10rem;
+  }
+  #screenPresentation #description #thumbnailsContainer .thumbnailDescription.show {
+    display: block;
+    opacity: 1;
+    width: 90%;
+  }
+}
+#screenPresentation.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#hits {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1;
+}
+#hits #hitsContainer {
+  width: 100%;
+  height: 66vh;
+  max-width: 750px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 4rem;
+  padding: 1rem;
+  overflow-y: auto;
+  border-radius: 10px;
+  background-color: rgba(236, 236, 236, 0.75);
+}
+#hits #hitsContainer .hits-row {
+  border-radius: 10px;
+  background-color: rgba(236, 236, 236, 0.75);
+  display: flex;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  justify-content: space-between;
+  flex-direction: row;
+}
+#hits #hitsContainer .hits-row .hits-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+#hits #hitsContainer .hits-row .hits-left .audio-title {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+#hits #hitsContainer .hits-row .hits-left .audio-title p {
+  font-weight: 600;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  margin: 0;
+}
+#hits #hitsContainer .hits-row .hits-left .audio-description {
+  display: none;
+  opacity: 0;
+  margin: 0 -1.5rem -0.5rem -1.5rem;
+  padding: 0 1.5rem;
+  background-size: cover;
+  background-position: center;
+}
+#hits #hitsContainer .hits-row .hits-left .audio-description p {
+  margin: 0;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 0.9rem;
+  line-height: 120%;
+  text-decoration: none;
+  color: black;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+}
+#hits #hitsContainer .hits-row .hits-left .audio-description .play-audio {
+  font-size: x-large;
+  cursor: pointer;
+  padding-bottom: 0.2rem;
+  line-height: 100%;
+  transform: scaleX(1.5);
+}
+#hits #hitsContainer .hits-row .hits-left .audio-description .timeline-audio {
+  display: flex;
+  flex-direction: row;
+}
+#hits #hitsContainer .hits-row .hits-left .audio-description .timeline-audio input {
+  width: 100%;
+}
+#hits #hitsContainer .hits-row .hits-right {
+  display: none;
+  opacity: 0;
+}
+#hits #hitsContainer .hits-row .hits-right img {
+  max-height: 15rem;
+  min-width: 15rem;
+  display: none;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+}
+#hits #hitsContainer .hits-row.active .hits-left .audio-description {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  opacity: 1;
+  gap: 1rem;
+}
+#hits #hitsContainer .hits-row.active .hits-right {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  opacity: 1;
+}
+#hits #hitsContainer .hits-row.active .hits-right img {
+  display: block;
+}
+@media (max-width: 600px) {
+  #hits #hitsContainer .hits-row {
+    flex-direction: column;
+  }
+  #hits #hitsContainer .hits-row .hits-right img {
+    min-width: 0;
+    margin: 0 0 0.5rem 0;
+  }
+}
+
+#hits.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#hits.dark-mode p {
+  color: black;
+}
+
+#calendar,
+#books {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 2;
+}
+#calendar #calendarContainer,
+#calendar #booksContainer,
+#books #calendarContainer,
+#books #booksContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 1rem;
+  flex: 1 1 auto;
+  padding: 1rem;
+  background-color: rgba(236, 236, 236, 0.75);
+  border-radius: 10px;
+}
+#calendar #calendarContainer #calendarImgContainer,
+#calendar #calendarContainer #booksImgContainer,
+#calendar #booksContainer #calendarImgContainer,
+#calendar #booksContainer #booksImgContainer,
+#books #calendarContainer #calendarImgContainer,
+#books #calendarContainer #booksImgContainer,
+#books #booksContainer #calendarImgContainer,
+#books #booksContainer #booksImgContainer {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#calendar #calendarContainer #calendarImgContainer p,
+#calendar #calendarContainer #booksImgContainer p,
+#calendar #booksContainer #calendarImgContainer p,
+#calendar #booksContainer #booksImgContainer p,
+#books #calendarContainer #calendarImgContainer p,
+#books #calendarContainer #booksImgContainer p,
+#books #booksContainer #calendarImgContainer p,
+#books #booksContainer #booksImgContainer p {
+  color: black;
+  margin: 0;
+  font-size: large;
+  font-weight: bold;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+}
+#calendar #calendarContainer #calendarImgContainer img,
+#calendar #calendarContainer #booksImgContainer img,
+#calendar #booksContainer #calendarImgContainer img,
+#calendar #booksContainer #booksImgContainer img,
+#books #calendarContainer #calendarImgContainer img,
+#books #calendarContainer #booksImgContainer img,
+#books #booksContainer #calendarImgContainer img,
+#books #booksContainer #booksImgContainer img {
+  max-height: 70vh;
+  max-width: 80vw;
+  border-radius: 10px;
+}
+#calendar #calendarContainer #calendarButtons,
+#calendar #calendarContainer #booksButtons,
+#calendar #booksContainer #calendarButtons,
+#calendar #booksContainer #booksButtons,
+#books #calendarContainer #calendarButtons,
+#books #calendarContainer #booksButtons,
+#books #booksContainer #calendarButtons,
+#books #booksContainer #booksButtons {
+  max-height: 5rem;
+  display: flex;
+  justify-content: space-around;
+}
+#calendar #calendarContainer #calendarButtons .calendar-button,
+#calendar #calendarContainer #calendarButtons .books-button,
+#calendar #calendarContainer #booksButtons .calendar-button,
+#calendar #calendarContainer #booksButtons .books-button,
+#calendar #booksContainer #calendarButtons .calendar-button,
+#calendar #booksContainer #calendarButtons .books-button,
+#calendar #booksContainer #booksButtons .calendar-button,
+#calendar #booksContainer #booksButtons .books-button,
+#books #calendarContainer #calendarButtons .calendar-button,
+#books #calendarContainer #calendarButtons .books-button,
+#books #calendarContainer #booksButtons .calendar-button,
+#books #calendarContainer #booksButtons .books-button,
+#books #booksContainer #calendarButtons .calendar-button,
+#books #booksContainer #calendarButtons .books-button,
+#books #booksContainer #booksButtons .calendar-button,
+#books #booksContainer #booksButtons .books-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#calendar #calendarContainer #calendarButtons .calendar-button .arrow-button,
+#calendar #calendarContainer #calendarButtons .books-button .arrow-button,
+#calendar #calendarContainer #booksButtons .calendar-button .arrow-button,
+#calendar #calendarContainer #booksButtons .books-button .arrow-button,
+#calendar #booksContainer #calendarButtons .calendar-button .arrow-button,
+#calendar #booksContainer #calendarButtons .books-button .arrow-button,
+#calendar #booksContainer #booksButtons .calendar-button .arrow-button,
+#calendar #booksContainer #booksButtons .books-button .arrow-button,
+#books #calendarContainer #calendarButtons .calendar-button .arrow-button,
+#books #calendarContainer #calendarButtons .books-button .arrow-button,
+#books #calendarContainer #booksButtons .calendar-button .arrow-button,
+#books #calendarContainer #booksButtons .books-button .arrow-button,
+#books #booksContainer #calendarButtons .calendar-button .arrow-button,
+#books #booksContainer #calendarButtons .books-button .arrow-button,
+#books #booksContainer #booksButtons .calendar-button .arrow-button,
+#books #booksContainer #booksButtons .books-button .arrow-button {
+  height: 2rem;
+  cursor: pointer;
+  font-size: xx-large;
+}
+
+.arrow-description {
+  height: 4rem;
+  width: -moz-max-content;
+  width: max-content;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  font-size: large;
+  pointer-events: none;
+  margin: 0;
+}
+
+#calendar.active,
+#books.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 500px) {
+  #calendar #calendarContainer,
+  #calendar #booksContainer,
+  #books #calendarContainer,
+  #books #booksContainer {
+    margin: 1.5rem;
+  }
+}
+#hitsContainer::-webkit-scrollbar,
+#thumbnailsContainer::-webkit-scrollbar {
+  display: none;
+}
+
+#hitsContainer,
+#thumbnailsContainer {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}/*# sourceMappingURL=projection.css.map */

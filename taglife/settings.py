@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
     'django_permissions_policy.PermissionsPolicyMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 CSRF_COOKIE_SAMESITE = 'None'       # Allow cross-site sending
@@ -132,6 +133,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
     # BASE_DIR / "node_modules"
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

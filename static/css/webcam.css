@@ -1,0 +1,10 @@
+#webcamContainer {
+  justify-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#webcamContainer img {
+  max-width: 75vw;
+}/*# sourceMappingURL=webcam.css.map */

@@ -1,11 +1,11 @@
 myenv
+venv
 db.sqlite3
 apps/images/migrations
 apps/main/migrations
 apps/main/__init__.py
 apps/__init__.py
 static/css/*.css.map
-static/css/*.css
 node_modules
 old3js.js
 apps/main/static/js/libs

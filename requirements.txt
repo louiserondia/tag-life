@@ -4,3 +4,4 @@ django-csp==4.0
 gunicorn==23.0.0
 setuptools==80.8.0
 django-permissions-policy==4.26.0
+whitenoise==6.9.0

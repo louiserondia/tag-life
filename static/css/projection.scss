@@ -38,6 +38,23 @@ img {
 
         #videoControls {
             position: absolute;
+            display: flex;
+
+            .play-video {
+                margin: 0.5rem 0;
+                font-size: x-large;
+                cursor: pointer;
+                padding-bottom: 0.2rem;
+                line-height: 100%;
+                transform: scaleX(1.5);
+
+                user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+            }
 
             #progressBarVideo {
                 width: 100%;
@@ -275,11 +292,27 @@ img {
                         line-height: 120%;
                         text-decoration: none;
                         color: black;
+
+                        user-select: none;
+                        -moz-user-select: none;
+                        -ms-user-select: none;
+                        -webkit-touch-callout: none;
+                        -webkit-user-select: none;
+                        -khtml-user-select: none;
+                    }
+
+                    .play-audio {
+                        font-size: x-large;
+                        cursor: pointer;
+                        padding-bottom: 0.2rem;
+                        line-height: 100%;
+                        transform: scaleX(1.5);
                     }
 
                     .timeline-audio {
                         display: flex;
                         flex-direction: row;
+
                         input {
                             width: 100%;
                         }

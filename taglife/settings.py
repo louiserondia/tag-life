@@ -15,7 +15,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
- 
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -52,8 +52,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'csp.middleware.CSPMiddleware'
+    'csp.middleware.CSPMiddleware',
+    'django_permissions_policy.PermissionsPolicyMiddleware',
 ]
+
+CSRF_COOKIE_SAMESITE = 'None'       # Allow cross-site sending
+CSRF_COOKIE_SECURE = True           # Only send cookie over HTTPS
 
 ROOT_URLCONF = 'taglife.urls'
 
@@ -125,8 +129,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static", 
-     # BASE_DIR / "node_modules"
+    BASE_DIR / "static",
+    # BASE_DIR / "node_modules"
 ]
 
 # Default primary key field type
@@ -137,19 +141,43 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'connect-src': ("'self'",),
+        'frame-src': (
+            'https://www.mixcloud.com',
+            'https://player-widget.mixcloud.com',
+        ),
+        'img-src': ("'self'", 'data:'),
+        'script-src': (
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            'https://www.youtube.com',
+            'https://www.gstatic.com',
+        ),
+        'style-src': ("'self'", "'unsafe-inline'"),
+    }
+}
 
-CONTENT_SECURITY_POLICY = {'DIRECTIVES': {'connect-src': ("'self'",),
-                'default-src': ("'self'",),
-                'frame-src': ('https://www.mixcloud.com',
-                              'https://player-widget.mixcloud.com'),
-                'img-src': ("'self'", 'data:'),
-                'script-src': ("'self'",
-                               "'unsafe-inline'",
-                               "'unsafe-eval'",
-                               'https://www.youtube.com',
-                               'https://www.gstatic.com'),
-                'style-src': ("'self'", "'unsafe-inline'")}}
-
+PERMISSIONS_POLICY = {
+    "accelerometer": [],
+    "ambient-light-sensor": [],
+    "autoplay": [],
+    "camera": [],
+    "display-capture": [],
+    "encrypted-media": [],
+    "fullscreen": [],
+    "geolocation": [],
+    "gyroscope": [],
+    "interest-cohort": [],
+    "magnetometer": [],
+    "microphone": [],
+    "midi": [],
+    "payment": [],
+    "usb": [],
+}
 
 LOGGING = {
     'version': 1,
@@ -165,4 +193,3 @@ LOGGING = {
         'level': 'ERROR',
     },
 }
-

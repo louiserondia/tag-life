@@ -3,3 +3,4 @@ three==0.8.0
 django-csp==4.0
 gunicorn==0.17.0
 setuptools==80.8.0
+django-permissions-policy==4.26.0

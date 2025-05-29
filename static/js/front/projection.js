@@ -228,7 +228,14 @@ function zoomOn(pos, lookAt, zoom, name) {
       else if (name == "books") books.classList.add("active");
       else if (name == "calendar") calendar.classList.add("active");
       else if (name == "screen") screenPresBox.classList.add("active");
-      else if (name == "dezoom") video.pause();
+      else if (name == "dezoom") {
+        video.pause();
+        document.querySelectorAll('audio').forEach((audio) => {
+          audio.pause();
+          changePlayButton(audio, audio.parentElement.querySelector('.play-audio'));
+        });
+        changePlayButton(video, playVideo);
+      }
       isZooming = false;
     }
   }
@@ -534,9 +541,13 @@ document.querySelectorAll('.double-arrow').forEach(button => {
 // ------- CALENDAR CAROUSEL ---------
 // -----------------------------------
 
+const today = new Date();
+
 const calendarPagesCount = 12;
 const calendarImg = document.getElementById("calendarImg");
-let calendarPage = getBookPage(calendarImg.src);
+let calendarPage = today.getMonth();
+
+calendarImg.setAttribute("src", `/static/img/calendar/${calendarPage}.jpg`);
 
 const calendarPrev = document.getElementById("calendarPrev");
 const calendarNext = document.getElementById("calendarNext");
@@ -594,6 +605,7 @@ thumbnails.forEach((thumbnail) => {
       );
       video.load();
       video.pause();
+      changePlayButton(video, playVideo);
       video.currentTime = 0;
       progressBarVideo.value = 0;
 
@@ -611,51 +623,27 @@ thumbnailDescriptions.forEach((description) => {
 });
 
 // -----------------------------------
-// --------- AUDIO TIMELINE ----------
-// -----------------------------------
-
-const progressBarsAudio = document.querySelectorAll('.progress-bar-audio');
-
-progressBarsAudio.forEach((bar) => {
-  const parent = bar.parentElement; 
-  const audio = parent.querySelector('audio');
-  const play = parent.querySelector('.play-audio');
-  
-  play.addEventListener('click', () => {
-    if (audio.paused) audio.play();
-    else audio.pause();
-  });
-  
-  bar.addEventListener('click', (e) => {
-    const rect = bar.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const ratio = clickX / rect.width;
-    const time = ratio * audio.duration;
-    audio.currentTime = time;
-  });
-  
-  // Mettre à jour la barre quand l'audio joue
-  audio.addEventListener('timeupdate', () => {
-    if (!isNaN(audio.duration) && !isSeeking) {
-      const value = (audio.currentTime / audio.duration) * 100;
-      bar.value = value;
-    }
-  });
-  
-});
-
-// -----------------------------------
 // --------- VIDEO TIMELINE ----------
 // -----------------------------------
 
 const videoControls = document.getElementById('videoControls');
 const progressBarVideo = document.getElementById('progressBarVideo');
-let isSeeking = false; // isSeeking permet de pas avoir de glitch quand on met a jour currentTime
+const playVideo = videoControls.querySelector('.play-video');
 
-video.addEventListener('click', () => {
-  if (video.paused) video.play();
-  else video.pause();
+function changePlayButton(file, button) {
+  if (file.paused) button.textContent = '⏵';
+  else button.textContent = '⏸';
+}
+
+[playVideo, video].forEach(v => {
+  v.addEventListener('click', () => {
+    if (video.paused) video.play();
+    else video.pause();
+    changePlayButton(video, playVideo);
+  });
 });
+
+let isSeeking = false; // isSeeking permet de pas avoir de glitch quand on met a jour currentTime
 
 // Mettre à jour la barre quand la vidéo joue
 video.addEventListener('timeupdate', () => {
@@ -680,6 +668,40 @@ progressBarVideo.addEventListener('change', () => {
   isSeeking = false;
 });
 
+// -----------------------------------
+// --------- AUDIO TIMELINE ----------
+// -----------------------------------
+
+const progressBarsAudio = document.querySelectorAll('.progress-bar-audio');
+
+progressBarsAudio.forEach((bar) => {
+  const parent = bar.parentElement;
+  const audio = parent.querySelector('audio');
+  const playAudio = parent.querySelector('.play-audio');
+
+  playAudio.addEventListener('click', () => {
+    if (audio.paused) audio.play();
+    else audio.pause();
+    changePlayButton(audio, playAudio);
+  });
+
+  bar.addEventListener('click', (e) => {
+    const rect = bar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = clickX / rect.width;
+    const time = ratio * audio.duration;
+    audio.currentTime = time;
+  });
+
+  // Mettre à jour la barre quand l'audio joue
+  audio.addEventListener('timeupdate', () => {
+    if (!isNaN(audio.duration) && !isSeeking) {
+      const value = (audio.currentTime / audio.duration) * 100;
+      bar.value = value;
+    }
+  });
+
+});
 
 // -----------------------------------
 // ---- DISPLAY AUDIO DESCRIPTION ----
@@ -694,6 +716,7 @@ function toggleAudioDescription(target) {
   target.classList.toggle("active");
   document.querySelectorAll('audio').forEach((audio) => {
     audio.pause();
+    changePlayButton(audio, audio.parentElement.querySelector('.play-audio'));
   });
 }
 

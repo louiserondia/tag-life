@@ -23,7 +23,7 @@ def add_tag_list_to_image_list(request: HttpRequest):
     dico = parse_json_from_file('media/images.json')
     for image in images:
         for tag in tags:
-            if not tag in dico[image]:
+            if image in dico and not tag in dico[image]:
                 dico[image].append(tag)
     write_to_json_file(dico, 'media/images.json')
     return JsonResponse({'images': images, 'tags': tags})
